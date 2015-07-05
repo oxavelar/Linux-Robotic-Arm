@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <stdint.h>
+#include "HighLatencyGPIO/GPIO.hh"
 
 class QuadratureEncoder
 {
@@ -13,9 +14,18 @@ class QuadratureEncoder
         void Stop(void);
 
     private:
-        /* Both pulse train inputs */
-        uint32_t channel_a;
-        uint32_t channel_b;
+        /* Pulse train inputs from GPIO class */
+        GPIO *channel_a, *channel_b, *channel_z;
+        
+        /* GPIO Interrupt routine user code */
+        static void ISR_ChannelA(void);
+        static void ISR_ChannelB(void);
+        static void ISR_ChannelZ(void);
+
+        /* Callback references to be used by GPIO class */
+        std::function<void(GPIO::Value)> _channel_a;
+        std::function<void(GPIO::Value)> _channel_b;
+        std::function<void(GPIO::Value)> _channel_z;
 
         /* Local counter variables */
         uint32_t counter_val;

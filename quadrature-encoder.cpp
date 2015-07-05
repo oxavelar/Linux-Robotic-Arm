@@ -4,7 +4,7 @@
  * for quadrature encoders.
  *
  * References:
- * http://stackoverflow.com/questions/19257624/interrupt-handling-and-user-space-notification
+ * https://github.com/tweej/HighLatencyGPIO
  *
  */
 
@@ -12,29 +12,30 @@
 #include <sstream>
 #include <stdlib.h>
 #include <string>
+#include "HighLatencyGPIO/GPIO.hh"
 #include "quadrature-encoder.h"
 
 QuadratureEncoder::QuadratureEncoder(void)
 {
-    int error;
-    char cmd[];
+    /* Register our local GPIO callbacks to use for SW interrupts */
+    _channel_a = std::bind(&ISR_ChannelA);
+    _channel_b = std::bind(&ISR_ChannelB);
+    _channel_z = std::bind(&ISR_ChannelZ);
     
-    /* Set up the GPIO driver direction */
-    echo in > /sys/class/gpio/gpio23/direction
+    /* Initialize channel A and channel B counters */
+    channel_a = new GPIO(15, GPIO::Edge::BOTH, _channel_a);
+    channel_b = new GPIO(16, GPIO::Edge::BOTH, _channel_b);
+    channel_z = new GPIO(16, GPIO::Edge::BOTH, _channel_z);
+    
 
-    /* Both rising and falling edge support for user-mode interrupts */
-    error = system("echo " + "0" + " > /sys/class/gpio/export");
-    
-    if(error) {
-        std::cout << "ERROR: Unable to register GPIO pins" << std::endl;
-        exit(EXIT_FAILURE);
-    } else {
-        std::cout << "INFO: Registered a new quadrature encoder driver (pin";
-        std::cout << channel_a;
-        std::cout << " : pin";
-        std::cout << channel_b;
-        std::cout << ")" << std::endl;
-    }
+
+    /*
+    std::cout << "INFO: Registered a new quadrature encoder driver (pin";
+    std::cout << channel_a;
+    std::cout << " : pin";
+    std::cout << channel_b;
+    std::cout << ")" << std::endl;
+    */
 }
 
 QuadratureEncoder::~QuadratureEncoder(void)
@@ -50,4 +51,20 @@ void QuadratureEncoder::Start(void)
 void QuadratureEncoder::Stop(void)
 {
     
+}
+
+/* Internal Quadrature Encoder ISR Handlers */
+void QuadratureEncoder::ISR_ChannelA(void)
+{
+
+}
+
+void QuadratureEncoder::ISR_ChannelB(void)
+{
+
+}
+
+void QuadratureEncoder::ISR_ChannelZ(void)
+{
+
 }
