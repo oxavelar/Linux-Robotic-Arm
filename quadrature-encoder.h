@@ -15,7 +15,7 @@ class QuadratureEncoder
 
     private:
         /* Pulse train inputs from GPIO class */
-        GPIO *channel_a, *channel_b, *channel_z;
+        GPIO *_gpio_a, *_gpio_b, *_gpio_z;
         
         /* GPIO Interrupt routine user code */
         static void ISR_ChannelA(void);

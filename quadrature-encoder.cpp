@@ -15,56 +15,59 @@
 #include "HighLatencyGPIO/GPIO.hh"
 #include "quadrature-encoder.h"
 
+
 QuadratureEncoder::QuadratureEncoder(void)
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    
     /* Register our local GPIO callbacks to use for SW interrupts */
     _channel_a = std::bind(&ISR_ChannelA);
     _channel_b = std::bind(&ISR_ChannelB);
     _channel_z = std::bind(&ISR_ChannelZ);
     
     /* Initialize channel A and channel B counters */
-    channel_a = new GPIO(15, GPIO::Edge::BOTH, _channel_a);
-    channel_b = new GPIO(16, GPIO::Edge::BOTH, _channel_b);
-    channel_z = new GPIO(16, GPIO::Edge::BOTH, _channel_z);
+    _gpio_a = new GPIO(CONFIG_GPIO_PIN_A, GPIO::Edge::BOTH, _channel_a);
+    _gpio_b = new GPIO(CONFIG_GPIO_PIN_B, GPIO::Edge::BOTH, _channel_b);
+    _gpio_z = new GPIO(CONFIG_GPIO_PIN_Z, GPIO::Edge::BOTH, _channel_z);
     
 
-
-    /*
-    std::cout << "INFO: Registered a new quadrature encoder driver (pin";
-    std::cout << channel_a;
-    std::cout << " : pin";
-    std::cout << channel_b;
+    /* Useful information to be printed regarding set-up */
+    std::cout << "INFO: Using a quadrature encoder driver @ (pinA=";
+    std::cout << CONFIG_GPIO_PIN_A;
+    std::cout << " pinB=";
+    std::cout << CONFIG_GPIO_PIN_B;
+    std::cout << " pinZ=";
+    std::cout << CONFIG_GPIO_PIN_Z;
     std::cout << ")" << std::endl;
-    */
 }
 
 QuadratureEncoder::~QuadratureEncoder(void)
 {
-    return;
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void QuadratureEncoder::Start(void)
 {
-    
+    std::cout << __PRETTY_FUNCTION__ << std::endl;    
 }
 
 void QuadratureEncoder::Stop(void)
 {
-    
+    std::cout << __PRETTY_FUNCTION__ << std::endl;    
 }
 
 /* Internal Quadrature Encoder ISR Handlers */
 void QuadratureEncoder::ISR_ChannelA(void)
 {
-
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void QuadratureEncoder::ISR_ChannelB(void)
 {
-
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
 
 void QuadratureEncoder::ISR_ChannelZ(void)
 {
-
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
