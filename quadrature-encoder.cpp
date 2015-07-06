@@ -75,10 +75,19 @@ void QuadratureEncoder::ISR_ChannelZ(void)
 uint32_t QuadratureEncoder::GetPosition(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    uint32_t read_val;
-    
-    read_val = 0;
-
+    uint32_t read_val = _counter_val;
     return read_val;
 
+}
+
+void QuadratureEncoder::ResetPosition(void)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    _counter_val = 0;
+}
+
+bool QuadratureEncoder::GetDirection(void)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    return true;
 }

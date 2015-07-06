@@ -6,14 +6,16 @@
 class QuadratureEncoder
 {
     public:
-        QuadratureEncoder(void);
-        ~QuadratureEncoder(void);
+        virtual QuadratureEncoder(void);
+        virtual ~QuadratureEncoder(void);
 
         void Init(void);
         void Start(void);
         void Stop(void);
 
         uint32_t GetPosition(void);
+        void ResetPosition(void);
+        bool GetDirection(void);
 
     private:
         /* Pulse train inputs from GPIO class */
@@ -29,7 +31,7 @@ class QuadratureEncoder
         std::function<void(GPIO::Value)> _channel_b;
         std::function<void(GPIO::Value)> _channel_z;
 
-        /* Local counter variables */
-        uint32_t counter_val;
+        /* Local counter variable */
+        uint32_t _counter_val;
 
 };
