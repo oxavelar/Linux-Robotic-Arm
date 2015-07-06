@@ -43,6 +43,9 @@ QuadratureEncoder::QuadratureEncoder(void)
 QuadratureEncoder::~QuadratureEncoder(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
+    delete _gpio_a;
+    delete _gpio_b;
+    delete _gpio_z;
 }
 
 void QuadratureEncoder::Start(void)
@@ -72,7 +75,7 @@ void QuadratureEncoder::ISR_ChannelZ(void)
 }
 
 /* External API for the class */
-uint32_t QuadratureEncoder::GetPosition(void)
+int32_t QuadratureEncoder::GetPosition(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     uint32_t read_val = _counter_val;

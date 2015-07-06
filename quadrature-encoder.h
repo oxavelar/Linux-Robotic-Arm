@@ -6,14 +6,14 @@
 class QuadratureEncoder
 {
     public:
-        virtual QuadratureEncoder(void);
+        QuadratureEncoder(void);
         virtual ~QuadratureEncoder(void);
 
         void Init(void);
         void Start(void);
         void Stop(void);
 
-        uint32_t GetPosition(void);
+        int32_t GetPosition(void);
         void ResetPosition(void);
         bool GetDirection(void);
 
@@ -32,6 +32,6 @@ class QuadratureEncoder
         std::function<void(GPIO::Value)> _channel_z;
 
         /* Local counter variable */
-        uint32_t _counter_val;
+        int32_t _counter_val;
 
 };
