@@ -13,6 +13,8 @@ class QuadratureEncoder
         void Start(void);
         void Stop(void);
 
+        uint32_t GetPosition(void);
+
     private:
         /* Pulse train inputs from GPIO class */
         GPIO *_gpio_a, *_gpio_b, *_gpio_z;

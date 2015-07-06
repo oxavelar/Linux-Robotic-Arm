@@ -29,10 +29,9 @@ QuadratureEncoder::QuadratureEncoder(void)
     _gpio_a = new GPIO(CONFIG_GPIO_PIN_A, GPIO::Edge::BOTH, _channel_a);
     _gpio_b = new GPIO(CONFIG_GPIO_PIN_B, GPIO::Edge::BOTH, _channel_b);
     _gpio_z = new GPIO(CONFIG_GPIO_PIN_Z, GPIO::Edge::BOTH, _channel_z);
-    
 
     /* Useful information to be printed regarding set-up */
-    std::cout << "INFO: Using a quadrature encoder driver @ (pinA=";
+    std::cout << "INFO: Userspace quadrature encoder initialized @ (pinA=";
     std::cout << CONFIG_GPIO_PIN_A;
     std::cout << " pinB=";
     std::cout << CONFIG_GPIO_PIN_B;
@@ -70,4 +69,16 @@ void QuadratureEncoder::ISR_ChannelB(void)
 void QuadratureEncoder::ISR_ChannelZ(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
+}
+
+/* External API for the class */
+uint32_t QuadratureEncoder::GetPosition(void)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    uint32_t read_val;
+    
+    read_val = 0;
+
+    return read_val;
+
 }
