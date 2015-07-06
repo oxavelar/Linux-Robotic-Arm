@@ -12,8 +12,11 @@ OBJECTS += HighLatencyGPIO/GPIO.o
 
 CXXFLAGS += -DCONFIG_GPIO_PIN_A=15 -DCONFIG_GPIO_PIN_B=16 -DCONFIG_GPIO_PIN_Z=17
 
-all: $(SOURCES) $(OBJECTS)
+all: $(SOURCES) $(OBJECTS) HighLatencyGPIO/GPIO.cc
 	$(CC) $(CXXFLAGS) $(LDLIBS) $(OBJECTS) -o $(PROGRAM)
+
+HighLatencyGPIO/GPIO.cc:
+	git clone -q https://github.com/tweej/HighLatencyGPIO
 
 clean:
 	rm -rf $(PROGRAM) $(OBJECTS)
