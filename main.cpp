@@ -2,16 +2,18 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>
-#include "quadrature-encoder.h"
+#include "QuadratureEncoder.h"
 
-QuadratureEncoder *QE;
+QuadratureEncoder *QE0, *QE1;
 
 int main(int argc, char *argv[])
 {
-    QE = new QuadratureEncoder();
+    QE0 = new QuadratureEncoder();
+    QE1 = new QuadratureEncoder();
 
     for(;;) {
-        QE->GetPosition();
+        QE0->GetPosition();
+        QE1->GetPosition();
         usleep(200000);
     }
     

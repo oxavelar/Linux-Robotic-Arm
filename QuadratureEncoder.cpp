@@ -12,8 +12,7 @@
 #include <sstream>
 #include <stdlib.h>
 #include <string>
-#include "HighLatencyGPIO/GPIO.hh"
-#include "quadrature-encoder.h"
+#include "QuadratureEncoder.h"
 
 
 QuadratureEncoder::QuadratureEncoder(void)
@@ -26,6 +25,7 @@ QuadratureEncoder::QuadratureEncoder(void)
     _channel_z = std::bind(&ISR_ChannelZ);
     
     /* Initialize channel A and channel B counters */
+
     _gpio_a = new GPIO(CONFIG_GPIO_PIN_A, GPIO::Edge::BOTH, _channel_a);
     _gpio_b = new GPIO(CONFIG_GPIO_PIN_B, GPIO::Edge::BOTH, _channel_b);
     _gpio_z = new GPIO(CONFIG_GPIO_PIN_Z, GPIO::Edge::BOTH, _channel_z);
