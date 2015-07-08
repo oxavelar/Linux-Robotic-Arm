@@ -1,16 +1,17 @@
-PROGRAM := linux-quadrature-encoder.bin
+PROGRAM := linux-robotic-arm.bin
 
 CC = g++
 CXXFLAGS += -O2 -g -fPIC -Wall -pedantic -std=c++0x
 LDLIBS += -lpthread -lboost_system -lboost_filesystem
 
-SOURCES = main.cpp QuadratureEncoder.cpp
-OBJECTS = main.o QuadratureEncoder.o
+SOURCES = demo.cpp RoboticArm.cpp
+OBJECTS = demo.o RoboticArm.o
 
-SOURCES += HighLatencyGPIO/GPIO.cc
-OBJECTS += HighLatencyGPIO/GPIO.o
+SOURCES += HighLatencyGPIO/GPIO.cc \
+           Linux-Quadrature-Encoder/QuadratureEncoder.cpp \
 
-CXXFLAGS += -DCONFIG_GPIO_PIN_A=15 -DCONFIG_GPIO_PIN_B=16 -DCONFIG_GPIO_PIN_Z=17
+OBJECTS += HighLatencyGPIO/GPIO.o \
+           Linux-Quadrature-Encoder/QuadratureEncoder.o
 
 all: $(SOURCES) $(OBJECTS) HighLatencyGPIO/GPIO.cc
 	$(CC) $(CXXFLAGS) $(LDLIBS) $(OBJECTS) -o $(PROGRAM)

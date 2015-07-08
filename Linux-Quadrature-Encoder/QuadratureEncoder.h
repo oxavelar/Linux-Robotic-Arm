@@ -1,12 +1,12 @@
 #pragma once
 #include <iostream>
 #include <stdint.h>
-#include "HighLatencyGPIO/GPIO.hh"
+#include "../HighLatencyGPIO/GPIO.hh"
 
 class QuadratureEncoder
 {
     public:
-        QuadratureEncoder(void);
+        QuadratureEncoder(const uint8_t &pin_a, const uint8_t &pin_b);
         virtual ~QuadratureEncoder(void);
 
         void Init(void);

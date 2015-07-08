@@ -15,28 +15,28 @@
 #include "QuadratureEncoder.h"
 
 
-QuadratureEncoder::QuadratureEncoder(void)
+QuadratureEncoder::QuadratureEncoder(const uint8_t &pin_a, const uint8_t &pin_b)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
     /* Register our local GPIO callbacks to use for SW interrupts */
     _channel_a = std::bind(&ISR_ChannelA);
     _channel_b = std::bind(&ISR_ChannelB);
-    _channel_z = std::bind(&ISR_ChannelZ);
+    //_channel_z = std::bind(&ISR_ChannelZ);
     
     /* Initialize channel A and channel B counters */
 
-    _gpio_a = new GPIO(CONFIG_GPIO_PIN_A, GPIO::Edge::BOTH, _channel_a);
-    _gpio_b = new GPIO(CONFIG_GPIO_PIN_B, GPIO::Edge::BOTH, _channel_b);
-    _gpio_z = new GPIO(CONFIG_GPIO_PIN_Z, GPIO::Edge::BOTH, _channel_z);
+    _gpio_a = new GPIO(pin_a, GPIO::Edge::BOTH, _channel_a);
+    _gpio_b = new GPIO(pin_b, GPIO::Edge::BOTH, _channel_b);
+    //_gpio_z = new GPIO(CONFIG_GPIO_PIN_Z, GPIO::Edge::BOTH, _channel_z);
 
     /* Useful information to be printed regarding set-up */
     std::cout << "INFO: Userspace quadrature encoder initialized @ (pinA=";
-    std::cout << CONFIG_GPIO_PIN_A;
+    std::cout << pin_a;
     std::cout << " pinB=";
-    std::cout << CONFIG_GPIO_PIN_B;
-    std::cout << " pinZ=";
-    std::cout << CONFIG_GPIO_PIN_Z;
+    std::cout << pin_b;
+    //std::cout << " pinZ=";
+    //std::cout << pin_z;
     std::cout << ")" << std::endl;
 }
 
