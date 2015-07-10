@@ -6,7 +6,7 @@
 class QuadratureEncoder
 {
     public:
-        QuadratureEncoder(const uint8_t &pin_a, const uint8_t &pin_b);
+        QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_b);
         virtual ~QuadratureEncoder(void);
 
         void Init(void);
@@ -22,9 +22,9 @@ class QuadratureEncoder
         GPIO *_gpio_a, *_gpio_b, *_gpio_z;
         
         /* GPIO Interrupt routine user code */
-        static void ISR_ChannelA(void);
-        static void ISR_ChannelB(void);
-        static void ISR_ChannelZ(void);
+        void ISR_ChannelA(void);
+        void ISR_ChannelB(void);
+        void ISR_ChannelZ(void);
 
         /* Callback references to be used by GPIO class */
         std::function<void(GPIO::Value)> _channel_a;

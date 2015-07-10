@@ -15,14 +15,14 @@
 #include "QuadratureEncoder.h"
 
 
-QuadratureEncoder::QuadratureEncoder(const uint8_t &pin_a, const uint8_t &pin_b)
+QuadratureEncoder::QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_b)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
     /* Register our local GPIO callbacks to use for SW interrupts */
-    _channel_a = std::bind(&ISR_ChannelA);
-    _channel_b = std::bind(&ISR_ChannelB);
-    //_channel_z = std::bind(&ISR_ChannelZ);
+    _channel_a = std::bind(&QuadratureEncoder::ISR_ChannelA, this);
+    _channel_b = std::bind(&QuadratureEncoder::ISR_ChannelB, this);
+    _channel_b = std::bind(&QuadratureEncoder::ISR_ChannelZ, this);
     
     /* Initialize channel A and channel B counters */
 
@@ -40,39 +40,50 @@ QuadratureEncoder::QuadratureEncoder(const uint8_t &pin_a, const uint8_t &pin_b)
     std::cout << ")" << std::endl;
 }
 
+
 QuadratureEncoder::~QuadratureEncoder(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     delete _gpio_a;
     delete _gpio_b;
-    delete _gpio_z;
+    //delete _gpio_z;
 }
+
 
 void QuadratureEncoder::Start(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;    
 }
 
+
 void QuadratureEncoder::Stop(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;    
 }
 
+
 /* Internal Quadrature Encoder ISR Handlers */
 void QuadratureEncoder::ISR_ChannelA(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
+    GPIO::Value pin_value = _gpio_a->getValue();
+    fprintf(stdout, "Pin value %d\n\n", pin_value);
 }
+
 
 void QuadratureEncoder::ISR_ChannelB(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
+    GPIO::Value pin_value = _gpio_b->getValue();
+    fprintf(stdout, "Pin value %d\n\n", pin_value);
 }
+
 
 void QuadratureEncoder::ISR_ChannelZ(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
+
 
 /* External API for the class */
 int32_t QuadratureEncoder::GetPosition(void)
@@ -83,14 +94,17 @@ int32_t QuadratureEncoder::GetPosition(void)
 
 }
 
+
 void QuadratureEncoder::ResetPosition(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     _counter_val = 0;
 }
 
+
 bool QuadratureEncoder::GetDirection(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     return true;
 }
+
