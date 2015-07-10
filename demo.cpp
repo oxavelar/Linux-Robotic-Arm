@@ -11,7 +11,7 @@ RoboticArm *RoboArm;
 
 void _cleanup(int signum)
 {
-   std::cout << "INFO: Caught signal " << signum << std::endl;
+   std::cout << "\nINFO: Caught signal " << signum << std::endl;
 
    /* Delete all of the robotic-arm objects */
     delete RoboArm;
