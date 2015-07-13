@@ -13,7 +13,8 @@ class QuadratureEncoder
         void Start(void);
         void Stop(void);
 
-        int32_t GetPosition(void);
+        uint32_t GetPosition(void);
+        uint32_t GetPeriod(void);
         void ResetPosition(void);
         bool GetDirection(void);
 
@@ -31,7 +32,8 @@ class QuadratureEncoder
         std::function<void(GPIO::Value)> _channel_b;
         std::function<void(GPIO::Value)> _channel_z;
 
-        /* Local counter variable */
+        /* Internal state variables */
         int32_t _counter_val;
+        uint32_t _pulse_period_us;
 
 };

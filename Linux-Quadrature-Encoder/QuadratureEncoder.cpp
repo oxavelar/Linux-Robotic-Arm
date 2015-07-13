@@ -12,6 +12,7 @@
 #include <sstream>
 #include <stdlib.h>
 #include <string>
+#include <chrono>
 #include "QuadratureEncoder.h"
 
 
@@ -22,21 +23,17 @@ QuadratureEncoder::QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_
     /* Register our local GPIO callbacks to use for SW interrupts */
     _channel_a = std::bind(&QuadratureEncoder::ISR_ChannelA, this);
     _channel_b = std::bind(&QuadratureEncoder::ISR_ChannelB, this);
-    _channel_b = std::bind(&QuadratureEncoder::ISR_ChannelZ, this);
     
     /* Initialize channel A and channel B counters */
 
     _gpio_a = new GPIO(pin_a, GPIO::Edge::BOTH, _channel_a);
     _gpio_b = new GPIO(pin_b, GPIO::Edge::BOTH, _channel_b);
-    //_gpio_z = new GPIO(CONFIG_GPIO_PIN_Z, GPIO::Edge::BOTH, _channel_z);
 
     /* Useful information to be printed regarding set-up */
     std::cout << "INFO: Userspace quadrature encoder initialized @ (pinA=";
     std::cout << pin_a;
     std::cout << " pinB=";
     std::cout << pin_b;
-    //std::cout << " pinZ=";
-    //std::cout << pin_z;
     std::cout << ")" << std::endl;
 }
 
@@ -79,14 +76,8 @@ void QuadratureEncoder::ISR_ChannelB(void)
 }
 
 
-void QuadratureEncoder::ISR_ChannelZ(void)
-{
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-}
-
-
 /* External API for the class */
-int32_t QuadratureEncoder::GetPosition(void)
+uint32_t QuadratureEncoder::GetPosition(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     uint32_t read_val = _counter_val;
@@ -94,6 +85,13 @@ int32_t QuadratureEncoder::GetPosition(void)
 
 }
 
+
+uint32_t QuadratureEncoder::GetPeriod(void)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    uint32_t read_val = _counter_val;
+    return read_val;
+}
 
 void QuadratureEncoder::ResetPosition(void)
 {

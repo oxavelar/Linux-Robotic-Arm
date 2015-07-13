@@ -25,6 +25,8 @@ RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
 #endif
 
     }
+
+    std::cout << "INFO: Created a " << _joints_nr << " arm object" << std::endl;
     
 }
 

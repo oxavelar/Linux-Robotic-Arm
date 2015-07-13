@@ -12,7 +12,7 @@ class RoboticArm
         void UpdatePosition(void);
 
     private:
-        uint8_t _joints_nr;
+        uint16_t _joints_nr;
 
 #ifndef VISUAL_ENCODER
         std::vector<QuadratureEncoder*> angular_joints;
