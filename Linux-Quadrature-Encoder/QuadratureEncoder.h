@@ -19,18 +19,16 @@ class QuadratureEncoder
         bool GetDirection(void);
 
     private:
-        /* Pulse train inputs from GPIO class */
-        GPIO *_gpio_a, *_gpio_b, *_gpio_z;
+        /* Pulse train inputs objects from the GPIO class */
+        GPIO *_gpio_a, *_gpio_b;
         
         /* GPIO Interrupt routine user code */
         void ISR_ChannelA(void);
         void ISR_ChannelB(void);
-        void ISR_ChannelZ(void);
 
         /* Callback references to be used by GPIO class */
         std::function<void(GPIO::Value)> _channel_a_callback;
         std::function<void(GPIO::Value)> _channel_b_callback;
-        std::function<void(GPIO::Value)> _channel_z_callback;
         
         /* Quadrature Encoder Matrix for conversion
            http://letsmakerobots.com/content/how-use-quadrature-encoder */

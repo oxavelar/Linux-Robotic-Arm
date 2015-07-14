@@ -10,8 +10,6 @@
 
 #include <iostream>
 #include <sstream>
-#include <stdlib.h>
-#include <string>
 #include <chrono>
 #include "QuadratureEncoder.h"
 
@@ -43,7 +41,6 @@ QuadratureEncoder::~QuadratureEncoder(void)
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     delete _gpio_a;
     delete _gpio_b;
-    //delete _gpio_z;
 }
 
 
