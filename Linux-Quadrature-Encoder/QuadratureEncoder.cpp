@@ -21,13 +21,13 @@ QuadratureEncoder::QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
     /* Register our local GPIO callbacks to use for SW interrupts */
-    _channel_a = std::bind(&QuadratureEncoder::ISR_ChannelA, this);
-    _channel_b = std::bind(&QuadratureEncoder::ISR_ChannelB, this);
+    _channel_a_callback = std::bind(&QuadratureEncoder::ISR_ChannelA, this);
+    _channel_b_callback = std::bind(&QuadratureEncoder::ISR_ChannelB, this);
     
     /* Initialize channel A and channel B counters */
 
-    _gpio_a = new GPIO(pin_a, GPIO::Edge::BOTH, _channel_a);
-    _gpio_b = new GPIO(pin_b, GPIO::Edge::BOTH, _channel_b);
+    _gpio_a = new GPIO(pin_a, GPIO::Edge::BOTH, _channel_a_callback);
+    _gpio_b = new GPIO(pin_b, GPIO::Edge::BOTH, _channel_b_callback);
 
     /* Useful information to be printed regarding set-up */
     std::cout << "INFO: Userspace quadrature encoder initialized @ (pinA=";
@@ -63,40 +63,62 @@ void QuadratureEncoder::Stop(void)
 void QuadratureEncoder::ISR_ChannelA(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    GPIO::Value pin_value = _gpio_a->getValue();
-    fprintf(stdout, "Pin value %d\n\n", pin_value);
+    
+    uint8_t a,b;
+    uint8_t current_read;
+
+    /* Convert enum class to actual zero or one */
+    _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
+    _gpio_b->getValue() == GPIO::Value::HIGH ? b = 1 : b = 0;
+
+    /* Convert binary input to decimal value */
+    current_read = a * 2 + b;
+    /* Increment, or decrement depending on matrix */
+    _counter += _qem[_prev_read * 4 + current_read];
+    /* Update our previous reading */
+    _prev_read = current_read;
 }
 
 
 void QuadratureEncoder::ISR_ChannelB(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    GPIO::Value pin_value = _gpio_b->getValue();
-    fprintf(stdout, "Pin value %d\n\n", pin_value);
+    
+    uint8_t a,b;
+    uint8_t current_read;
+
+    /* Convert enum class to actual zero or one */
+    _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
+    _gpio_b->getValue() == GPIO::Value::HIGH ? b = 1 : b = 0;
+
+    /* Convert binary input to decimal value */
+    current_read = a * 2 + b;
+    /* Increment, or decrement depending on matrix */
+    _counter += _qem[_prev_read * 4 + current_read];
+    /* Update our previous reading */
+    _prev_read = current_read;
 }
 
 
 /* External API for the class */
-uint32_t QuadratureEncoder::GetPosition(void)
+int32_t QuadratureEncoder::GetPosition(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    uint32_t read_val = _counter_val;
-    return read_val;
-
+    std::cout << "Current local counter " << _counter << std::endl;
+    return _counter;
 }
 
 
 uint32_t QuadratureEncoder::GetPeriod(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    uint32_t read_val = _counter_val;
-    return read_val;
+    return _pulse_period_us;
 }
 
 void QuadratureEncoder::ResetPosition(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    _counter_val = 0;
+    _counter = 0;
 }
 
 

@@ -2,7 +2,7 @@ PROGRAM := linux-robotic-arm.bin
 TARGET_BOARD_PLATFORM := Galileo
 
 CC = g++
-CXXFLAGS += -O2 -g -fPIC -Wall -pedantic -std=c++0x -pipe -flto
+CXXFLAGS += -O3 -g -fPIC -Wall -pedantic -std=c++0x -pipe
 LDLIBS += -lpthread -lboost_system -lboost_filesystem
 
 SOURCES = demo.cpp RoboticArm.cpp

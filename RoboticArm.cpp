@@ -14,12 +14,23 @@
 RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    
+
+    /* +==========+=========+
+       |  SYS_FS  |   LABEL |
+       +==========+=========+
+       |      24  |     IO6 |
+       |      25  |    IO11 |
+       |      26  |     IO8 | 
+       |      27  |     IO7 |
+       +==========+=========+
+    */
+    int pins[][2] = {{24, 25}, {27, 26}};
+
     /* Initialize a joint position object for every required one */
-    for(auto j = 0; j < joints_nr; j++) {
+    for(auto j = 0; j < _joints_nr; j++) {
 
 #ifndef VISUAL_ENCODER
-        angular_joints.push_back(new QuadratureEncoder(15 + 2 * j, 16 + 2 * j));
+        angular_joints.push_back(new QuadratureEncoder(pins[j][0], pins[j][1]));
 #else
         angular_joints.push_back(new VisualEncoder());
 #endif
