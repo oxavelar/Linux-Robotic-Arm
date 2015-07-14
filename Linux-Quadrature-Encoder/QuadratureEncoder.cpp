@@ -61,19 +61,29 @@ void QuadratureEncoder::ISR_ChannelA(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
-    uint8_t a,b;
-    uint8_t current_read;
+    uint8_t a, b;
+    uint8_t delta;
+    uint8_t current_packed_read;
 
     /* Convert enum class to actual zero or one */
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
     _gpio_b->getValue() == GPIO::Value::HIGH ? b = 1 : b = 0;
 
     /* Convert binary input to decimal value */
-    current_read = a * 2 + b;
+    current_packed_read = (a << 1) | (b << 0);
     /* Increment, or decrement depending on matrix */
-    _counter += _qem[_prev_read * 4 + current_read];
+    delta = _qem[_prev_packed_read * 4 + current_packed_read];
+    
+    if(delta == -1)
+        _direction =  Direction::CCW;
+    else if (delta == 1)
+        _direction =  Direction::CW;
+    
+    /* Update our local tracking variable */
+    _counter += delta;
+
     /* Update our previous reading */
-    _prev_read = current_read;
+    _prev_packed_read = current_packed_read;
 }
 
 
@@ -81,19 +91,29 @@ void QuadratureEncoder::ISR_ChannelB(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
-    uint8_t a,b;
-    uint8_t current_read;
+    uint8_t a, b;
+    uint8_t delta;
+    uint8_t current_packed_read;
 
     /* Convert enum class to actual zero or one */
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
     _gpio_b->getValue() == GPIO::Value::HIGH ? b = 1 : b = 0;
 
     /* Convert binary input to decimal value */
-    current_read = a * 2 + b;
+    current_packed_read = (a << 1) | (b << 0);
     /* Increment, or decrement depending on matrix */
-    _counter += _qem[_prev_read * 4 + current_read];
+    delta = _qem[_prev_packed_read * 4 + current_packed_read];
+    
+    if(delta == -1)
+        _direction =  Direction::CCW;
+    else if (delta == 1)
+        _direction =  Direction::CW;
+    
+    /* Update our local tracking variable */
+    _counter += delta;
+
     /* Update our previous reading */
-    _prev_read = current_read;
+    _prev_packed_read = current_packed_read;
 }
 
 
@@ -119,9 +139,9 @@ void QuadratureEncoder::ResetPosition(void)
 }
 
 
-bool QuadratureEncoder::GetDirection(void)
+QuadratureEncoder::Direction QuadratureEncoder::GetDirection(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    return true;
+    return _direction;
 }
 
