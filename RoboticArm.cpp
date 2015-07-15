@@ -37,7 +37,7 @@ RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
 
     }
 
-    std::cout << "INFO: Created a " << _joints_nr << " arm object" << std::endl;
+    std::cout << "INFO: Created a " << _joints_nr << " joints object" << std::endl;
     
 }
 
@@ -59,7 +59,9 @@ void RoboticArm::UpdatePosition(void)
 
     /* Print all of the joints positions relative to themselves for now */
     for(auto j = 0; j < _joints_nr; j++) {
-      angular_joints[j]->GetPosition();
+        (void) angular_joints[j]->GetPosition();
+        (void) angular_joints[j]->GetPeriod();
+        std::cout << std::endl;
     }
 }
 

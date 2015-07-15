@@ -6,7 +6,7 @@
 class RoboticArm
 {
     public:
-        RoboticArm(const uint16_t &joints_nr);
+        explicit RoboticArm(const uint16_t &joints_nr);
         virtual ~RoboticArm(void);
 
         void UpdatePosition(void);

@@ -9,7 +9,6 @@
  */
 
 #include <iostream>
-#include <sstream>
 #include <chrono>
 #include "QuadratureEncoder.h"
 
@@ -22,37 +21,56 @@ QuadratureEncoder::QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_
     _channel_a_callback = std::bind(&QuadratureEncoder::ISR_ChannelA, this);
     _channel_b_callback = std::bind(&QuadratureEncoder::ISR_ChannelB, this);
     
-    /* Initialize channel A and channel B counters */
-
+    /* Initialize channels GPIO objects and assign local callbacks */
     _gpio_a = new GPIO(pin_a, GPIO::Edge::BOTH, _channel_a_callback);
     _gpio_b = new GPIO(pin_b, GPIO::Edge::BOTH, _channel_b_callback);
 
     /* Useful information to be printed regarding set-up */
-    std::cout << "INFO: Userspace quadrature encoder initialized @ (pinA=";
-    std::cout << pin_a;
-    std::cout << " pinB=";
-    std::cout << pin_b;
-    std::cout << ")" << std::endl;
+    std::cout << "INFO: Userspace quadrature encoder initialized @ (pinA="
+              << pin_a
+              << " pinB="
+              << pin_b
+              << ")" << std::endl;
 }
 
 
 QuadratureEncoder::~QuadratureEncoder(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
     delete _gpio_a;
     delete _gpio_b;
 }
 
 
-void QuadratureEncoder::Start(void)
+/* External API for the user, exposed to be used by higher classes */
+int32_t QuadratureEncoder::GetPosition(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;    
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << "INFO: Current position counter " << _counter << std::endl;
+    return _counter;
 }
 
 
-void QuadratureEncoder::Stop(void)
+std::chrono::microseconds QuadratureEncoder::GetPeriod(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;    
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    
+    std::cout << "INFO: Pulse-width duration " << _pulse_period_us.count() 
+              << " microseconds" << std::endl;
+
+    return _pulse_period_us;
+}
+
+void QuadratureEncoder::ResetPosition(void)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    _counter = 0;
+}
+
+
+QuadratureEncoder::Direction QuadratureEncoder::GetDirection(void)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    return _direction;
 }
 
 
@@ -64,6 +82,9 @@ void QuadratureEncoder::ISR_ChannelA(void)
     uint8_t a, b;
     uint8_t delta;
     uint8_t current_packed_read;
+
+    /* Obtain the pulse-width if the pin becomes LOW */
+    GetGPIOPulseWidth(_gpio_a, GPIO::Value::LOW);
 
     /* Convert enum class to actual zero or one */
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
@@ -98,6 +119,9 @@ void QuadratureEncoder::ISR_ChannelB(void)
     /* Convert enum class to actual zero or one */
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
     _gpio_b->getValue() == GPIO::Value::HIGH ? b = 1 : b = 0;
+    
+    /* Obtain the pulse-width if the pin becomes LOW */
+    GetGPIOPulseWidth(_gpio_b, GPIO::Value::LOW);
 
     /* Convert binary input to decimal value */
     current_packed_read = (a << 1) | (b << 0);
@@ -117,31 +141,18 @@ void QuadratureEncoder::ISR_ChannelB(void)
 }
 
 
-/* External API for the class */
-int32_t QuadratureEncoder::GetPosition(void)
+void QuadratureEncoder::GetGPIOPulseWidth(const GPIO *gpio,
+                                          const GPIO::Value &condition)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    std::cout << "Current local counter " << _counter << std::endl;
-    return _counter;
-}
-
-
-uint32_t QuadratureEncoder::GetPeriod(void)
-{
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    return _pulse_period_us;
-}
-
-void QuadratureEncoder::ResetPosition(void)
-{
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    _counter = 0;
-}
-
-
-QuadratureEncoder::Direction QuadratureEncoder::GetDirection(void)
-{
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    return _direction;
+    const auto now = std::chrono::high_resolution_clock::now();
+    
+    if(gpio->getValue() != condition) {
+        /* If the GPIO went low obtain the delta keep it stored */
+        _isr_timestamp = now;
+    } else {
+        /* Else, calculate the pulse-width and save it */
+        auto delta = now - _isr_timestamp;
+        _pulse_period_us = std::chrono::duration_cast<std::chrono::microseconds>(delta);
+    }
 }
 

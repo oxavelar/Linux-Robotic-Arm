@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <chrono>
 #include <stdint.h>
 #include "../HighLatencyGPIO/GPIO.hh"
 
@@ -8,15 +9,11 @@ class QuadratureEncoder
     public:
         enum class Direction { CCW, CW };
 
-        QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_b);
+        explicit QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_b);
         virtual ~QuadratureEncoder(void);
 
-        void Init(void);
-        void Start(void);
-        void Stop(void);
-
         int32_t GetPosition(void);
-        uint32_t GetPeriod(void);
+        std::chrono::microseconds GetPeriod(void);
         void ResetPosition(void);
         Direction GetDirection(void);
 
@@ -39,7 +36,10 @@ class QuadratureEncoder
 
         /* Internal state variables */
         int32_t _counter;
-        uint32_t _pulse_period_us;
+        std::chrono::microseconds _pulse_period_us;
         Direction _direction;
-
+        
+        /* Used to keep track of the actual interrupt pulse-widths */
+        void GetGPIOPulseWidth(const GPIO *gpio, const GPIO::Value &condition);
+        std::chrono::high_resolution_clock::time_point _isr_timestamp;
 };
