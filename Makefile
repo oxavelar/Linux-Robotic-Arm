@@ -9,9 +9,11 @@ SOURCES = demo.cpp RoboticArm.cpp
 OBJECTS = demo.o RoboticArm.o
 
 SOURCES += HighLatencyGPIO/GPIO.cc \
+           HighLatencyPWM/PWM.cc \
            Linux-Quadrature-Encoder/QuadratureEncoder.cpp \
 
 OBJECTS += HighLatencyGPIO/GPIO.o \
+           HighLatencyPWM/PWM.o \
            Linux-Quadrature-Encoder/QuadratureEncoder.o
 
 
@@ -25,6 +27,9 @@ all: $(SOURCES) $(OBJECTS) HighLatencyGPIO/GPIO.cc
 
 HighLatencyGPIO/GPIO.cc:
 	git clone -q https://github.com/tweej/HighLatencyGPIO
+
+HighLatencyPWM/PWM.cc:
+	git clone -q https://github.com/oxavelar/HighLatencyPWM
 
 clean:
 	rm -rf $(PROGRAM) $(OBJECTS)
