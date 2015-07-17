@@ -50,14 +50,14 @@ int32_t QuadratureEncoder::GetPosition(void)
 }
 
 
-std::chrono::microseconds QuadratureEncoder::GetPeriod(void)
+std::chrono::nanoseconds QuadratureEncoder::GetPeriod(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
-    std::cout << "INFO: Pulse-width duration " << _pulse_period_us.count() 
-              << " microseconds" << std::endl;
+    std::cout << "INFO: Pulse-width duration " << _pulse_period_ns.count() 
+              << " nanoseconds" << std::endl;
 
-    return _pulse_period_us;
+    return _pulse_period_ns;
 }
 
 void QuadratureEncoder::ResetPosition(void)
@@ -150,7 +150,7 @@ void QuadratureEncoder::TrackGPIOPulseWidth(const GPIO *gpio,
     } else {
         /* Else, calculate the pulse-width and save it */
         auto delta = now - _isr_timestamp;
-        _pulse_period_us = std::chrono::duration_cast<std::chrono::microseconds>(delta);
+        _pulse_period_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(delta);
     }
 }
 

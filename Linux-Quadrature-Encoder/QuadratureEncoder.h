@@ -13,7 +13,7 @@ class QuadratureEncoder
         virtual ~QuadratureEncoder(void);
 
         int32_t GetPosition(void);
-        std::chrono::microseconds GetPeriod(void);
+        std::chrono::nanoseconds GetPeriod(void);
         void ResetPosition(void);
         Direction GetDirection(void);
 
@@ -36,7 +36,7 @@ class QuadratureEncoder
 
         /* Internal state variables */
         int32_t _counter;
-        std::chrono::microseconds _pulse_period_us;
+        std::chrono::nanoseconds _pulse_period_ns;
         Direction _direction;
         
         /* Used to keep track of the actual interrupt pulse-widths */
