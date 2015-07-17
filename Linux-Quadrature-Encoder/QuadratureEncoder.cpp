@@ -83,8 +83,8 @@ void QuadratureEncoder::ISR_ChannelA(void)
     uint8_t a, b;
     uint8_t current_packed_read;
 
-    /* Obtain the pulse-width if the pin becomes LOW */
-    GetGPIOPulseWidth(_gpio_a, GPIO::Value::LOW);
+    /* Obtain the pulse-width from last irq up to when the pin becomes LOW */
+    TrackGPIOPulseWidth(_gpio_a, GPIO::Value::LOW);
 
     /* Convert enum class to actual zero or one */
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
@@ -95,14 +95,13 @@ void QuadratureEncoder::ISR_ChannelA(void)
     /* Increment, or decrement depending on matrix */
     delta = _qem[_prev_packed_read * 4 + current_packed_read];
     
-    if(delta == -1)
-        _direction =  Direction::CCW;
-    else if (delta == 1)
-        _direction =  Direction::CW;
+    /* Update our rotation direction now */
+    if(delta == -1)            _direction =  Direction::CCW;
+    else if (delta == 1)       _direction =  Direction::CW;
     
     /* Update our local tracking variable */
     _counter += delta;
-
+    
     /* Update our previous reading */
     _prev_packed_read = current_packed_read;
 }
@@ -120,29 +119,28 @@ void QuadratureEncoder::ISR_ChannelB(void)
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
     _gpio_b->getValue() == GPIO::Value::HIGH ? b = 1 : b = 0;
     
-    /* Obtain the pulse-width if the pin becomes LOW */
-    GetGPIOPulseWidth(_gpio_b, GPIO::Value::LOW);
+    /* Obtain the pulse-width from last irq up to when the pin becomes LOW */
+    TrackGPIOPulseWidth(_gpio_b, GPIO::Value::LOW);
 
     /* Convert binary input to decimal value */
     current_packed_read = (a << 1) | (b << 0);
     /* Increment, or decrement depending on matrix */
     delta = _qem[_prev_packed_read * 4 + current_packed_read];
     
-    if(delta == -1)
-        _direction =  Direction::CCW;
-    else if (delta == 1)
-        _direction =  Direction::CW;
+    /* Update our rotation direction now */
+    if(delta == -1)            _direction =  Direction::CCW;
+    else if (delta == 1)       _direction =  Direction::CW;
     
     /* Update our local tracking variable */
     _counter += delta;
-
+    
     /* Update our previous reading */
     _prev_packed_read = current_packed_read;
 }
 
 
-void QuadratureEncoder::GetGPIOPulseWidth(const GPIO *gpio,
-                                          const GPIO::Value &condition)
+void QuadratureEncoder::TrackGPIOPulseWidth(const GPIO *gpio,
+                                            const GPIO::Value &condition)
 {
     const auto now = std::chrono::high_resolution_clock::now();
     
