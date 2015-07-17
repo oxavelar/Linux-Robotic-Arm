@@ -23,7 +23,7 @@ void _cleanup(int signum)
 int main(int argc, char *argv[])
 {
     /* Two joints robotic arm for the demo */
-    RoboArm = new RoboticArm(2);
+    RoboArm = new RoboticArm(1);
     
     /* Register a signal handler to exit gracefully */
     signal(SIGINT, _cleanup);

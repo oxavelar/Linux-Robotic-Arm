@@ -37,10 +37,10 @@ RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
 #endif
         
         /* Object movement childs */
-        angular_rotors.push_back(new PWM(3 + 2*j));
+        angular_rotors.push_back(new PWM(8 + 2*j));
         /* Initialize the rotor control arguments */
         angular_rotors[j]->setPeriod(5000000);
-        angular_rotors[j]->setDutyCycle(50);
+        angular_rotors[j]->setDuty(2500000);
         angular_rotors[j]->setState(PWM::State::ENABLED);
     }
 
