@@ -15,29 +15,37 @@ RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
 
-    /* +==========+=========+
-       |  SYS_FS  |   LABEL |
-       +==========+=========+
-       |      24  |     IO6 |
-       |      25  |    IO11 |
-       |      26  |     IO8 | 
-       |      27  |     IO7 |
-       +==========+=========+
+    /*
+     The following is Intel's Galileo layout for the pins.
+  
+      +==========+=========+===================+
+       |  SYS_FS  |   LABEL |       DESCRIPTION |
+       +==========+=========+===================+
+       |      24  |     IO6 |   QE Channel A #1 |
+       |      25  |    IO11 |   QE Channel B #1 |
+       |      26  |     IO8 |   QE Channel A #2 |
+       |      27  |     IO7 |   QE Channel B #2 |
+       |       3  |    PWM3 |  Motor DC Ctrl #1 |
+       |       5  |    PWM5 |  Motor DC Ctrl #2 |
+       +==========+=========+================== +
+
     */
-    int pins[][2] = {{24, 25}, {27, 26}};
+    int quad_enc_pins[][2] = {{24, 25}, {27, 26}};
+    int dc_motor_pins[] = {3, 5};
 
     /* Initialize each joint objects */
     for(auto j = 0; j < _joints_nr; j++) {
         
         /* Objects for the position detection */
 #ifndef VISUAL_ENCODER
-        angular_joints.push_back(new QuadratureEncoder(pins[j][0], pins[j][1]));
+        angular_joints.push_back(new QuadratureEncoder(quad_enc_pins[j][0],
+                                                       quad_enc_pins[j][1]));
 #else
         angular_joints.push_back(new VisualEncoder());
 #endif
         
         /* Object movement childs */
-        angular_rotors.push_back(new PWM(8 + 2*j));
+        angular_rotors.push_back(new PWM(dc_motor_pins[j]));
         /* Initialize the rotor control arguments */
         angular_rotors[j]->setPeriod(5000000);
         angular_rotors[j]->setDuty(2500000);
