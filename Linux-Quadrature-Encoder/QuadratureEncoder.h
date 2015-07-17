@@ -32,7 +32,7 @@ class QuadratureEncoder
         /* Quadrature Encoder Matrix for conversion
            http://letsmakerobots.com/content/how-use-quadrature-encoder */
         uint8_t _prev_packed_read;
-        int _qem[16] = {0,-1,1,2,1,0,2,-1,-1,2,0,1,2,1,-1,0};
+        int8_t _qem[16] = {0,-1,1,2,1,0,2,-1,-1,2,0,1,2,1,-1,0};
 
         /* Internal state variables */
         int32_t _counter;

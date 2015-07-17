@@ -78,9 +78,9 @@ QuadratureEncoder::Direction QuadratureEncoder::GetDirection(void)
 void QuadratureEncoder::ISR_ChannelA(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    
+
+    int8_t delta;
     uint8_t a, b;
-    uint8_t delta;
     uint8_t current_packed_read;
 
     /* Obtain the pulse-width if the pin becomes LOW */
@@ -111,9 +111,9 @@ void QuadratureEncoder::ISR_ChannelA(void)
 void QuadratureEncoder::ISR_ChannelB(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    
+
+    int8_t delta;
     uint8_t a, b;
-    uint8_t delta;
     uint8_t current_packed_read;
 
     /* Convert enum class to actual zero or one */

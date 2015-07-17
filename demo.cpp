@@ -20,7 +20,7 @@ void _cleanup(int signum)
 }
 
 
-int main(int argc, char *argv[])
+int main(void)
 {
     /* Two joints robotic arm for the demo */
     RoboArm = new RoboticArm(1);
