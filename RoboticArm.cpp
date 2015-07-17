@@ -26,15 +26,22 @@ RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
     */
     int pins[][2] = {{24, 25}, {27, 26}};
 
-    /* Initialize a joint position object for every required one */
+    /* Initialize each joint objects */
     for(auto j = 0; j < _joints_nr; j++) {
-
+        
+        /* Objects for the position detection */
 #ifndef VISUAL_ENCODER
         angular_joints.push_back(new QuadratureEncoder(pins[j][0], pins[j][1]));
 #else
         angular_joints.push_back(new VisualEncoder());
 #endif
-
+        
+        /* Object movement childs */
+        angular_rotors.push_back(new PWM(8 + 2*j));
+        /* Initialize the rotor control arguments */
+        angular_rotors[j]->setPeriod(5000000);
+        angular_rotors[j]->setDuty(2500000);
+        angular_rotors[j]->setState(PWM::State::ENABLED);
     }
 
     std::cout << "INFO: Created a " << _joints_nr << " joints object" << std::endl;
@@ -49,6 +56,7 @@ RoboticArm::~RoboticArm(void)
     /* Call each of the positioning objects destructors */
     for(auto j = 0; j < _joints_nr; j++) {
       delete angular_joints[j];
+      delete angular_rotors[j];
     }
 }
 

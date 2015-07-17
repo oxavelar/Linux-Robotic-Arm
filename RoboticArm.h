@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdint.h>
 #include "Linux-Quadrature-Encoder/QuadratureEncoder.h"
+#include "HighLatencyPWM/PWM.hh"
 
 class RoboticArm
 {
@@ -17,6 +18,9 @@ class RoboticArm
 #ifndef VISUAL_ENCODER
         std::vector<QuadratureEncoder*> angular_joints;
 #else
-        std::vector<VisualeEncoder*> angular_joints;
+        std::vector<VisualEncoder*> angular_joints;
 #endif
+        /* Movement DC motors */
+        std::vector<PWM*> angular_rotors;
+
 };
