@@ -21,7 +21,7 @@ all: $(SOURCES) $(OBJECTS) HighLatencyGPIO/GPIO.cc
 	$(CC) $(CXXFLAGS) $(LDLIBS) $(OBJECTS) -o $(PROGRAM)
 
 HighLatencyGPIO/GPIO.cc:
-	git clone -q https://github.com/tweej/HighLatencyGPIO
+	git clone -q https://github.com/oxavelar/HighLatencyGPIO
 
 HighLatencyPWM/PWM.cc:
 	git clone -q https://github.com/oxavelar/HighLatencyPWM
