@@ -9,21 +9,21 @@
  */
 
 #include <iostream>
-#include <unistd.h>
+#include <stdexcept>
 #include "Motor.h"
 
 
 Motor::Motor(const uint16_t &pin_pwm)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    
+    /* DC motor control is performed with PWM sysfs abstraction */
     _pwm = new PWM(pin_pwm);
     
-    /* Set some default values for testing */
-    auto period = 7000000;
-    _pwm->setPeriod(period);
-    _pwm->setDuty(0.1 * period);
-    _pwm->setState(PWM::State::ENABLED);
+    /* Operational values at default */
+    _pwm_period_ns = ((1 / BASE_PWM_FREQUENCY_HZ) * 1000 * 1000 * 1000);
+    _pwm_dutycycle_ns = (BASE_PWM_DUTYCYCLE * _pwm_period_ns / 100);
+    
+    _pwm->setPeriod(_pwm_period_ns);
+    _pwm->setDuty(_pwm_dutycycle_ns);
 
     /* Useful information to be printed regarding set-up */
     std::cout << "INFO: Userspace motor initialized @ (pinPWM=" 
@@ -34,9 +34,42 @@ Motor::Motor(const uint16_t &pin_pwm)
 Motor::~Motor(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    
-    _pwm->setState(PWM::State::DISABLED);
-    usleep(500000);
+    /* Deleting the PWM object will disable it's output too */
     delete _pwm;
+}
+
+
+void Motor::Start(void)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    _pwm->setState(PWM::State::ENABLED);
+}
+
+
+void Motor::Stop(void)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    _pwm->setState(PWM::State::DISABLED);
+}
+
+
+void Motor::SetSpeed(const unsigned char &percent)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    
+    if(percent <= 100) {
+        _pwm->setDuty(_pwm_period_ns * percent / 100);
+    } else {
+        throw std::runtime_error("Invalid speed value");
+    }
+}
+
+int Motor::IsStopped(void)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    
+    int stopped = 0;
+    if ( _pwm->getState() == PWM::State::ENABLED ) stopped = 1;
+    return(stopped);
 }
 

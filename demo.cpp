@@ -27,12 +27,13 @@ int main(void)
     
     /* Register a signal handler to exit gracefully */
     signal(SIGINT, _cleanup);
-
+    
+    RoboArm->Init();
     /* Input a curve or shape to the roboarm to draw it */
     for(;;) {
-        //RoboArm->Circle();
+        RoboArm->DemoCircle();
         RoboArm->UpdatePosition();
-        usleep(800000);
+        usleep(5000000);
         std::cout << std::endl;
     }
 

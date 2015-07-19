@@ -10,6 +10,8 @@ class RoboticArm
         explicit RoboticArm(const uint16_t &joints_nr);
         virtual ~RoboticArm(void);
 
+        void Init();
+        void DemoCircle(void);
         void UpdatePosition(void);
 
     private:

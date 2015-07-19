@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <chrono>
+#include <stdexcept>
 #include "QuadratureEncoder.h"
 
 
@@ -36,6 +37,8 @@ QuadratureEncoder::QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_
 
 QuadratureEncoder::~QuadratureEncoder(void)
 {
+    _channel_a_callback = NULL;
+    _channel_b_callback = NULL;
     delete _gpio_a;
     delete _gpio_b;
 }
@@ -44,7 +47,6 @@ QuadratureEncoder::~QuadratureEncoder(void)
 /* External API for the user, exposed to be used by higher classes */
 int32_t QuadratureEncoder::GetPosition(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
     std::cout << "INFO: Current position counter " << _counter << std::endl;
     return _counter;
 }
@@ -52,8 +54,6 @@ int32_t QuadratureEncoder::GetPosition(void)
 
 std::chrono::nanoseconds QuadratureEncoder::GetPeriod(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    
     std::cout << "INFO: Pulse-width duration " << _pulse_period_ns.count() 
               << " nanoseconds" << std::endl;
 

@@ -10,28 +10,27 @@
 #include "RoboticArm.h"
 
 
+
+int quad_enc_pins[2][2] = {{24, 25}, {27, 26}};
+int dc_motor_pins[2] = {3, 5};
+/*
+    The following is Intel's Galileo layout for the pins.
+
+    +==========+=========+===================+
+    |  SYS_FS  |   LABEL |       DESCRIPTION |
+    +==========+=========+===================+
+    |      24  |     IO6 |   QE Channel A #1 |
+    |      25  |    IO11 |   QE Channel B #1 |
+    |      26  |     IO8 |   QE Channel A #2 |
+    |      27  |     IO7 |   QE Channel B #2 |
+    |       3  |    PWM3 |  Motor DC Ctrl #1 |
+    |       5  |    PWM5 |  Motor DC Ctrl #2 |
+    +==========+=========+================== +
+*/
+
+
 RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
-    /*
-     The following is Intel's Galileo layout for the pins.
-  
-      +==========+=========+===================+
-       |  SYS_FS  |   LABEL |       DESCRIPTION |
-       +==========+=========+===================+
-       |      24  |     IO6 |   QE Channel A #1 |
-       |      25  |    IO11 |   QE Channel B #1 |
-       |      26  |     IO8 |   QE Channel A #2 |
-       |      27  |     IO7 |   QE Channel B #2 |
-       |       3  |    PWM3 |  Motor DC Ctrl #1 |
-       |       5  |    PWM5 |  Motor DC Ctrl #2 |
-       +==========+=========+================== +
-
-    */
-    int quad_enc_pins[][2] = {{24, 25}, {27, 26}};
-    int dc_motor_pins[] = {3, 5};
-
     /* Initialize each joint objects */
     for(auto j = 0; j < _joints_nr; j++) {
         
@@ -42,8 +41,6 @@ RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
 #else
         angular_joints.push_back(new VisualEncoder());
 #endif
-        
-        /* Object movement childs */
         angular_rotors.push_back(new Motor(dc_motor_pins[j]));
     }
 
@@ -58,9 +55,28 @@ RoboticArm::~RoboticArm(void)
     
     /* Call each of the positioning objects destructors */
     for(auto j = 0; j < _joints_nr; j++) {
-      delete angular_rotors[j];
-      delete angular_joints[j];
+        delete angular_rotors[j];
+        delete angular_joints[j];
     }
+}
+
+
+void RoboticArm::Init(void)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    /* Perform the initialization for each of the joints */
+    for(auto j = 0; j < _joints_nr; j++) {
+        /* Get the rotors to a known position */
+        angular_rotors[j]->SetSpeed(100);
+        angular_rotors[j]->Start();
+        angular_rotors[j]->Stop();
+    }
+}
+
+
+void RoboticArm::DemoCircle(void)
+{
+
 }
 
 
