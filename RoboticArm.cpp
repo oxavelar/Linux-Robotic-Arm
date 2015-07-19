@@ -90,7 +90,7 @@ void RoboticArm::UpdatePosition(void)
     for(auto j = 0; j < _joints_nr; j++) {
 
         angular_rotors[j]->Start();
-        //angular_rotors[j]->Stop();
+        angular_rotors[j]->Stop();
 
         angular_joints[j]->GetPosition();
         angular_joints[j]->GetPeriod();
