@@ -1,7 +1,7 @@
 PROGRAM := linux-robotic-arm.bin
 
 CC = g++
-CXXFLAGS += -O2 -g -fPIC -Wall -Wextra -Werror -pedantic-errors -std=c++11 -pipe
+CXXFLAGS += -O2 -fPIC -Wall -Wextra -Werror -pedantic-errors -std=c++11 -pipe
 LDLIBS += -lpthread -lboost_system -lboost_filesystem
 
 SOURCES = demo.cpp RoboticArm.cpp
@@ -9,10 +9,12 @@ OBJECTS = demo.o RoboticArm.o
 
 SOURCES += HighLatencyGPIO/GPIO.cc \
            HighLatencyPWM/PWM.cc \
+           Linux-DC-Motor/Motor.cpp \
            Linux-Quadrature-Encoder/QuadratureEncoder.cpp \
 
 OBJECTS += HighLatencyGPIO/GPIO.o \
            HighLatencyPWM/PWM.o \
+           Linux-DC-Motor/Motor.o \
            Linux-Quadrature-Encoder/QuadratureEncoder.o
 
 

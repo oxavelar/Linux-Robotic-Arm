@@ -7,7 +7,6 @@
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>
-#include <string>
 #include "RoboticArm.h"
 
 
@@ -45,11 +44,7 @@ RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
 #endif
         
         /* Object movement childs */
-        angular_rotors.push_back(new PWM(dc_motor_pins[j]));
-        /* Initialize the rotor control arguments */
-        angular_rotors[j]->setPeriod(5000000);
-        angular_rotors[j]->setDuty(2500000);
-        angular_rotors[j]->setState(PWM::State::ENABLED);
+        angular_rotors.push_back(new Motor(dc_motor_pins[j]));
     }
 
     std::cout << "INFO: Created a " << _joints_nr << " joints object" << std::endl;
@@ -63,8 +58,8 @@ RoboticArm::~RoboticArm(void)
     
     /* Call each of the positioning objects destructors */
     for(auto j = 0; j < _joints_nr; j++) {
-      delete angular_joints[j];
       delete angular_rotors[j];
+      delete angular_joints[j];
     }
 }
 
