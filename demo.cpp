@@ -33,7 +33,7 @@ int main(void)
     for(;;) {
         RoboArm->DemoCircle();
         RoboArm->UpdatePosition();
-        usleep(10000000);
+        usleep(3E06);
         std::cout << std::endl;
     }
 

@@ -7,6 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdlib.h>
+#include <unistd.h>
 #include "RoboticArm.h"
 
 
@@ -90,6 +91,7 @@ void RoboticArm::UpdatePosition(void)
     for(auto j = 0; j < _joints_nr; j++) {
 
         angular_rotors[j]->Start();
+        usleep(10E06);
         angular_rotors[j]->Stop();
 
         angular_joints[j]->GetPosition();
