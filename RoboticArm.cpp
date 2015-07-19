@@ -88,12 +88,12 @@ void RoboticArm::UpdatePosition(void)
 
     /* Print all of the joints positions relative to themselves for now */
     for(auto j = 0; j < _joints_nr; j++) {
-        
-        angular_joints[j]->GetPosition();
-        angular_joints[j]->GetPeriod();
 
         angular_rotors[j]->Start();
-        angular_rotors[j]->Stop();
+        //angular_rotors[j]->Stop();
+
+        angular_joints[j]->GetPosition();
+        angular_joints[j]->GetPeriod();
 
         std::cout << std::endl;
     }

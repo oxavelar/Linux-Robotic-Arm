@@ -71,7 +71,7 @@ int Motor::IsStopped(void)
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
     int stopped = 0;
-    if ( _pwm->getState() == PWM::State::ENABLED ) stopped = 1;
+    if ( _pwm->getState() == PWM::State::DISABLED ) stopped = 1;
     return(stopped);
 }
 

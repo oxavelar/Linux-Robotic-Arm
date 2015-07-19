@@ -81,8 +81,8 @@ void QuadratureEncoder::ISR_ChannelA(void)
     uint8_t a, b;
     uint8_t current_packed_read;
 
-    /* Obtain the pulse-width from last irq up to when the pin becomes LOW */
-    TrackGPIOPulseWidth(_gpio_a, GPIO::Value::LOW);
+    /* Obtain the pulse-width between transitions */
+    TrackGPIOPulseWidth();
 
     /* Convert enum class to actual zero or one */
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
@@ -117,8 +117,8 @@ void QuadratureEncoder::ISR_ChannelB(void)
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
     _gpio_b->getValue() == GPIO::Value::HIGH ? b = 1 : b = 0;
     
-    /* Obtain the pulse-width from last irq up to when the pin becomes LOW */
-    TrackGPIOPulseWidth(_gpio_b, GPIO::Value::LOW);
+    /* Obtain the pulse-width between transitions */
+    TrackGPIOPulseWidth();
 
     /* Convert binary input to decimal value */
     current_packed_read = (a << 1) | (b << 0);
@@ -137,16 +137,15 @@ void QuadratureEncoder::ISR_ChannelB(void)
 }
 
 
-void QuadratureEncoder::TrackGPIOPulseWidth(const GPIO *gpio,
-                                            const GPIO::Value &condition)
+void QuadratureEncoder::TrackGPIOPulseWidth(void)
 {
+    static int toggle;
     const auto now = std::chrono::high_resolution_clock::now();
     
-    if(gpio->getValue() != condition) {
-        /* If the GPIO went low obtain the delta keep it stored */
+    if(toggle++ % 2) {
         _isr_timestamp = now;
     } else {
-        /* Else, calculate the pulse-width and save it */
+        /* Calculate the pulse-width on even transitions */
         auto delta = now - _isr_timestamp;
         _pulse_period_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(delta);
     }

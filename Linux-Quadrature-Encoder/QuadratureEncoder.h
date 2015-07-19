@@ -40,6 +40,6 @@ class QuadratureEncoder
         Direction _direction;
         
         /* Used to keep track of the actual interrupt pulse-widths */
-        void TrackGPIOPulseWidth(const GPIO *gpio, const GPIO::Value &condition);
+        void TrackGPIOPulseWidth(void);
         std::chrono::high_resolution_clock::time_point _isr_timestamp;
 };
