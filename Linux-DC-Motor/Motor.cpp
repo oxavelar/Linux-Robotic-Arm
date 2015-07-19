@@ -18,13 +18,14 @@ Motor::Motor(const uint16_t &pin_pwm)
     /* DC motor control is performed with PWM sysfs abstraction */
     _pwm = new PWM(pin_pwm);
     
-    /* Operational values at default */
-    _pwm_period_ns = ((1 / BASE_PWM_FREQUENCY_HZ) * 1000 * 1000 * 1000);
-    _pwm_dutycycle_ns = (BASE_PWM_DUTYCYCLE * _pwm_period_ns / 100);
+    /* Operational values being calculated at default */
+    const float t = 1 / (float)BASE_PWM_FREQUENCY_HZ;
+    _pwm_period_ns = t * 1E9;
+    _pwm_dutycycle_ns = BASE_PWM_DUTYCYCLE * _pwm_period_ns / 100;
     
     _pwm->setPeriod(_pwm_period_ns);
     _pwm->setDuty(_pwm_dutycycle_ns);
-
+    
     /* Useful information to be printed regarding set-up */
     std::cout << "INFO: Userspace motor created @ (pinPWM=" 
               << pin_pwm << ")" << std::endl;

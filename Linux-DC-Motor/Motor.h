@@ -5,11 +5,11 @@
 #include "../HighLatencyPWM/PWM.hh"
 
 #ifndef BASE_PWM_FREQUENCY_HZ
-#define BASE_PWM_FREQUENCY_HZ 2000
+#define BASE_PWM_FREQUENCY_HZ 2000u
 #endif
 
 #ifndef BASE_PWM_DUTYCYCLE
-#define BASE_PWM_DUTYCYCLE 50
+#define BASE_PWM_DUTYCYCLE 50u
 #endif
 
 class Motor

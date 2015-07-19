@@ -69,7 +69,7 @@ void RoboticArm::Init(void)
     /* Perform the initialization for each of the joints */
     for(auto j = 0; j < _joints_nr; j++) {
         /* Get the rotors to a known position */
-        angular_rotors[j]->SetSpeed(100);
+        angular_rotors[j]->SetSpeed(50);
         angular_rotors[j]->Start();
         angular_rotors[j]->Stop();
     }
