@@ -5,8 +5,9 @@
 #include "../HighLatencyPWM/PWM.hh"
 
 #ifndef BASE_PWM_FREQUENCY_HZ
-#define BASE_PWM_FREQUENCY_HZ 50
+#define BASE_PWM_FREQUENCY_HZ 2000
 #endif
+
 #ifndef BASE_PWM_DUTYCYCLE
 #define BASE_PWM_DUTYCYCLE 50
 #endif
@@ -21,7 +22,7 @@ class Motor
 
         void Start(void);
         void Stop(void);
-        void SetSpeed(const unsigned char &percent);
+        void SetSpeed(const float &percent);
         int IsStopped(void);
 
     private:

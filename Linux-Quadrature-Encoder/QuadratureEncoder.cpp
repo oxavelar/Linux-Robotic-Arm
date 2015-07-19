@@ -27,7 +27,7 @@ QuadratureEncoder::QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_
     _gpio_b = new GPIO(pin_b, GPIO::Edge::BOTH, _channel_b_callback);
 
     /* Useful information to be printed regarding set-up */
-    std::cout << "INFO: Userspace quadrature encoder initialized @ (pinA="
+    std::cout << "INFO: Userspace quadrature encoder created @ (pinA="
               << pin_a
               << " pinB="
               << pin_b
@@ -37,8 +37,6 @@ QuadratureEncoder::QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_
 
 QuadratureEncoder::~QuadratureEncoder(void)
 {
-    _channel_a_callback = NULL;
-    _channel_b_callback = NULL;
     delete _gpio_a;
     delete _gpio_b;
 }

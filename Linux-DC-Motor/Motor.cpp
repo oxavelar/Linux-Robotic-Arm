@@ -26,8 +26,11 @@ Motor::Motor(const uint16_t &pin_pwm)
     _pwm->setDuty(_pwm_dutycycle_ns);
 
     /* Useful information to be printed regarding set-up */
-    std::cout << "INFO: Userspace motor initialized @ (pinPWM=" 
+    std::cout << "INFO: Userspace motor created @ (pinPWM=" 
               << pin_pwm << ")" << std::endl;
+    std::cout << "      operating on a PWM frequency of "
+              << BASE_PWM_FREQUENCY_HZ << "Hz with " << BASE_PWM_DUTYCYCLE
+              << "% duty cycle" << std::endl;
 }
 
 
@@ -41,19 +44,17 @@ Motor::~Motor(void)
 
 void Motor::Start(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
     _pwm->setState(PWM::State::ENABLED);
 }
 
 
 void Motor::Stop(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
     _pwm->setState(PWM::State::DISABLED);
 }
 
 
-void Motor::SetSpeed(const unsigned char &percent)
+void Motor::SetSpeed(const float &percent)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     

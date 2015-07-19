@@ -26,6 +26,8 @@ int dc_motor_pins[2] = {3, 5};
     |       3  |    PWM3 |  Motor DC Ctrl #1 |
     |       5  |    PWM5 |  Motor DC Ctrl #2 |
     +==========+=========+================== +
+
+    Note: Galileo's cannot go slower than ~125 Hz on Linux SYSFS PWM.
 */
 
 
@@ -86,8 +88,13 @@ void RoboticArm::UpdatePosition(void)
 
     /* Print all of the joints positions relative to themselves for now */
     for(auto j = 0; j < _joints_nr; j++) {
-        (void) angular_joints[j]->GetPosition();
-        (void) angular_joints[j]->GetPeriod();
+        
+        angular_joints[j]->GetPosition();
+        angular_joints[j]->GetPeriod();
+
+        angular_rotors[j]->Start();
+        angular_rotors[j]->Stop();
+
         std::cout << std::endl;
     }
 }
