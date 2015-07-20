@@ -23,7 +23,7 @@ void _cleanup(int signum)
 int main(void)
 {
     /* Two joints robotic arm for the demo */
-    RoboArm = new RoboticArm(1);
+    RoboArm = new RoboticArm();
     
     /* Register a signal handler to exit gracefully */
     signal(SIGINT, _cleanup);
@@ -31,7 +31,6 @@ int main(void)
     RoboArm->Init();
     /* Input a curve or shape to the roboarm to draw it */
     for(;;) {
-        RoboArm->DemoCircle();
         RoboArm->UpdatePosition();
         usleep(3E06);
         std::cout << std::endl;

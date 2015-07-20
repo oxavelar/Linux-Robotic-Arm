@@ -21,7 +21,7 @@ OBJECTS += HighLatencyGPIO/GPIO.o \
 CXXFLAGS += -DBASE_PWM_FREQUENCY_HZ=5000 -DBASE_PWM_DUTYCYCLE=50
 
 
-all: $(SOURCES) $(OBJECTS) HighLatencyGPIO/GPIO.cc
+all: $(SOURCES) $(OBJECTS) HighLatencyGPIO/GPIO.cc HighLatencyPWM/PWM.cc
 	$(CC) $(CXXFLAGS) $(LDLIBS) $(OBJECTS) -o $(PROGRAM)
 
 HighLatencyGPIO/GPIO.cc:
@@ -32,3 +32,4 @@ HighLatencyPWM/PWM.cc:
 
 clean:
 	rm -rf $(PROGRAM) $(OBJECTS)
+

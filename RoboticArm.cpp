@@ -9,49 +9,38 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "RoboticArm.h"
+#include "RoboticArm_Config.h"
 
 
-
-int quad_enc_pins[2][2] = {{24, 25}, {27, 26}};
-int dc_motor_pins[2][2] = {{ 3,  5}, { 1,  7}};
-/*
-    The following is Intel's Galileo layout for the pins.
-
-    +==========+=========+=======================+
-    |  SYS_FS  |   LABEL |           DESCRIPTION |
-    +==========+=========+=======================+
-    |      24  |     IO6 |       QE Channel A #1 |
-    |      25  |    IO11 |       QE Channel B #1 |
-    |      26  |     IO8 |       QE Channel A #2 |
-    |      27  |     IO7 |       QE Channel B #2 |
-    |       3  |    PWM3 |  Motor DC Ctrl #1 CW  |
-    |       5  |    PWM5 |  Motor DC Ctrl #1 CCW |
-    |       9  |    PWM1 |  Motor DC Ctrl #2 CW  |
-    |      10  |    PWM7 |  Motor DC Ctrl #2 CCW |
-    +==========+=========+====================== +
-
-    Note: Galileo's cannot go slower than ~125 Hz on Linux SYSFS PWM.
-*/
-
-
-RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
+RoboticJoint::RoboticJoint(const int &id) : _id(id)
 {
-    /* Initialize each joint objects */
-    for(auto j = 0; j < _joints_nr; j++) {
-        
-        /* Objects for the position detection */
 #ifndef VISUAL_ENCODER
-        angular_joints.push_back(new QuadratureEncoder(quad_enc_pins[j][0],
-                                                       quad_enc_pins[j][1]));
-#else
-        angular_joints.push_back(new VisualEncoder());
+    Position = new QuadratureEncoder(config::quad_enc_pins[_id][0],
+                                     config::quad_enc_pins[_id][1]);
 #endif
-        angular_rotors.push_back(new Motor(dc_motor_pins[j][0],
-                                           dc_motor_pins[j][1]));
+    Movement = new Motor(config::dc_motor_pins[_id][0],
+                         config::dc_motor_pins[_id][1]);
+}
 
+
+
+RoboticJoint::~RoboticJoint(void)
+{
+    delete Position;
+    delete Movement;
+}
+
+
+RoboticArm::RoboticArm(void) : _joints_nr(config::joints_nr)
+{
+    //_joints_nr = config.joints_nr;
+    
+    /* Initialize each joint objects */
+    for(auto id = 0; id < _joints_nr; id++) {
+        joints.push_back(new RoboticJoint(id));
     }
 
-    std::cout << "INFO: Created a " << _joints_nr << " joints object" << std::endl;
+    std::cout << "INFO: Created a " << _joints_nr << " joints arm object" << std::endl;
     
 }
 
@@ -60,10 +49,9 @@ RoboticArm::~RoboticArm(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
-    /* Call each of the positioning objects destructors */
-    for(auto j = 0; j < _joints_nr; j++) {
-        delete angular_rotors[j];
-        delete angular_joints[j];
+    /* Call each of the joints destructors */
+    for(auto id = 0; id < _joints_nr; id++) {
+        delete joints[id];
     }
 }
 
@@ -72,18 +60,12 @@ void RoboticArm::Init(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     /* Perform the initialization for each of the joints */
-    for(auto j = 0; j < _joints_nr; j++) {
+    for(auto id = 0; id < _joints_nr; id++) {
         /* Get the rotors to a known position */
-        angular_rotors[j]->SetSpeed(50);
-        angular_rotors[j]->Start();
-        angular_rotors[j]->Stop();
+        joints[id]->Movement->SetSpeed(50);
+        joints[id]->Movement->Start();
+        joints[id]->Movement->Stop();
     }
-}
-
-
-void RoboticArm::DemoCircle(void)
-{
-
 }
 
 
@@ -92,16 +74,16 @@ void RoboticArm::UpdatePosition(void)
     std::cout << __PRETTY_FUNCTION__ << std::endl;
 
     /* Print all of the joints positions relative to themselves for now */
-    for(auto j = 0; j < _joints_nr; j++) {
+    for(auto id = 0; id < _joints_nr; id++) {
 
-        angular_rotors[j]->Start();
+        joints[id]->Movement->Start();
         usleep(100E03);
-        angular_rotors[j]->Stop();
+        joints[id]->Movement->Stop();
         usleep(100E03);
         
-        angular_joints[j]->GetPosition();
-        angular_joints[j]->GetPeriod();
-        angular_joints[j]->PrintStats();
+        joints[id]->Position->GetPosition();
+        joints[id]->Position->GetPeriod();
+        joints[id]->Position->PrintStats();
 
         std::cout << std::endl;
     }
