@@ -97,6 +97,7 @@ void RoboticArm::UpdatePosition(void)
         
         angular_joints[j]->GetPosition();
         angular_joints[j]->GetPeriod();
+        angular_joints[j]->PrintStats();
 
         std::cout << std::endl;
     }
