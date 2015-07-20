@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <chrono>
+#include <atomic>
 #include <stdint.h>
 #include "../HighLatencyGPIO/GPIO.hh"
 
@@ -9,10 +10,10 @@ class QuadratureEncoder
     public:
         enum class Direction { CCW, CW };
 
-        explicit QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_b);
+        explicit QuadratureEncoder(const int &pin_a, const int &pin_b);
         virtual ~QuadratureEncoder(void);
 
-        int32_t GetPosition(void);
+        int GetPosition(void);
         std::chrono::nanoseconds GetPeriod(void);
         void ResetPosition(void);
         Direction GetDirection(void);
@@ -31,11 +32,11 @@ class QuadratureEncoder
         
         /* Quadrature Encoder Matrix for conversion
            http://letsmakerobots.com/content/how-use-quadrature-encoder */
-        uint8_t _prev_packed_read;
-        int8_t _qem[16] = {0,-1,1,2,1,0,2,-1,-1,2,0,1,2,1,-1,0};
+        std::atomic_int _prev_packed_read_a, _prev_packed_read_b;
+        const char _qem[16] = {0,-1,1,2,1,0,2,-1,-1,2,0,1,2,1,-1,0};
 
         /* Internal state variables */
-        int32_t _counter;
+        std::atomic_int _counter;
         std::chrono::nanoseconds _pulse_period_ns;
         Direction _direction;
         

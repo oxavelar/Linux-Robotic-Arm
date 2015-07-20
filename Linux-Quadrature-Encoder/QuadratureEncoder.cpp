@@ -9,12 +9,11 @@
  */
 
 #include <iostream>
-#include <chrono>
 #include <stdexcept>
 #include "QuadratureEncoder.h"
 
 
-QuadratureEncoder::QuadratureEncoder(const uint16_t &pin_a, const uint16_t &pin_b)
+QuadratureEncoder::QuadratureEncoder(const int &pin_a, const int &pin_b)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
@@ -43,7 +42,7 @@ QuadratureEncoder::~QuadratureEncoder(void)
 
 
 /* External API for the user, exposed to be used by higher classes */
-int32_t QuadratureEncoder::GetPosition(void)
+int QuadratureEncoder::GetPosition(void)
 {
     std::cout << "INFO: Current position counter " << _counter << std::endl;
     return _counter;
@@ -53,7 +52,7 @@ int32_t QuadratureEncoder::GetPosition(void)
 std::chrono::nanoseconds QuadratureEncoder::GetPeriod(void)
 {
     std::cout << "INFO: Pulse-width duration " << _pulse_period_ns.count() 
-              << " nanoseconds" << std::endl;
+              << " ns" << std::endl;
 
     return _pulse_period_ns;
 }
@@ -79,7 +78,7 @@ void QuadratureEncoder::ISR_ChannelA(void)
 
     int8_t delta;
     uint8_t a, b;
-    uint8_t current_packed_read;
+    uint8_t current_packed_read_a;
 
     /* Obtain the pulse-width between transitions */
     TrackGPIOPulseWidth();
@@ -89,19 +88,19 @@ void QuadratureEncoder::ISR_ChannelA(void)
     _gpio_b->getValue() == GPIO::Value::HIGH ? b = 1 : b = 0;
 
     /* Convert binary input to decimal value */
-    current_packed_read = (a << 1) | (b << 0);
+    current_packed_read_a = (a << 1) | (b << 0);
     /* Increment, or decrement depending on matrix */
-    delta = _qem[_prev_packed_read * 4 + current_packed_read];
+    delta = _qem[_prev_packed_read_a * 4 + current_packed_read_a];
     
     /* Update our rotation direction now */
-    if(delta == -1)            _direction =  Direction::CCW;
-    else if (delta == 1)       _direction =  Direction::CW;
+    if(delta == -1)            _direction = Direction::CCW;
+    else if (delta == 1)       _direction = Direction::CW;
     
     /* Update our local tracking variable */
     _counter += delta;
     
     /* Update our previous reading */
-    _prev_packed_read = current_packed_read;
+    _prev_packed_read_a = current_packed_read_a;
 }
 
 
@@ -111,7 +110,7 @@ void QuadratureEncoder::ISR_ChannelB(void)
 
     int8_t delta;
     uint8_t a, b;
-    uint8_t current_packed_read;
+    uint8_t current_packed_read_b;
 
     /* Convert enum class to actual zero or one */
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
@@ -121,25 +120,25 @@ void QuadratureEncoder::ISR_ChannelB(void)
     TrackGPIOPulseWidth();
 
     /* Convert binary input to decimal value */
-    current_packed_read = (a << 1) | (b << 0);
+    current_packed_read_b = (a << 1) | (b << 0);
     /* Increment, or decrement depending on matrix */
-    delta = _qem[_prev_packed_read * 4 + current_packed_read];
+    delta = _qem[_prev_packed_read_b * 4 + current_packed_read_b];
     
     /* Update our rotation direction now */
-    if(delta == -1)            _direction =  Direction::CCW;
-    else if (delta == 1)       _direction =  Direction::CW;
+    if(delta == -1)            _direction = Direction::CCW;
+    else if (delta == 1)       _direction = Direction::CW;
     
     /* Update our local tracking variable */
     _counter += delta;
     
     /* Update our previous reading */
-    _prev_packed_read = current_packed_read;
+    _prev_packed_read_b = current_packed_read_b;
 }
 
 
 void QuadratureEncoder::TrackGPIOPulseWidth(void)
 {
-    static int toggle;
+    static std::atomic_int toggle;
     const auto now = std::chrono::high_resolution_clock::now();
     
     if(toggle++ % 2) {
