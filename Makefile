@@ -1,4 +1,4 @@
-PROGRAM := linux-robotic-arm.bin
+PROGRAM := linux-robotic-arm.app
 
 CC = g++
 CXXFLAGS += -O3 -fPIC -Wall -Wextra -Werror -pedantic-errors -std=c++11 -pipe
