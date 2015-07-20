@@ -32,13 +32,4 @@ class Motor
     private:
         /* PWM control objects from the class */
         PWM *_pwm_a, *_pwm_b, *_pwm_sel;
-
-        /* Internal state variables */
-        uint32_t _speed;
-        
-        Direction _motor_direction;
-
-        /* Global PWM values */
-        PWM::Period _pwm_period_ns;
-        PWM::Duty _pwm_dutycycle_ns;
 };

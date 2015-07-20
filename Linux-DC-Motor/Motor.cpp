@@ -21,9 +21,10 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
     
     /* Operational values being calculated at default */
     const float t = 1 / (float)BASE_PWM_FREQUENCY_HZ;
-    _pwm_period_ns = t * 1E9;
-    _pwm_dutycycle_ns = BASE_PWM_DUTYCYCLE * _pwm_period_ns / 100;
+    const PWM::Period _pwm_period_ns = t * 1E9;
+    const PWM::Duty _pwm_dutycycle_ns = BASE_PWM_DUTYCYCLE * _pwm_period_ns / 100;
     
+    /* Set both PWM channels to default values but keep them off */
     _pwm_a->setPeriod(_pwm_period_ns);
     _pwm_a->setDuty(_pwm_dutycycle_ns);
     _pwm_b->setPeriod(_pwm_period_ns);
