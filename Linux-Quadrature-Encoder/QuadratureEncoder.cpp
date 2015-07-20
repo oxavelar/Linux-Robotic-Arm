@@ -51,11 +51,12 @@ int QuadratureEncoder::GetPosition(void)
 
 std::chrono::nanoseconds QuadratureEncoder::GetPeriod(void)
 {
-    std::cout << "INFO: Pulse-width duration " << _pulse_period_ns.count() 
+    std::cout << "INFO: Last pulse-width duration " << _pulse_period_ns.count() 
               << " ns" << std::endl;
 
     return _pulse_period_ns;
 }
+
 
 void QuadratureEncoder::ResetPosition(void)
 {
@@ -71,14 +72,21 @@ QuadratureEncoder::Direction QuadratureEncoder::GetDirection(void)
 }
 
 
+void QuadratureEncoder::PrintStats(void)
+{
+    std::cout << "INFO: Channel A interrupts:    " << _channel_a_isr_cnt << std::endl;
+    std::cout << "INFO: Channel B interrupts:    " << _channel_b_isr_cnt << std::endl;
+
+    (void) GetPeriod();
+}
+
+
 /* Internal Quadrature Encoder ISR Handlers */
 void QuadratureEncoder::ISR_ChannelA(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
-    int8_t delta;
-    uint8_t a, b;
-    uint8_t current_packed_read_a;
+    char delta;
+    char a, b;
+    char current_packed_read_a;
 
     /* Obtain the pulse-width between transitions */
     TrackGPIOPulseWidth();
@@ -101,16 +109,17 @@ void QuadratureEncoder::ISR_ChannelA(void)
     
     /* Update our previous reading */
     _prev_packed_read_a = current_packed_read_a;
+
+    /* Debug statistics */
+    _channel_a_isr_cnt++;
 }
 
 
 void QuadratureEncoder::ISR_ChannelB(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
-    int8_t delta;
-    uint8_t a, b;
-    uint8_t current_packed_read_b;
+    char delta;
+    char a, b;
+    char current_packed_read_b;
 
     /* Convert enum class to actual zero or one */
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
@@ -133,6 +142,9 @@ void QuadratureEncoder::ISR_ChannelB(void)
     
     /* Update our previous reading */
     _prev_packed_read_b = current_packed_read_b;
+
+    /* Debug statistics */
+    _channel_b_isr_cnt++;
 }
 
 

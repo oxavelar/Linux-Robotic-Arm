@@ -18,6 +18,8 @@ class QuadratureEncoder
         void ResetPosition(void);
         Direction GetDirection(void);
 
+        void PrintStats(void);
+
     private:
         /* Pulse train inputs objects from the GPIO class */
         GPIO *_gpio_a, *_gpio_b;
@@ -43,4 +45,7 @@ class QuadratureEncoder
         /* Used to keep track of the actual interrupt pulse-widths */
         void TrackGPIOPulseWidth(void);
         std::chrono::high_resolution_clock::time_point _isr_timestamp;
+
+        /* Debug variables */
+        std::atomic_ullong _channel_a_isr_cnt, _channel_b_isr_cnt;
 };
