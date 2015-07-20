@@ -98,29 +98,25 @@ void Motor::SetDirection(const Direction &dir)
 {
     /* Obtain the other direction settings, before switching */
     const float speed = GetSpeed();
-    const int stopped = IsStopped();
+    const State status = GetState();
     
     /* Stop the rotation going in that direction */
-    if (!stopped) Stop();
+    if (status == State::RUNNING) Stop();
 
     /* Update the active pwm pointer, depending which way you want to go */
     if      (dir == Direction::CW)      _pwm_sel = _pwm_a;
     else if (dir == Direction::CCW)     _pwm_sel = _pwm_b;
     
-    /* Copying values over to the other rotation direction */
+    /* Copying values over to the other rotation direction and start if required */
     SetSpeed(speed);
-    if (!stopped) Start();
+    if (status == State::RUNNING) Start();
 }
 
 
-int Motor::IsStopped(void)
+Motor::State Motor::GetState(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    
-    int stopped = 0;
-    if ( _pwm_a->getState() == PWM::State::DISABLED ) stopped |= 1;
-    if ( _pwm_b->getState() == PWM::State::DISABLED ) stopped |= 1;
-
-    return(stopped);
+    State status = State::STOPPED;
+    if ( _pwm_sel->getState() == PWM::State::ENABLED ) status = State::RUNNING;
+    return(status);
 }
 

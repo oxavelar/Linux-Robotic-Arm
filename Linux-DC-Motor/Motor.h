@@ -15,6 +15,7 @@
 class Motor
 {
     public:
+        enum class State : char { STOPPED, RUNNING };
         enum class Direction { CCW, CW };
 
         explicit Motor(const int &pin_pwm_a, const int &pin_pwm_b);
@@ -28,7 +29,7 @@ class Motor
         Direction GetDirection(void);
         void SetDirection(const Direction &dir);
 
-        int IsStopped(void);
+        State GetState(void);
 
     private:
         /* PWM control objects from the class */
