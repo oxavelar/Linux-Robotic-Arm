@@ -58,9 +58,8 @@ std::chrono::nanoseconds QuadratureEncoder::GetPeriod(void)
 }
 
 
-void QuadratureEncoder::ResetPosition(void)
+void QuadratureEncoder::SetZero(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
     _counter = 0;
 }
 

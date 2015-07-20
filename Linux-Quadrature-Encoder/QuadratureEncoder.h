@@ -15,7 +15,7 @@ class QuadratureEncoder
 
         int GetPosition(void);
         std::chrono::nanoseconds GetPeriod(void);
-        void ResetPosition(void);
+        void SetZero(void);
         Direction GetDirection(void);
 
         void PrintStats(void);
