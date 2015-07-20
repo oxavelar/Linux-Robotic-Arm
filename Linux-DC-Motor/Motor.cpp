@@ -17,18 +17,22 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
 {
     /* DC motor control is performed with PWM sysfs abstraction */
     _pwm_a = new PWM(pin_pwm_a);
-    _pwm_b = new PWM(pin_pwm_a);
+    _pwm_b = new PWM(pin_pwm_b);
     
     /* Operational values being calculated at default */
-    const float t = 1 / (float)BASE_PWM_FREQUENCY_HZ;
-    const PWM::Period _pwm_period_ns = t * 1E9;
-    const PWM::Duty _pwm_dutycycle_ns = BASE_PWM_DUTYCYCLE * _pwm_period_ns / 100;
+    const float t = (1 / (float)BASE_PWM_FREQUENCY_HZ);
+    const PWM::Period _pwm_period_ns = (t * 1E9);
+    const PWM::Duty _pwm_dutycycle_ns = (BASE_PWM_DUTYCYCLE * _pwm_period_ns / 100);
     
     /* Set both PWM channels to default values but keep them off */
     _pwm_a->setPeriod(_pwm_period_ns);
-    _pwm_a->setDuty(_pwm_dutycycle_ns);
     _pwm_b->setPeriod(_pwm_period_ns);
+    _pwm_a->setDuty(_pwm_dutycycle_ns);
     _pwm_b->setDuty(_pwm_dutycycle_ns);
+    
+    /* Defaults to stopped and clockwise */
+    Stop();
+    SetDirection(Direction::CW);
 
     /* Useful information to be printed regarding set-up */
     std::cout << "INFO: Userspace motor created @ (pinPWM=" 
@@ -62,17 +66,6 @@ void Motor::Stop(void)
 }
 
 
-void Motor::SetSpeed(const float &percent)
-{
-    /* Translates the speed percentage to a PWM duty cycle */
-    if(percent <= 100) {
-        _pwm_sel->setDuty(_pwm_sel->getDuty() * percent / 100);
-    } else {
-        throw std::runtime_error("Invalid speed value");
-    }
-}
-
-
 float Motor::GetSpeed(void)
 {
     float speed;
@@ -80,6 +73,26 @@ float Motor::GetSpeed(void)
     speed = float(100 * _pwm_sel->getDuty() / _pwm_sel->getPeriod());
     return(speed);
 }
+
+
+void Motor::SetSpeed(const float &percent)
+{
+    /* Translates the speed percentage to a PWM duty cycle */
+    if(percent <= 100)
+        _pwm_sel->setDuty(_pwm_sel->getDuty() * percent / 100);
+    else
+        throw std::runtime_error("Invalid speed value");
+}
+
+
+Motor::Direction Motor::GetDirection(void)
+{
+    Direction dir = Direction::CW;
+    if      (_pwm_sel == _pwm_a )       dir = Direction::CW;
+    else if (_pwm_sel == _pwm_b )       dir = Direction::CCW;
+    return(dir);
+}
+
 
 void Motor::SetDirection(const Direction &dir)
 {
@@ -91,8 +104,8 @@ void Motor::SetDirection(const Direction &dir)
     if (!stopped) Stop();
 
     /* Update the active pwm pointer, depending which way you want to go */
-    if (dir == Direction::CW)           _pwm_sel = _pwm_b;
-    else if (dir == Direction::CCW)     _pwm_sel = _pwm_a;
+    if      (dir == Direction::CW)      _pwm_sel = _pwm_a;
+    else if (dir == Direction::CCW)     _pwm_sel = _pwm_b;
     
     /* Copying values over to the other rotation direction */
     SetSpeed(speed);

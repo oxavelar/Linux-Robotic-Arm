@@ -20,11 +20,12 @@ class Motor
         explicit Motor(const int &pin_pwm_a, const int &pin_pwm_b);
         virtual ~Motor(void);
 
-        void Start(void);
         void Stop(void);
-        void SetSpeed(const float &percent);
+        void Start(void);
         float GetSpeed(void);
+        void SetSpeed(const float &percent);
 
+        Direction GetDirection(void);
         void SetDirection(const Direction &dir);
 
         int IsStopped(void);
