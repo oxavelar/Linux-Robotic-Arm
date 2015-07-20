@@ -91,9 +91,10 @@ void RoboticArm::UpdatePosition(void)
     for(auto j = 0; j < _joints_nr; j++) {
 
         angular_rotors[j]->Start();
-        usleep(10E03);
+        usleep(100E03);
         angular_rotors[j]->Stop();
-
+        usleep(100E03);
+        
         angular_joints[j]->GetPosition();
         angular_joints[j]->GetPeriod();
 
