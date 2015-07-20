@@ -13,20 +13,22 @@
 
 
 int quad_enc_pins[2][2] = {{24, 25}, {27, 26}};
-int dc_motor_pins[2] = {3, 5};
+int dc_motor_pins[2][2] = {{ 3,  5}, { 1,  7}};
 /*
     The following is Intel's Galileo layout for the pins.
 
-    +==========+=========+===================+
-    |  SYS_FS  |   LABEL |       DESCRIPTION |
-    +==========+=========+===================+
-    |      24  |     IO6 |   QE Channel A #1 |
-    |      25  |    IO11 |   QE Channel B #1 |
-    |      26  |     IO8 |   QE Channel A #2 |
-    |      27  |     IO7 |   QE Channel B #2 |
-    |       3  |    PWM3 |  Motor DC Ctrl #1 |
-    |       5  |    PWM5 |  Motor DC Ctrl #2 |
-    +==========+=========+================== +
+    +==========+=========+=======================+
+    |  SYS_FS  |   LABEL |           DESCRIPTION |
+    +==========+=========+=======================+
+    |      24  |     IO6 |       QE Channel A #1 |
+    |      25  |    IO11 |       QE Channel B #1 |
+    |      26  |     IO8 |       QE Channel A #2 |
+    |      27  |     IO7 |       QE Channel B #2 |
+    |       3  |    PWM3 |  Motor DC Ctrl #1 CW  |
+    |       5  |    PWM5 |  Motor DC Ctrl #1 CCW |
+    |       9  |    PWM1 |  Motor DC Ctrl #2 CW  |
+    |      10  |    PWM7 |  Motor DC Ctrl #2 CCW |
+    +==========+=========+====================== +
 
     Note: Galileo's cannot go slower than ~125 Hz on Linux SYSFS PWM.
 */
@@ -44,7 +46,9 @@ RoboticArm::RoboticArm(const uint16_t &joints_nr): _joints_nr(joints_nr)
 #else
         angular_joints.push_back(new VisualEncoder());
 #endif
-        angular_rotors.push_back(new Motor(dc_motor_pins[j]));
+        angular_rotors.push_back(new Motor(dc_motor_pins[j][0],
+                                           dc_motor_pins[j][1]));
+
     }
 
     std::cout << "INFO: Created a " << _joints_nr << " joints object" << std::endl;
