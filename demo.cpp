@@ -31,9 +31,9 @@ int main(void)
     signal(SIGINT, _cleanup);
     
     /* Higher priority for interrupt procesisng */
-    struct sched_param sp = { .sched_priority = sched_get_priority_max(SCHED_FIFO) };
+    struct sched_param sp = { .sched_priority = sched_get_priority_max(SCHED_RR) };
 
-    if( sched_setscheduler(0, SCHED_FIFO, &sp) != 0 ) {
+    if( sched_setscheduler(0, SCHED_RR, &sp) != 0 ) {
         std::cout << "WARNING: Failed to increase process priority!" << std::endl;
     }
 
