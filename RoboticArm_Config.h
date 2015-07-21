@@ -17,6 +17,7 @@
  *   |      14  |     IO2 | H-Bridge direction #1 |
  *   |       9  |    PWM1 |      Motor DC Ctrl #2 |
  *   |      17  |     IO5 | H-Bridge direction #2 |
+ *   |  video0  | USB HST |         USB HD WebCam |
  *   +==========+=========+====================== +
  *
  *  Note: Galileo's cannot go slower than ~125 Hz on Linux SYSFS PWM.
@@ -31,6 +32,9 @@ namespace config
     /* Pair of pins used for these elements */
     static constexpr int quad_enc_pins[][2] = {{24, 25}, {27, 26}};
     static constexpr int dc_motor_pins[][2] = {{ 3, 14}, { 1, 17}};
+    
+    /* All of the joints will utilize the same webcam port in this case */
+    static constexpr int visual_enc_ports[] = {0, 0};
     
     /* Calculate number of joints based of motors */
     static const int joints_nr = sizeof(dc_motor_pins)/sizeof(dc_motor_pins[0]);
