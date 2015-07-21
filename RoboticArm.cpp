@@ -19,7 +19,7 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
     Position = new QuadratureEncoder(config::quad_enc_pins[_id][0],
                                      config::quad_enc_pins[_id][1]);
 #else
-    Position = new VisualEncoder();
+    Position = new VisualEncoder(config::visual_enc_port[_id]);
 #endif
     Movement = new Motor(config::dc_motor_pins[_id][0],
                          config::dc_motor_pins[_id][1]);
@@ -39,7 +39,6 @@ RoboticArm::RoboticArm(void) : _joints_nr(config::joints_nr)
     for(auto id = 0; id < _joints_nr; id++) {
         joints.push_back(new RoboticJoint(id));
     }
-
     std::cout << "INFO: Created a " << _joints_nr << " joints arm object" << std::endl;
 }
 
