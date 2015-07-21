@@ -30,7 +30,7 @@ namespace config
 {
     /* Pair of pins used for these elements */
     static constexpr int quad_enc_pins[][2] = {{24, 25}, {27, 26}};
-    static constexpr int dc_motor_pins[][2] = {{ 3, 15}, { 9, 17}};
+    static constexpr int dc_motor_pins[][2] = {{ 3, 15}, { 1, 17}};
     
     /* Calculate number of joints based of motors */
     static const int joints_nr = sizeof(dc_motor_pins)/sizeof(dc_motor_pins[0]);
