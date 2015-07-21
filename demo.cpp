@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <signal.h>
-#include <sys/resource.h>
 #include <sched.h>
 #include <pthread.h>
 #include "RoboticArm.h"
@@ -32,7 +31,9 @@ int main(void)
     signal(SIGINT, _cleanup);
     
     /* Higher priority for interrupt procesisng */
-    if( setpriority(PRIO_PROCESS, 0, 15) != 0) {
+    struct sched_param sp = { .sched_priority = sched_get_priority_max(SCHED_FIFO) };
+
+    if( sched_setscheduler(0, SCHED_FIFO, &sp) != 0 ) {
         std::cout << "WARNING: Failed to increase process priority!" << std::endl;
     }
 

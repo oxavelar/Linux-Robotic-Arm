@@ -88,9 +88,8 @@ void RoboticArm::UpdatePosition(void)
 
         joints[id]->Movement->SetSpeed(50.0);
         joints[id]->Movement->Start();
-        usleep(12E03);                      // 12ms
+        usleep(1E06);                      // 1s
         joints[id]->Movement->Stop();
-        usleep(100E03);                     // 100ms
         
         joints[id]->Position->GetPosition();
         joints[id]->Position->PrintStats();
