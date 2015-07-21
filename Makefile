@@ -18,6 +18,7 @@ OBJECTS += HighLatencyGPIO/GPIO.o \
            Linux-Quadrature-Encoder/QuadratureEncoder.o
 
 
+CXXFLAGS += -DGPIO_HIGH_PRIORITY_THREADS
 CXXFLAGS += -DBASE_PWM_FREQUENCY_HZ=25000 -DBASE_PWM_DUTYCYCLE=50
 
 

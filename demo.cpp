@@ -32,9 +32,9 @@ int main(void)
     
     /* Higher priority for interrupt procesisng */
     /* https://rt.wiki.kernel.org/index.php/HOWTO:_Build_an_RT-application */
-    struct sched_param sp = { .sched_priority = sched_get_priority_max(SCHED_RR) - 9 };
+    struct sched_param sp = { .sched_priority = sched_get_priority_max(SCHED_FIFO) - 9 };
 
-    if( sched_setscheduler(0, SCHED_RR, &sp) != 0 ) {
+    if( sched_setscheduler(0, SCHED_FIFO, &sp) != 0 ) {
         std::cout << "WARNING: Failed to increase process priority!" << std::endl;
     }
 
