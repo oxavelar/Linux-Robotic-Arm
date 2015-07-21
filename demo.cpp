@@ -29,6 +29,8 @@ int main(void)
     signal(SIGINT, _cleanup);
     
     RoboArm->Init();
+    usleep(2E06);
+    
     /* Input a curve or shape to the roboarm to draw it */
     for(;;) {
         RoboArm->UpdatePosition();

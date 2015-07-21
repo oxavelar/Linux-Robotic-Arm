@@ -20,16 +20,15 @@ Motor::Motor(const int &pin_pwm, const int &pin_dir)
     _pwm = new PWM(pin_pwm);
     _gpio = new GPIO(pin_dir, GPIO::Direction::OUT);
     
-    /* Operational values being calculated at default */
-    const float t = (1 / (float)BASE_PWM_FREQUENCY_HZ);
+    /* Operational values being calculated for default base freq */
+    const double t = (1 / (double)BASE_PWM_FREQUENCY_HZ);
     const PWM::Period _pwm_period_ns = (t * 1E9);
-    const PWM::Duty _pwm_dutycycle_ns = (BASE_PWM_DUTYCYCLE * _pwm_period_ns / 100);
+    const PWM::Duty _pwm_dutycycle_ns = (BASE_PWM_DUTYCYCLE * t * 1E9 / 100);
     
-    /* Set PWM channel to default values but keep them off */
     _pwm->setPeriod(_pwm_period_ns);
     _pwm->setDuty(_pwm_dutycycle_ns);
     
-    /* Defaults to stopped and clockwise */
+    /* Defaults to stopped and clockwise rotation */
     Stop();
     SetDirection(Direction::CW);
 
@@ -65,20 +64,25 @@ void Motor::Stop(void)
 }
 
 
-float Motor::GetSpeed(void)
+double Motor::GetSpeed(void)
 {
-    float speed;
+    double speed;
     /* Reverse translates the PWM duty cycle to speed % */
-    speed = float(100 * _pwm->getDuty() / _pwm->getPeriod());
+    speed = (double)_pwm->getDuty() * 100 / (double)_pwm->getPeriod();
     return(speed);
 }
 
 
-void Motor::SetSpeed(const float &percent)
+void Motor::SetSpeed(const double &percent)
 {
     /* Translates the speed percentage to a PWM duty cycle */
-    if(percent <= 100)
-        _pwm->setDuty(_pwm->getDuty() * percent / 100);
+    double val = (double)_pwm->getPeriod() * percent / (double)100;
+    std::cout << _pwm->getPeriod() << std::endl;
+    std::cout << val << std::endl;
+    std::cout << val << std::endl;
+    std::cout << val << std::endl;
+    if((percent <= 100) and (percent >= 0))
+        _pwm->setDuty(val);
     else
         throw std::runtime_error("Invalid speed value");
 }
@@ -87,8 +91,8 @@ void Motor::SetSpeed(const float &percent)
 Motor::Direction Motor::GetDirection(void)
 {
     Direction dir = Direction::CW;
-    if      ( _gpio->getValue() == GPIO::Value::LOW )  dir = Direction::CW;
-    else if ( _gpio->getValue() == GPIO::Value::HIGH ) dir = Direction::CCW;
+    if     ( _gpio->getValue() == GPIO::Value::LOW  ) dir = Direction::CW;
+    else if( _gpio->getValue() == GPIO::Value::HIGH ) dir = Direction::CCW;
     return(dir);
 }
 
@@ -96,15 +100,15 @@ Motor::Direction Motor::GetDirection(void)
 void Motor::SetDirection(const Direction &dir)
 {
     /* Move the direction pin depending which way you want to go */
-    if      (dir == Direction::CW)  _gpio->setValue(GPIO::Value::LOW);
-    else if (dir == Direction::CCW) _gpio->setValue(GPIO::Value::HIGH);
+    if     ( dir == Direction::CW )  _gpio->setValue(GPIO::Value::LOW);
+    else if( dir == Direction::CCW ) _gpio->setValue(GPIO::Value::HIGH);
 }
 
 
 Motor::State Motor::GetState(void)
 {
     State status = State::STOPPED;
-    if ( _pwm->getState() == PWM::State::ENABLED ) status = State::RUNNING;
+    if( _pwm->getState() == PWM::State::ENABLED ) status = State::RUNNING;
     return(status);
 }
 

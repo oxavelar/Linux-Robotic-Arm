@@ -48,8 +48,9 @@ RoboticArm::~RoboticArm(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
-    /* Call each of the joints destructors */
+    /* Call each of the joints destructors and stop any movement object */
     for(auto id = 0; id < _joints_nr; id++) {
+        joints[id]->Movement->Stop();
         delete joints[id];
     }
 }
@@ -70,10 +71,11 @@ void RoboticArm::Init(void)
             joints[id]->Movement->Start();
         } while (joints[id]->Position->GetPosition() != still_moving);
         /* Reset the position coordinates, this is our reference */
+        joints[id]->Movement->Stop();
         joints[id]->Position->SetZero();
 
-       std::cout << "INFO: Calibrated all of the joints to a known position" << std::endl;
     }
+    std::cout << "INFO: Calibrated all of the joints to a known position" << std::endl;
 }
 
 
@@ -84,13 +86,13 @@ void RoboticArm::UpdatePosition(void)
     /* Print all of the joints positions relative to themselves for now */
     for(auto id = 0; id < _joints_nr; id++) {
 
+        joints[id]->Movement->SetSpeed(50.0);
         joints[id]->Movement->Start();
-        usleep(100E03);
+        usleep(1.7E03);                     // 1.7ms
         joints[id]->Movement->Stop();
-        usleep(100E03);
+        usleep(1.7E03);                     // 1.7ms
         
         joints[id]->Position->GetPosition();
-        joints[id]->Position->GetPeriod();
         joints[id]->Position->PrintStats();
 
         std::cout << std::endl;

@@ -25,8 +25,8 @@ class Motor
 
         void Stop(void);
         void Start(void);
-        float GetSpeed(void);
-        void SetSpeed(const float &percent);
+        double GetSpeed(void);
+        void SetSpeed(const double &percent);
 
         Direction GetDirection(void);
         void SetDirection(const Direction &dir);

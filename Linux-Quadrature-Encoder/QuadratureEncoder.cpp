@@ -10,6 +10,7 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <cmath>
 #include "QuadratureEncoder.h"
 
 
@@ -24,6 +25,10 @@ QuadratureEncoder::QuadratureEncoder(const int &pin_a, const int &pin_b)
     /* Initialize channels GPIO objects and assign local callbacks */
     _gpio_a = new GPIO(pin_a, GPIO::Edge::BOTH, _channel_a_callback);
     _gpio_b = new GPIO(pin_b, GPIO::Edge::BOTH, _channel_b_callback);
+    
+    /* Reset statistics */
+    _channel_a_isr_cnt = 0;
+    _channel_b_isr_cnt = 0;
 
     /* Useful information to be printed regarding set-up */
     std::cout << "INFO: Userspace quadrature encoder created @ (pinA="
@@ -44,14 +49,15 @@ QuadratureEncoder::~QuadratureEncoder(void)
 /* External API for the user, exposed to be used by higher classes */
 int QuadratureEncoder::GetPosition(void)
 {
-    std::cout << "INFO: Current position counter " << _counter << std::endl;
+    std::cout << "INFO: Current position counter " 
+              << std::abs(_counter) << std::endl;
     return _counter;
 }
 
 
 std::chrono::nanoseconds QuadratureEncoder::GetPeriod(void)
 {
-    std::cout << "INFO: Last pulse-width duration " << _pulse_period_ns.count() 
+    std::cout << "INFO: Last pulsewidth duration " << _pulse_period_ns.count() 
               << " ns" << std::endl;
 
     return _pulse_period_ns;
@@ -66,16 +72,19 @@ void QuadratureEncoder::SetZero(void)
 
 QuadratureEncoder::Direction QuadratureEncoder::GetDirection(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    if(_direction == Direction::CW) {
+        std::cout << "INFO: Current direction        +" << std::endl;
+    } else
+        std::cout << "INFO: Current direction        -" << std::endl;
     return _direction;
 }
 
 
 void QuadratureEncoder::PrintStats(void)
 {
-    std::cout << "INFO: Channel A interrupts:    " << _channel_a_isr_cnt << std::endl;
-    std::cout << "INFO: Channel B interrupts:    " << _channel_b_isr_cnt << std::endl;
-
+    std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_cnt << std::endl;
+    std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_cnt << std::endl;
+    (void) GetDirection();
     (void) GetPeriod();
 }
 
@@ -87,7 +96,7 @@ void QuadratureEncoder::ISR_ChannelA(void)
     char a, b;
     char current_packed_read_a;
 
-    /* Obtain the pulse-width between transitions */
+    /* Obtain the pulsewidth between transitions */
     TrackGPIOPulseWidth();
 
     /* Convert enum class to actual zero or one */
@@ -101,7 +110,7 @@ void QuadratureEncoder::ISR_ChannelA(void)
     
     /* Update our rotation direction now */
     if(delta == -1)            _direction = Direction::CCW;
-    else if (delta == 1)       _direction = Direction::CW;
+    else if(delta == 1)        _direction = Direction::CW;
     
     /* Update our local tracking variable */
     _counter += delta;
@@ -124,7 +133,7 @@ void QuadratureEncoder::ISR_ChannelB(void)
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
     _gpio_b->getValue() == GPIO::Value::HIGH ? b = 1 : b = 0;
     
-    /* Obtain the pulse-width between transitions */
+    /* Obtain the pulsewidth between transitions */
     TrackGPIOPulseWidth();
 
     /* Convert binary input to decimal value */
@@ -155,7 +164,7 @@ void QuadratureEncoder::TrackGPIOPulseWidth(void)
     if(toggle++ % 2) {
         _isr_timestamp = now;
     } else {
-        /* Calculate the pulse-width on even transitions */
+        /* Calculate the pulsewidth on even transitions */
         auto delta = now - _isr_timestamp;
         _pulse_period_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(delta);
     }
