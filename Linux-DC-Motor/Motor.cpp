@@ -77,10 +77,6 @@ void Motor::SetSpeed(const double &percent)
 {
     /* Translates the speed percentage to a PWM duty cycle */
     double val = (double)_pwm->getPeriod() * percent / (double)100;
-    std::cout << _pwm->getPeriod() << std::endl;
-    std::cout << val << std::endl;
-    std::cout << val << std::endl;
-    std::cout << val << std::endl;
     if((percent <= 100) and (percent >= 0))
         _pwm->setDuty(val);
     else
