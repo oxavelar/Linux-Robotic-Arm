@@ -31,7 +31,8 @@ int main(void)
     signal(SIGINT, _cleanup);
     
     /* Higher priority for interrupt procesisng */
-    struct sched_param sp = { .sched_priority = sched_get_priority_max(SCHED_RR) };
+    /* https://rt.wiki.kernel.org/index.php/HOWTO:_Build_an_RT-application */
+    struct sched_param sp = { .sched_priority = sched_get_priority_max(SCHED_RR) - 9 };
 
     if( sched_setscheduler(0, SCHED_RR, &sp) != 0 ) {
         std::cout << "WARNING: Failed to increase process priority!" << std::endl;
