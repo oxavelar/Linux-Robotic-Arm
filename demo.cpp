@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <signal.h>
+#include <sys/resource.h>
+#include <sched.h>
+#include <pthread.h>
 #include "RoboticArm.h"
 
 
@@ -28,6 +31,11 @@ int main(void)
     /* Register a signal handler to exit gracefully */
     signal(SIGINT, _cleanup);
     
+    /* Higher priority for interrupt procesisng */
+    if( setpriority(PRIO_PROCESS, 0, 15) != 0) {
+        std::cout << "WARNING: Failed to increase process priority!" << std::endl;
+    }
+
     RoboArm->Init();
     usleep(2E06);
     
