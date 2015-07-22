@@ -29,14 +29,15 @@ int main(void)
     
     /* Register a signal handler to exit gracefully */
     signal(SIGINT, _cleanup);
-    
+
+#ifdef RT_PRIORITY
     /* Higher priority for interrupt procesisng */
     /* https://rt.wiki.kernel.org/index.php/HOWTO:_Build_an_RT-application */
-    struct sched_param sp = { .sched_priority = sched_get_priority_max(SCHED_FIFO) - 9 };
-
+    struct sched_param sp = { .sched_priority = sched_get_priority_max(SCHED_FIFO) - 50 };
     if( sched_setscheduler(0, SCHED_FIFO, &sp) != 0 ) {
         std::cout << "WARNING: Failed to increase process priority!" << std::endl;
     }
+#endif
 
     RoboArm->Init();
     usleep(2E06);
