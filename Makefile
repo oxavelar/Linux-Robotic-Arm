@@ -17,12 +17,13 @@ OBJECTS += HighLatencyGPIO/GPIO.o \
            Linux-DC-Motor/Motor.o \
            Linux-Quadrature-Encoder/QuadratureEncoder.o
 
+DEPS = HighLatencyGPIO/GPIO.cc HighLatencyPWM/PWM.cc
 
 CXXFLAGS += -DGPIO_HIGH_PRIORITY_THREADS
 CXXFLAGS += -DBASE_PWM_FREQUENCY_HZ=25000 -DBASE_PWM_DUTYCYCLE=50
 
 
-all: $(SOURCES) $(OBJECTS) HighLatencyGPIO/GPIO.cc HighLatencyPWM/PWM.cc
+all: $(DEPS) $(SOURCES) $(OBJECTS)
 	$(CC) $(CXXFLAGS) $(LDLIBS) $(OBJECTS) -o $(PROGRAM)
 
 HighLatencyGPIO/GPIO.cc:
