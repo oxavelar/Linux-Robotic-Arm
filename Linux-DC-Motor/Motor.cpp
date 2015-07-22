@@ -87,7 +87,7 @@ void Motor::SetSpeed(const double &percent)
 Motor::Direction Motor::GetDirection(void)
 {
     Direction dir = Direction::CW;
-    if     ( _gpio->getValue() == GPIO::Value::LOW  ) dir = Direction::CW;
+    if     ( _gpio->getValue() == GPIO::Value::LOW )  dir = Direction::CW;
     else if( _gpio->getValue() == GPIO::Value::HIGH ) dir = Direction::CCW;
     return(dir);
 }

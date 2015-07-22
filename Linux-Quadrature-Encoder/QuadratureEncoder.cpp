@@ -143,7 +143,7 @@ void QuadratureEncoder::ISR_ChannelB(void)
     
     /* Update our rotation direction now */
     if(delta == -1)            _direction = Direction::CCW;
-    else if (delta == 1)       _direction = Direction::CW;
+    else if(delta == 1)        _direction = Direction::CW;
     
     /* Update our local tracking variable */
     _counter += delta;

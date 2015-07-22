@@ -85,10 +85,10 @@ void RoboticArm::UpdatePosition(void)
     /* Print all of the joints positions relative to themselves for now */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        joints[id]->Movement->SetSpeed(50.0);
+        //joints[id]->Movement->SetSpeed(50.0);
         joints[id]->Movement->Start();
-        usleep(500E03);
-        joints[id]->Movement->Stop();
+        //usleep(500E03);
+        //joints[id]->Movement->Stop();
         
         joints[id]->Position->GetPosition();
         joints[id]->Position->PrintStats();
