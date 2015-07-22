@@ -6,7 +6,7 @@
 #include "../HighLatencyGPIO/GPIO.hh"
 
 #ifndef BASE_PWM_FREQUENCY_HZ
-#define BASE_PWM_FREQUENCY_HZ 2000
+#define BASE_PWM_FREQUENCY_HZ 30000
 #endif
 
 #ifndef BASE_PWM_DUTYCYCLE
@@ -35,7 +35,6 @@ class Motor
 
     private:
         /* External world interactions to the H-Bridge */
-        PWM *_pwm;
-        GPIO * _gpio;
+        PWM *_pwm_a, *_pwm_b, *_pwm_active;
 };
 
