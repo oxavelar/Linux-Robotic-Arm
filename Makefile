@@ -20,18 +20,16 @@ OBJECTS += HighLatencyGPIO/GPIO.o \
 DEPS = HighLatencyGPIO/GPIO.cc HighLatencyPWM/PWM.cc
 
 CXXFLAGS += -DRT_PRIORITY
-CXXFLAGS += -DBASE_PWM_FREQUENCY_HZ=200 -DBASE_PWM_DUTYCYCLE=50
+CXXFLAGS += -DBASE_PWM_FREQUENCY_HZ=150 -DBASE_PWM_DUTYCYCLE=50
 
 
-all: $(DEPS) $(SOURCES) $(OBJECTS)
+all : $(DEPS) $(SOURCES) $(OBJECTS)
 	$(CC) $(CXXFLAGS) $(LDLIBS) $(OBJECTS) -o $(PROGRAM)
 
-HighLatencyGPIO/GPIO.cc:
+$(DEPS) :
 	git clone -q https://github.com/oxavelar/HighLatencyGPIO
-
-HighLatencyPWM/PWM.cc:
 	git clone -q https://github.com/oxavelar/HighLatencyPWM
 
-clean:
-	rm -rf $(PROGRAM) $(OBJECTS)
+clean :
+	-rm -rf $(PROGRAM) $(OBJECTS)
 
