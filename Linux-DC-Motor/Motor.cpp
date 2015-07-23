@@ -30,9 +30,8 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
     _pwm_a->setDuty(_pwm_dutycycle_ns);
     _pwm_b->setDuty(_pwm_dutycycle_ns);
 
-    /* Defaults to stopped and clockwise rotation */
-    Stop();
-    SetDirection(Direction::CW);
+    /* Defaults to channel A as active */
+    _pwm_active = _pwm_a;
 
     /* Useful information to be printed regarding set-up */
     std::cout << "INFO: Userspace motor created @ (pinPWM_A=" 
@@ -48,6 +47,8 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
 
 Motor::~Motor(void)
 {
+    /* Just to be on the safe side */
+    Stop();
     /* Deleting the PWM object will disable it's output too */
     delete _pwm_a;
     delete _pwm_b;

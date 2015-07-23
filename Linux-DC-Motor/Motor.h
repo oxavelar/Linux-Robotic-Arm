@@ -20,7 +20,7 @@ class Motor
         enum class State : char { STOPPED, RUNNING };
         enum class Direction { CCW, CW };
 
-        explicit Motor(const int &pin_pwm, const int &pin_dir);
+        explicit Motor(const int &pin_pwm_a, const int &pin_pwm_b);
         virtual ~Motor(void);
 
         void Stop(void);

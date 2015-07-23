@@ -31,7 +31,7 @@ namespace config
 {
     /* Pair of pins used for these elements */
     static constexpr int quad_enc_pins[][2] = {{24, 25}, {26, 27}};
-    static constexpr int dc_motor_pins[][2] = {{ 3,  7}, { 1,  7}};
+    static constexpr int dc_motor_pins[][2] = {{ 3,  7}, { 1,  5}};
     
     /* All of the joints will utilize the same webcam port in this case */
     static constexpr int visual_enc_ports[] = {0, 0};
