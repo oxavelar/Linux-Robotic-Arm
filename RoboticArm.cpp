@@ -66,7 +66,7 @@ void RoboticArm::Init(void)
         joints[id]->Movement->SetDirection(Motor::Direction::CW);
         do {
             still_moving = joints[id]->Position->GetPosition();
-            joints[id]->Movement->SetSpeed(10);
+            joints[id]->Movement->SetSpeed(80.0);
             joints[id]->Movement->Start();
         } while (joints[id]->Position->GetPosition() != still_moving);
         /* Reset the position coordinates, this is our reference */
@@ -85,7 +85,7 @@ void RoboticArm::UpdatePosition(void)
     /* Print all of the joints positions relative to themselves for now */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        //joints[id]->Movement->SetSpeed(50.0);
+        joints[id]->Movement->SetSpeed(50.0);
         joints[id]->Movement->Start();
         //usleep(500E03);
         //joints[id]->Movement->Stop();
