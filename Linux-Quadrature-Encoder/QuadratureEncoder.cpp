@@ -102,8 +102,6 @@ void QuadratureEncoder::PrintStats(void)
 {
     std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_cnt << std::endl;
     std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_cnt << std::endl;
-    (void) GetDirection();
-    (void) GetPeriod();
 }
 
 
