@@ -36,6 +36,9 @@ namespace config
     /* All of the joints will utilize the same webcam port in this case */
     static constexpr int visual_enc_ports[] = {0, 0};
     
+    /* Physical characteristics of the encoders being used */
+    static constexpr long quad_enc_segments[] = {64 * 29, 2000};
+
     /* Calculate number of joints based of motors */
     static const int joints_nr = sizeof(dc_motor_pins)/sizeof(dc_motor_pins[0]);
 }

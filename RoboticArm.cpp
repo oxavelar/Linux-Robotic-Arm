@@ -18,6 +18,7 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
 #ifndef VISUAL_ENCODER
     Position = new QuadratureEncoder(config::quad_enc_pins[_id][0],
                                      config::quad_enc_pins[_id][1]);
+    Position->SetParameters(config::quad_enc_segments[_id]);
 #else
     Position = new VisualEncoder(config::visual_enc_port[_id]);
 #endif
@@ -85,12 +86,13 @@ void RoboticArm::UpdatePosition(void)
     /* Print all of the joints positions relative to themselves for now */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        joints[id]->Movement->SetSpeed(50.0);
-        joints[id]->Movement->Start();
+        //joints[id]->Movement->SetSpeed(10.0);
+        //joints[id]->Movement->Start();
         //usleep(500E03);
         //joints[id]->Movement->Stop();
         
         joints[id]->Position->GetPosition();
+        joints[id]->Position->GetDegrees();
         joints[id]->Position->PrintStats();
 
         std::cout << std::endl;
