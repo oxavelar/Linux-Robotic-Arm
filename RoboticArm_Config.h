@@ -4,7 +4,7 @@
  * definitions, this will be dependency injected into the source
  * code that makes use of the following static members.
  *
- *  The following is Intel's Galileo layout for the pins.
+ * The following is Intel's Galileo layout for the pins.
  *
  *   +==========+=========+=======================+
  *   |  SYS_FS  |   LABEL |           DESCRIPTION |
@@ -20,10 +20,20 @@
  *   |  video0  | USB HST |         USB HD WebCam |
  *   +==========+=========+====================== +
  *
- *  Note: Galileo's cannot go slower than ~125 Hz on Linux SYSFS PWM.
+ * Note: Galileo's cannot go slower than ~125 Hz on Linux SYSFS PWM.
+ * 
+ * The quadrature encoders in this project are a Pololu brand ones.
+ * one offers 48 CPR in a 75:1 configuration, while the other is a
+ * 64 CPR in a 29:1 configuration. (CPR = Counts Per Revolution).
+ * 
+ *
+ *
  *
  * References:
  * http://www.malinov.com/Home/sergey-s-blog/intelgalileo-programminggpiofromlinux
+ * https://www.pololu.com/product/1443
+ * https://www.pololu.com/product/2286
+ *
  */
 
 
@@ -37,7 +47,7 @@ namespace config
     static constexpr int visual_enc_ports[] = {0, 0};
     
     /* Physical characteristics of the encoders being used */
-    static constexpr long quad_enc_segments[] = {64 * 29, 2000};
+    static constexpr long quad_enc_segments[] = {64 * 29, 48 * 75};
 
     /* Calculate number of joints based of motors */
     static const int joints_nr = sizeof(dc_motor_pins)/sizeof(dc_motor_pins[0]);
