@@ -12,7 +12,6 @@
 #include "RoboticArm_Config.h"
 
 
-
 RoboticJoint::RoboticJoint(const int &id) : _id(id)
 {
 #ifndef VISUAL_ENCODER
