@@ -19,8 +19,8 @@ QuadratureEncoder::QuadratureEncoder(const int &pin_a, const int &pin_b)
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     
     /* Register our local GPIO callbacks to use for SW interrupts */
-    _channel_a_callback = std::bind(&QuadratureEncoder::ISR_ChannelA, this);
-    _channel_b_callback = std::bind(&QuadratureEncoder::ISR_ChannelB, this);
+    _channel_a_callback = std::bind(&QuadratureEncoder::_ISR_ChannelA, this);
+    _channel_b_callback = std::bind(&QuadratureEncoder::_ISR_ChannelB, this);
     
     /* Initialize channels GPIO objects and assign local callbacks */
     _gpio_a = new GPIO(pin_a, GPIO::Edge::BOTH, _channel_a_callback);
@@ -46,7 +46,25 @@ QuadratureEncoder::~QuadratureEncoder(void)
 }
 
 
-/* External API for the user, exposed to be used by higher classes */
+/// External API for the user, exposed to be used by higher classes
+void QuadratureEncoder::SetParameters(const int &segments)
+{
+    _segments_per_revolution = segments;
+}
+
+
+double QuadratureEncoder::GetDegrees(void)
+{
+    double degrees;
+    /* Direction will do +1 if CW or -1 if CCW, atomic load since it is shared */
+    const int sign = (int)_direction.load();
+    degrees = sign * _counter / (double)_segments_per_revolution;
+    std::cout << "INFO: Current position degrees " 
+              << degrees << std::endl;
+    return degrees;
+}
+
+
 int QuadratureEncoder::GetPosition(void)
 {
     std::cout << "INFO: Current position counter " 
@@ -89,15 +107,15 @@ void QuadratureEncoder::PrintStats(void)
 }
 
 
-/* Internal Quadrature Encoder ISR Handlers */
-void QuadratureEncoder::ISR_ChannelA(void)
+/// Internal Quadrature Encoder ISR Handlers and methods
+void QuadratureEncoder::_ISR_ChannelA(void)
 {
     char delta;
     char a, b;
     char current_packed_read_a;
 
-    /* Obtain the pulsewidth between transitions */
-    TrackGPIOPulseWidth();
+    /* Obtain the pulsewidth between transitions, rely only on channel A */
+    _TrackChannelPulseWidth();
 
     /* Convert enum class to actual zero or one */
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
@@ -108,9 +126,9 @@ void QuadratureEncoder::ISR_ChannelA(void)
     /* Increment, or decrement depending on matrix */
     delta = _qem[_prev_packed_read_a * 4 + current_packed_read_a];
     
-    /* Update our rotation direction now */
-    if(delta == -1)            _direction = Direction::CCW;
-    else if(delta == 1)        _direction = Direction::CW;
+    /* Update our rotation direction now, casting to enum */
+    if (delta)
+        _direction = (Direction)delta;
     
     /* Update our local tracking variable */
     _counter += delta;
@@ -123,7 +141,7 @@ void QuadratureEncoder::ISR_ChannelA(void)
 }
 
 
-void QuadratureEncoder::ISR_ChannelB(void)
+void QuadratureEncoder::_ISR_ChannelB(void)
 {
     char delta;
     char a, b;
@@ -133,17 +151,14 @@ void QuadratureEncoder::ISR_ChannelB(void)
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
     _gpio_b->getValue() == GPIO::Value::HIGH ? b = 1 : b = 0;
     
-    /* Obtain the pulsewidth between transitions */
-    TrackGPIOPulseWidth();
-
     /* Convert binary input to decimal value */
     current_packed_read_b = (a << 1) | (b << 0);
     /* Increment, or decrement depending on matrix */
     delta = _qem[_prev_packed_read_b * 4 + current_packed_read_b];
-    
-    /* Update our rotation direction now */
-    if(delta == -1)            _direction = Direction::CCW;
-    else if(delta == 1)        _direction = Direction::CW;
+
+     /* Update our rotation direction now, casting to enum */
+    if (delta)
+        _direction = (Direction)delta;
     
     /* Update our local tracking variable */
     _counter += delta;
@@ -156,9 +171,14 @@ void QuadratureEncoder::ISR_ChannelB(void)
 }
 
 
-void QuadratureEncoder::TrackGPIOPulseWidth(void)
+void QuadratureEncoder::_TrackChannelPulseWidth(void)
 {
-    static std::atomic_int toggle;
+    /* 
+     * Will only be called from a single ISR, a single channel
+     * shall provide us with the information for pulse-width
+     * tracking. 
+     */
+    static char toggle;
     const auto now = std::chrono::high_resolution_clock::now();
     
     if(toggle++ % 2) {

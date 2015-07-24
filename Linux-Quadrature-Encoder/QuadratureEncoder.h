@@ -8,11 +8,13 @@
 class QuadratureEncoder
 {
     public:
-        enum class Direction { CCW, CW };
+        enum class Direction : int { CCW = -1, CW = 1 };
 
         explicit QuadratureEncoder(const int &pin_a, const int &pin_b);
         virtual ~QuadratureEncoder(void);
-
+        
+        void SetParameters(const int &segments);
+        double GetDegrees(void);
         int GetPosition(void);
         std::chrono::nanoseconds GetPeriod(void);
         void SetZero(void);
@@ -25,8 +27,8 @@ class QuadratureEncoder
         GPIO *_gpio_a, *_gpio_b;
         
         /* GPIO Interrupt routine user code */
-        void ISR_ChannelA(void);
-        void ISR_ChannelB(void);
+        void _ISR_ChannelA(void);
+        void _ISR_ChannelB(void);
 
         /* Callback references to be used by GPIO class */
         std::function<void(GPIO::Value)> _channel_a_callback;
@@ -40,10 +42,14 @@ class QuadratureEncoder
         /* Internal state variables */
         std::atomic_int _counter;
         std::chrono::nanoseconds _pulse_period_ns;
-        Direction _direction;
+        std::atomic<Direction> _direction;
         
+        /* How many counts are an actual revolution */
+        int _segments_per_revolution;
+
         /* Used to keep track of the actual interrupt pulse-widths */
-        void TrackGPIOPulseWidth(void);
+        void _TrackChannelPulseWidth(void);
+
         std::chrono::high_resolution_clock::time_point _isr_timestamp;
 
         /* Debug variables */
