@@ -9,6 +9,7 @@
 
 
 RoboticArm *RoboArm;
+Point coordinates;
 
 
 void _cleanup(int signum)
@@ -44,6 +45,13 @@ int main(void)
     
     /* Input a curve or shape to the roboarm to draw it */
     for(;;) {
+        coordinates = RoboArm->GetPosition();
+        /* Show the cartesian coordinates */
+        std::cout << "( x: "  << coordinates[0]
+                  <<   "y: "  << coordinates[1]
+                  <<   "z: )" << coordinates[2];
+
+        /* Debug information displayed */
         RoboArm->UpdatePosition();
         usleep(3E06);
         std::cout << std::endl;

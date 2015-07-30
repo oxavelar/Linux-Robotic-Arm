@@ -39,6 +39,9 @@
 
 namespace config
 {
+    /* The physical length of each of the links in meters */
+    static constexpr float link_lengths[] = { 0.015, 0.015 };
+
     /* Pair of pins used for these elements */
     static constexpr int quad_enc_pins[][2] = {{24, 25}, {26, 27}};
     static constexpr int dc_motor_pins[][2] = {{ 3,  7}, { 1,  5}};
