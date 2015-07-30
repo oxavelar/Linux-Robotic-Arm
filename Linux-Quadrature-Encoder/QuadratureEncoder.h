@@ -14,7 +14,7 @@ class QuadratureEncoder
         virtual ~QuadratureEncoder(void);
         
         void SetParameters(const int &segments);
-        double GetDegrees(void);
+        double GetAngle(void);
         int GetPosition(void);
         std::chrono::nanoseconds GetPeriod(void);
         void SetZero(void);

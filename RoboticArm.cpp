@@ -47,6 +47,24 @@ RoboticJoint::~RoboticJoint(void)
 }
 
 
+double RoboticJoint::GetAngle(void)
+{
+    return Position->GetAngle();
+}
+
+
+void RoboticJoint::SetAngle(const double &theta)
+{
+    /* Set angle consists of the interaction between Position & Movement */
+    const auto initial_angle = Position->GetAngle();
+    
+    if( initial_angle != theta ) {
+        std::cout << "INFO: Commanded angle for joint " << _id << " is different";
+        std::cout << "      Trying to guess the position for now!";
+    }
+}
+
+
 RoboticArm::RoboticArm(void) : _joints_nr(config::joints_nr)
 {
     /* Initialize each joint objects with unique ID's */
@@ -107,29 +125,30 @@ void RoboticArm::DebugMessages(void)
         //joints[id]->Movement->Stop();
         
         joints[id]->Position->GetPosition();
-        joints[id]->Position->GetDegrees();
+        joints[id]->Position->GetAngle();
         joints[id]->Position->PrintStats();
 
         std::cout << std::endl;
     }
 }
 
+
 Point RoboticArm::GetPosition(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    /* Makes use of forward kinematics in order to get position */
 
     /* End of the arm position in a 3D space */
     Point pos;
 
-    /* Forward kinematics temporary working matrix */
-    std::vector<float> theta;
+    /* Temporary working matrix */
+    std::vector<double> theta;
 
     /* Length of the links in meters, read only */
-    const float *alpha = &config::link_lengths[0];
+    const auto *alpha = &config::link_lengths[0];
     
     /* Fill our N joints angles in our temporary matrix */
     for(auto id = 0; id < _joints_nr; id++) {
-        theta.push_back(joints[id]->Position->GetDegrees());
+        theta.push_back( joints[id]->GetAngle() );
     }
 
     /* 2D and 1D forward kinematics hardcoded */
@@ -152,7 +171,47 @@ Point RoboticArm::GetPosition(void)
         pos.z = 0;
         break;
     }
-
+    
     return pos; 
+}
+
+
+void RoboticArm::SetPosition(const Point &pos)
+{
+    /* Makes use of inverse kinematics in order to get position */
+
+    /* Temporary working matrix */
+    std::vector<double> theta;
+
+    /* Length of the links in meters, read only */
+    const auto *alpha = &config::link_lengths[0];
+    
+    /* Dummy values for now! */
+    theta.push_back(0);
+    theta.push_back(1);
+
+    /* 2D and 1D forward kinematics hardcoded */
+    switch(_joints_nr)
+    {
+    case 1:
+        break;
+    case 2:
+        double theta0, theta1;
+        theta1 = atan( sqrt( 1 - (pos.x*pos.x + pos.y*pos.y - alpha[0]*alpha[0] - alpha[1]*alpha[1]) / (2 * alpha[0] * alpha[1]) ) );
+        theta0 =  atan(pos.y / pos.x) - atan( (alpha[1] * sin(theta1)) / (alpha[0] + alpha[1] * cos(theta1)) );
+        theta.push_back(theta0);
+        theta.push_back(theta1);
+        break;
+    default:
+        /* oxavelar: To extend this to 3 dimensions for N joints */
+        break;
+    }
+    
+    /* Command each of the joints to the desired angle */
+    for(auto id = 0; id < _joints_nr; id++) {
+        joints[id]->SetAngle( theta.back() );
+        theta.pop_back();
+    }
+
 }
 

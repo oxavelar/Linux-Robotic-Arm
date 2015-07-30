@@ -8,7 +8,7 @@
 class Point
 {
     public:
-        float x, y, z;
+        double x, y, z;
 };
 
 
@@ -17,6 +17,9 @@ class RoboticJoint
     public:
         explicit RoboticJoint(const int &id);
         virtual ~RoboticJoint(void);
+
+        double GetAngle(void);
+        void SetAngle(const double &theta);
 
         /* Quadrature encoders + DC motors */
         QuadratureEncoder* Position;
@@ -38,7 +41,7 @@ class RoboticArm
         void DemoCircle(void);
         void DebugMessages(void);
         Point GetPosition(void);
-        void SetPosition(Point);
+        void SetPosition(const Point &pos);
 
     private:
         int _joints_nr;

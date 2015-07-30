@@ -53,7 +53,7 @@ void QuadratureEncoder::SetParameters(const int &segments)
 }
 
 
-double QuadratureEncoder::GetDegrees(void)
+double QuadratureEncoder::GetAngle(void)
 {
     double degrees;
     /* Direction will do +1 if CW or -1 if CCW, atomic load since it is shared */
