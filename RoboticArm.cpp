@@ -2,6 +2,10 @@
  * The following classes makes use of lower position objects in order
  * to model a different N joints robotic arm.
  *
+ * Forward Kinematics :     ANGLES -> CARTESIAN
+ * Inverse Kinematics :     CARTESIAN -> ANGLES
+ *
+ *
  * References:
  * http://cdn.intechopen.com/pdfs/379.pdf
  */
@@ -121,11 +125,10 @@ Point RoboticArm::GetPosition(void)
     /* Forward kinematics temporary working matrix */
     std::vector<float> theta;
 
-
-    /* Length of the links in meters */
+    /* Length of the links in meters, read only */
     const float *alpha = &config::link_lengths[0];
     
-    /* Extract N joints angle in our temporary matrix */
+    /* Fill our N joints angles in our temporary matrix */
     for(auto id = 0; id < _joints_nr; id++) {
         theta.push_back(joints[id]->Position->GetDegrees());
     }
@@ -151,7 +154,7 @@ Point RoboticArm::GetPosition(void)
         break;
     }
 
-
+    /* Fill in our 3D calculations */
     position.push_back(x);
     position.push_back(y);
     position.push_back(z);
