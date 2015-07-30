@@ -31,7 +31,7 @@ class RoboticArm
 
         void Init();
         void DemoCircle(void);
-        void UpdatePosition(void);
+        void DebugMessages(void);
         Point GetPosition(void);
         void SetPosition(Point);
 

@@ -90,7 +90,7 @@ void RoboticArm::Init(void)
 }
 
 
-void RoboticArm::UpdatePosition(void)
+void RoboticArm::DebugMessages(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
 
@@ -110,7 +110,7 @@ void RoboticArm::UpdatePosition(void)
     }
 }
 
-std::vector<float> RoboticArm::GetPosition(void)
+Point RoboticArm::GetPosition(void)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
 

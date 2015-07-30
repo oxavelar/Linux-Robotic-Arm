@@ -52,7 +52,7 @@ int main(void)
                   <<   "z: )" << coordinates[2];
 
         /* Debug information displayed */
-        RoboArm->UpdatePosition();
+        RoboArm->DebugMessages();
         usleep(3E06);
         std::cout << std::endl;
     }
