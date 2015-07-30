@@ -2,6 +2,8 @@
  * The following classes makes use of lower position objects in order
  * to model a different N joints robotic arm.
  *
+ * References:
+ * http://cdn.intechopen.com/pdfs/379.pdf
  */
 
 #include <iostream>
