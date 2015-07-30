@@ -114,24 +114,41 @@ std::vector<float> RoboticArm::GetPosition(void)
 
     /* End of the arm position in a 3D space */
     Point position;
+    float x, y, z;
 
     /* Forward kinematics temporary working matrix */
     std::vector<float> theta;
 
+
     /* Length of the links in meters */
-    float alpha_1 = config::link_lengths[0];
-    float alpha_2 = config::link_lengths[1];
+    const float *alpha = &config::link_lengths[0];
     
     /* Extract N joints angle in our temporary matrix */
     for(auto id = 0; id < _joints_nr; id++) {
         theta.push_back(joints[id]->Position->GetDegrees());
     }
 
-    /* 2D Forward kinematics hardcoded */
-    /* oxavelar: To extend this to 3 dimensions for N joints */
-    auto x = alpha_1 * cos(theta[0]) + alpha_2 * cos(theta[0] + theta[1]);
-    auto y = alpha_1 * sin(theta[0]) + alpha_2 * sin(theta[0] + theta[1]);
-    auto z = 0;
+    /* 2D and 1D forward kinematics hardcoded */
+    switch(_joints_nr)
+    {
+    case 1:
+        x = 0;
+        y = 0;
+        z = 0;
+        break;
+    case 2:
+        x = alpha[0] * cos(theta[0]) + alpha[1] * cos(theta[0] + theta[1]);
+        y = alpha[0] * sin(theta[0]) + alpha[1] * sin(theta[0] + theta[1]);
+        z = 0;
+        break;
+    default:
+        /* oxavelar: To extend this to 3 dimensions for N joints */
+        x = 0;
+        y = 0;
+        z = 0;
+        break;
+    }
+
 
     position.push_back(x);
     position.push_back(y);
