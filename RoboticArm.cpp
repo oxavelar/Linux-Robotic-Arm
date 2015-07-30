@@ -119,8 +119,7 @@ Point RoboticArm::GetPosition(void)
     std::cout << __PRETTY_FUNCTION__ << std::endl;
 
     /* End of the arm position in a 3D space */
-    Point position;
-    float x, y, z;
+    Point pos;
 
     /* Forward kinematics temporary working matrix */
     std::vector<float> theta;
@@ -137,29 +136,23 @@ Point RoboticArm::GetPosition(void)
     switch(_joints_nr)
     {
     case 1:
-        x = 0;
-        y = 0;
-        z = 0;
+        pos.x = 0;
+        pos.y = 0;
+        pos.z = 0;
         break;
     case 2:
-        x = alpha[0] * cos(theta[0]) + alpha[1] * cos(theta[0] + theta[1]);
-        y = alpha[0] * sin(theta[0]) + alpha[1] * sin(theta[0] + theta[1]);
-        z = 0;
+        pos.x = alpha[0] * cos(theta[0]) + alpha[1] * cos(theta[0] + theta[1]);
+        pos.y = alpha[0] * sin(theta[0]) + alpha[1] * sin(theta[0] + theta[1]);
+        pos.z = 0;
         break;
     default:
         /* oxavelar: To extend this to 3 dimensions for N joints */
-        x = 0;
-        y = 0;
-        z = 0;
+        pos.x = 0;
+        pos.y = 0;
+        pos.z = 0;
         break;
     }
 
-    /* Fill in our 3D calculations */
-    position.push_back(x);
-    position.push_back(y);
-    position.push_back(z);
-   
-    /* C++11 will return a copy of the std::vector, we're safe */
-    return position; 
+    return pos; 
 }
 

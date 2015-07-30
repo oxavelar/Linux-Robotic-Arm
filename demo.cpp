@@ -47,9 +47,9 @@ int main(void)
     for(;;) {
         coordinates = RoboArm->GetPosition();
         /* Show the cartesian coordinates */
-        std::cout << "( x: "  << coordinates[0]
-                  <<   "y: "  << coordinates[1]
-                  <<   "z: )" << coordinates[2];
+        std::cout << "( x: "  << coordinates.x
+                  <<   "y: "  << coordinates.y
+                  <<   "z: )" << coordinates.z;
 
         /* Debug information displayed */
         RoboArm->DebugMessages();

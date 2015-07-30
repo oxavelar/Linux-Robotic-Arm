@@ -4,7 +4,12 @@
 #include "Linux-DC-Motor/Motor.h"
 #include "Linux-Quadrature-Encoder/QuadratureEncoder.h"
 
-using Point = std::vector<float>;
+
+class Point
+{
+    public:
+        float x, y, z;
+};
 
 
 class RoboticJoint
