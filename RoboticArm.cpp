@@ -49,6 +49,8 @@ RoboticJoint::~RoboticJoint(void)
 
 double RoboticJoint::GetAngle(void)
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+
     return Position->GetAngle();
 }
 
@@ -150,8 +152,8 @@ Point RoboticArm::GetPosition(void)
     for(auto id = 0; id < _joints_nr; id++) {
         theta.push_back( joints[id]->GetAngle() );
     }
-
-    /* 2D and 1D forward kinematics hardcoded */
+    
+    
     switch(_joints_nr)
     {
     case 1:
@@ -178,7 +180,7 @@ Point RoboticArm::GetPosition(void)
 
 void RoboticArm::SetPosition(const Point &pos)
 {
-    /* Makes use of inverse kinematics in order to get position */
+    /* Makes use of inverse kinematics in order to set position */
 
     /* Temporary working matrix */
     std::vector<double> theta;
@@ -186,11 +188,7 @@ void RoboticArm::SetPosition(const Point &pos)
     /* Length of the links in meters, read only */
     const auto *alpha = &config::link_lengths[0];
     
-    /* Dummy values for now! */
-    theta.push_back(0);
-    theta.push_back(1);
 
-    /* 2D and 1D forward kinematics hardcoded */
     switch(_joints_nr)
     {
     case 1:
@@ -212,6 +210,5 @@ void RoboticArm::SetPosition(const Point &pos)
         joints[id]->SetAngle( theta.back() );
         theta.pop_back();
     }
-
 }
 
