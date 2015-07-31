@@ -45,7 +45,8 @@ int main(void)
     
     /* Input a curve or shape to the roboarm to draw it */
     for(;;) {
-        coordinates = RoboArm->GetPosition();
+        RoboArm->GetPosition(coordinates);
+        
         /* Show the cartesian coordinates */
         std::cout << "( x: "  << coordinates.x
                   <<   "y: "  << coordinates.y

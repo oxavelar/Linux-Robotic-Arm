@@ -40,7 +40,7 @@ class RoboticArm
         void Init();
         void DemoCircle(void);
         void DebugMessages(void);
-        Point GetPosition(void);
+        void GetPosition(Point &pos);
         void SetPosition(const Point &pos);
 
     private:

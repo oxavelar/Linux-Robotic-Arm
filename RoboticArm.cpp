@@ -135,12 +135,9 @@ void RoboticArm::DebugMessages(void)
 }
 
 
-Point RoboticArm::GetPosition(void)
+void RoboticArm::GetPosition(Point &pos)
 {
     /* Makes use of forward kinematics in order to get position */
-
-    /* End of the arm position in a 3D space */
-    Point pos;
 
     /* Temporary working matrix */
     std::vector<double> theta;
@@ -173,8 +170,6 @@ Point RoboticArm::GetPosition(void)
         pos.z = 0;
         break;
     }
-    
-    return pos; 
 }
 
 
