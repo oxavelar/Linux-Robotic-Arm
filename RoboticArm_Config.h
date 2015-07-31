@@ -53,6 +53,6 @@ namespace config
     static constexpr long quad_enc_segments[] = {64 * 29, 48 * 75};
 
     /* Calculate number of joints based of motors */
-    static const int joints_nr = sizeof(dc_motor_pins)/sizeof(dc_motor_pins[0]);
+    static constexpr int joints_nr = sizeof(dc_motor_pins)/sizeof(dc_motor_pins[0]);
 }
 
