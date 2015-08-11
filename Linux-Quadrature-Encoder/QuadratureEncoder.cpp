@@ -57,10 +57,8 @@ double QuadratureEncoder::GetAngle(void)
 {
     double degrees;
     /* Direction will do +1 if CW or -1 if CCW, atomic load since it is shared */
-    const int sign = (int)_direction.load();
+    const auto sign = (int)_direction.load();
     degrees = sign * _counter / (double)_segments_per_revolution;
-    std::cout << "INFO: Current position degrees " 
-              << degrees << std::endl;
     return degrees;
 }
 
@@ -108,12 +106,11 @@ void QuadratureEncoder::PrintStats(void)
 /// Internal Quadrature Encoder ISR Handlers and methods
 void QuadratureEncoder::_ISR_ChannelA(void)
 {
-    char delta;
     char a, b;
     char current_packed_read_a;
 
     /* Obtain the pulsewidth between transitions, rely only on channel A */
-    _TrackChannelPulseWidth();
+    //_TrackChannelPulseWidth();
 
     /* Convert enum class to actual zero or one */
     _gpio_a->getValue() == GPIO::Value::HIGH ? a = 1 : a = 0;
@@ -122,7 +119,13 @@ void QuadratureEncoder::_ISR_ChannelA(void)
     /* Convert binary input to decimal value */
     current_packed_read_a = (a << 1) | (b << 0);
     /* Increment, or decrement depending on matrix */
-    delta = _qem[_prev_packed_read_a * 4 + current_packed_read_a];
+    auto delta = _qem[_prev_packed_read_a * 4 + current_packed_read_a];
+
+    /* Put a code guard on illegal encoder train pulse values */
+    if (delta == -127) {
+        std::cout << "WARNING: Execution might be too slow, reading wrong values from the encoder" << std::endl;
+        delta = 0;
+    }
     
     /* Update our rotation direction now, casting to enum */
     if (delta)
@@ -141,7 +144,6 @@ void QuadratureEncoder::_ISR_ChannelA(void)
 
 void QuadratureEncoder::_ISR_ChannelB(void)
 {
-    char delta;
     char a, b;
     char current_packed_read_b;
 
@@ -152,7 +154,13 @@ void QuadratureEncoder::_ISR_ChannelB(void)
     /* Convert binary input to decimal value */
     current_packed_read_b = (a << 1) | (b << 0);
     /* Increment, or decrement depending on matrix */
-    delta = _qem[_prev_packed_read_b * 4 + current_packed_read_b];
+    auto delta = _qem[_prev_packed_read_b * 4 + current_packed_read_b];
+
+    /* Put a code guard on illegal encoder train pulse values */
+    if (delta == -127) {
+        std::cout << "WARNING: Execution might be too slow, reading wrong values from the encoder" << std::endl;
+        delta = 0;
+    }
 
      /* Update our rotation direction now, casting to enum */
     if (delta)
