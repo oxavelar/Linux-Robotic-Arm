@@ -49,8 +49,9 @@ int main(void)
         
         /* Show the cartesian coordinates */
         std::cout << "( x: "  << coordinates.x
-                  <<   "y: "  << coordinates.y
-                  <<   "z: )" << coordinates.z;
+                  <<  " | y: "  << coordinates.y
+                  <<  " | z: " << coordinates.z
+                  << " )" << std::endl;
 
         /* Debug information displayed */
         RoboArm->DebugMessages();

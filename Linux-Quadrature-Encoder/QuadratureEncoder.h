@@ -37,7 +37,7 @@ class QuadratureEncoder
         /* Quadrature Encoder Matrix for conversion
            http://letsmakerobots.com/content/how-use-quadrature-encoder */
         std::atomic_int _prev_packed_read_a, _prev_packed_read_b;
-        const char _qem[16] = {0,-1,1,2,1,0,2,-1,-1,2,0,1,2,1,-1,0};
+        const signed char _qem[16] = {0,-1,1,2,1,0,2,-1,-1,2,0,1,2,1,-1,0};
 
         /* Internal state variables */
         std::atomic_int _counter;
