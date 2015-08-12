@@ -96,7 +96,13 @@ void QuadratureEncoder::PrintStats(void)
 #ifdef DEBUG
     std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_cnt << std::endl;
     std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_cnt << std::endl;
-    std::cout << "INFO: Channels history         " << (char*)_channels_history << std::endl;
+
+    /* Trace table is printed */
+    char _trace_header[QE_MAX_TRACE_DEPTH];
+    _trace_header[_trace_index] = 'v';
+    std::cout << "                               " << (char*)_trace_header << std::endl;
+    std::cout << "INFO: ChannelA history         " << (char*)_channel_a_history << std::endl;
+    std::cout << "INFO: ChannelB history         " << (char*)_channel_b_history << std::endl;
 #endif
 }
 
@@ -108,7 +114,7 @@ void QuadratureEncoder::_ISR_ChannelA(void)
     //_TrackChannelPulseWidth();
     _GPIO_DataProcess();
 #ifdef DEBUG
-    _TraceHistory();
+    _FillTraceHistory();
     _channel_a_isr_cnt++;
 #endif
 }
@@ -118,7 +124,7 @@ void QuadratureEncoder::_ISR_ChannelB(void)
 {
     _GPIO_DataProcess();
 #ifdef DEBUG
-    _TraceHistory();
+    _FillTraceHistory();
     _channel_b_isr_cnt++;
 #endif
 }
@@ -163,10 +169,9 @@ void QuadratureEncoder::_TrackChannelPulseWidth(void)
      * shall provide us with the information for pulse-width
      * tracking. 
      */
-    static std::atomic_char toggle;
     const auto now = std::chrono::high_resolution_clock::now();
     
-    if(toggle++ % 2) {
+    if(_internal_toggle++ % 2) {
         _isr_timestamp = now;
     } else {
         /* Calculate the pulsewidth on even transitions */
@@ -176,13 +181,17 @@ void QuadratureEncoder::_TrackChannelPulseWidth(void)
 }
 
 
-void QuadratureEncoder::_TraceHistory(void)
+void QuadratureEncoder::_FillTraceHistory(void)
 {
     /*
-     * Once this is called it is used to store a fake trace
-     * of what the packed bus is like for debug purposes.
+     * Once this is called it is used to store a representative trace
+     * in a char string what the bus is like for debug purposes.
      */
-    static std::atomic_char trace_index;
-    _channels_history[trace_index++ % 50] =  _prev_packed_read + '0';
+    /* Positions the character in the buffer, each two characters */
+    _trace_index += 2;
+    _trace_index = _trace_index % (QE_MAX_TRACE_DEPTH / 2);
+    
+    _channel_a_history[_trace_index] =  (_prev_packed_read & (1<<0)) + '0';
+    _channel_b_history[_trace_index] =  (_prev_packed_read  >> 1)    + '0';
 }
 

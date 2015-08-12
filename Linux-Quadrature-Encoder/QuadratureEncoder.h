@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include "../HighLatencyGPIO/GPIO.hh"
 
+#define QE_MAX_TRACE_DEPTH 64
+
 class QuadratureEncoder
 {
     public:
@@ -62,6 +64,7 @@ class QuadratureEncoder
         int _segments_per_revolution;
 
         /* Used to keep track of the actual interrupt pulse-widths */
+        std::atomic_char _internal_toggle;
         void _TrackChannelPulseWidth(void);
 
         std::chrono::high_resolution_clock::time_point _isr_timestamp;
@@ -70,7 +73,10 @@ class QuadratureEncoder
         /* Debug variable or methods */
         std::atomic_ullong _channel_a_isr_cnt, _channel_b_isr_cnt;
 
-        void _TraceHistory(void);
-        char _channels_history[50];
+        std::atomic_char _trace_index;
+        char _channel_a_history[QE_MAX_TRACE_DEPTH];
+        char _channel_b_history[QE_MAX_TRACE_DEPTH];
+
+        void _FillTraceHistory(void);
 #endif
 };
