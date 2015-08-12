@@ -63,7 +63,21 @@ void RoboticJoint::SetAngle(const double &theta)
     
     if( initial_angle != theta ) {
         std::cout << "INFO: Commanded angle for joint " << _id << " is different";
-        std::cout << "      Trying to guess the position for now!";
+        std::cout << "      Trying to guess the position now!";
+
+        /* Go right, or go left */
+
+        /* Proceed with caution on a tight controlled loop */
+        Movement->SetSpeed(10.0);
+        Movement->Start();
+        Movement->SetDirection(Motor::Direction::CW);
+        std::cout << "INFO: Going 1 second CW!" << std::endl;
+        usleep(1E06);
+        Movement->SetDirection(Motor::Direction::CCW);
+        std::cout << "INFO: Going 1 second CCW!" << std::endl;
+        usleep(1E06);
+        Movement->Stop();
+
     }
 }
 

@@ -55,6 +55,13 @@ int main(void)
 
         /* Debug information displayed */
         RoboArm->DebugMessages();
+
+        /* Command the robot to a new position */
+        Point new_coordinates;
+        new_coordinates.x = 0.02;
+        new_coordinates.y = 0.03;
+        RoboArm->SetPosition(new_coordinates);
+
         usleep(3E06);
         std::cout << std::endl;
     }

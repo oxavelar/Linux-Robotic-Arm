@@ -73,7 +73,7 @@ class QuadratureEncoder
         /* Debug variable or methods */
         std::atomic_ullong _channel_a_isr_cnt, _channel_b_isr_cnt;
 
-        std::atomic_char _trace_index;
+        std::atomic_int _trace_index;
         char _channel_a_history[QE_MAX_TRACE_DEPTH];
         char _channel_b_history[QE_MAX_TRACE_DEPTH];
 

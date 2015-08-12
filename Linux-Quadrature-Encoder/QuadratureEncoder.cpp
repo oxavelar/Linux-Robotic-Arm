@@ -98,11 +98,9 @@ void QuadratureEncoder::PrintStats(void)
     std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_cnt << std::endl;
 
     /* Trace table is printed */
-    char _trace_header[QE_MAX_TRACE_DEPTH];
-    _trace_header[_trace_index] = 'v';
-    std::cout << "                               " << (char*)_trace_header << std::endl;
-    std::cout << "INFO: ChannelA history         " << (char*)_channel_a_history << std::endl;
-    std::cout << "INFO: ChannelB history         " << (char*)_channel_b_history << std::endl;
+    std::cout << "                               " << _trace_index << std::endl;
+    std::cout << "INFO: ChannelA history         " << _channel_a_history << std::endl;
+    std::cout << "INFO: ChannelB history         " << _channel_b_history << std::endl;
 #endif
 }
 
@@ -187,11 +185,11 @@ void QuadratureEncoder::_FillTraceHistory(void)
      * Once this is called it is used to store a representative trace
      * in a char string what the bus is like for debug purposes.
      */
+    _channel_a_history[_trace_index] = (_prev_packed_read  &  1) + '0';
+    _channel_b_history[_trace_index] = (_prev_packed_read  >> 1) + '0';
+
     /* Positions the character in the buffer, each two characters */
     _trace_index += 2;
     _trace_index = _trace_index % (QE_MAX_TRACE_DEPTH / 2);
-    
-    _channel_a_history[_trace_index] =  (_prev_packed_read & (1<<0)) + '0';
-    _channel_b_history[_trace_index] =  (_prev_packed_read  >> 1)    + '0';
 }
 
