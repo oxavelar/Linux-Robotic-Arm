@@ -10,12 +10,11 @@ class QuadratureEncoder
     public:
         enum class Direction : int { CCW = -1, CW = 1 };
 
-        explicit QuadratureEncoder(const int &pin_a, const int &pin_b);
+        explicit QuadratureEncoder(const int &pin_a, const int &pin_b, const int &rate=4);
         virtual ~QuadratureEncoder(void);
         
         void SetParameters(const int &segments);
         double GetAngle(void);
-        int GetPosition(void);
         std::chrono::nanoseconds GetPeriod(void);
         void SetZero(void);
         Direction GetDirection(void);
@@ -35,17 +34,30 @@ class QuadratureEncoder
         std::function<void(GPIO::Value)> _channel_b_callback;
         
         /* Quadrature Encoder Matrix for conversion
-           http://letsmakerobots.com/content/how-use-quadrature-encoder 
-           If a value of -127 is read it means the code is too slow!
+           http://letsmakerobots.com/content/how-use-quadrature-encoder
+
+            2x Rate: [3,2,3,2...] or [2,3,2,3...]
+            4x Rate: [0,1,3,2...] or [0,2,3,1...] 
+
+            Depending on the direction, they are packed signal values, can be seen
+            as an array of 4 bit values, starting from one channel extending to the
+            other.
+
+           Note: If a value of 'x' is read it means the code is too slow!
         */
-        std::atomic_int _prev_packed_read_a, _prev_packed_read_b;
-        const signed char _qem[16] = {0,-1,1,-127,1,0,-127,-1,-1,-127,0,1,-127,1,-1,0};
+        void _GPIO_DataProcess(void);
+
+        std::atomic_int _prev_packed_read;
+        const signed char _qem[16] = {0,-1,1,'x',1,0,'x',-1,-1,'x',0,1,'x',1,-1,0};
 
         /* Internal state variables */
         std::atomic_int _counter;
         std::chrono::nanoseconds _pulse_period_ns;
         std::atomic<Direction> _direction;
         
+        /* If we are in 1x, 2x or 4x rates */
+        const int _encoder_rate;
+
         /* How many counts are an actual revolution */
         int _segments_per_revolution;
 
@@ -54,6 +66,11 @@ class QuadratureEncoder
 
         std::chrono::high_resolution_clock::time_point _isr_timestamp;
 
-        /* Debug variables */
+#ifdef DEBUG
+        /* Debug variable or methods */
         std::atomic_ullong _channel_a_isr_cnt, _channel_b_isr_cnt;
+
+        void _TraceHistory(void);
+        char _channels_history[50];
+#endif
 };

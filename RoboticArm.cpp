@@ -23,11 +23,12 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
 {
 #ifndef VISUAL_ENCODER
 
-    Position = new QuadratureEncoder(config::quad_enc_pins[_id][0],
-                                     config::quad_enc_pins[_id][1]);
+    Position = new QuadratureEncoder(config::quad_encoder_pins[_id][0],
+                                     config::quad_encoder_pins[_id][1],
+                                     config::quad_encoder_rate);
     /* Set the physical parameters for correct degree measurements
      * this is basically the number of segments per revolution   */
-    Position->SetParameters(config::quad_enc_segments[_id]);
+    Position->SetParameters(config::quad_encoder_segments[_id]);
 
 #else
 
@@ -49,9 +50,9 @@ RoboticJoint::~RoboticJoint(void)
 
 double RoboticJoint::GetAngle(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
-    return Position->GetAngle();
+    double angle = Position->GetAngle();
+    std::cout << __PRETTY_FUNCTION__ << " = " << angle << std::endl;
+    return angle;
 }
 
 
@@ -96,15 +97,15 @@ void RoboticArm::Init(void)
     for(auto id = 0; id < _joints_nr; id++) {
 
         /* Get the rotors to a known position on a tight controlled loop */
-        int still_moving;
+        double still_moving;
         double init_speed = 80.00;
         joints[id]->Movement->SetDirection(Motor::Direction::CW);
         joints[id]->Movement->Start();
         do {
-            still_moving = joints[id]->Position->GetPosition();
+            still_moving = joints[id]->Position->GetAngle();
             joints[id]->Movement->SetSpeed(init_speed);
             usleep(500);
-        } while (joints[id]->Position->GetPosition() != still_moving);
+        } while ((int)joints[id]->Position->GetAngle() != (int)still_moving);
         /* Reset the position coordinates, this is our reference */
         joints[id]->Movement->Stop();
         joints[id]->Position->SetZero();
@@ -121,13 +122,6 @@ void RoboticArm::DebugMessages(void)
     /* Print all of the joints positions relative to themselves for now */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        //joints[id]->Movement->SetSpeed(10.0);
-        //joints[id]->Movement->Start();
-        //usleep(500E03);
-        //joints[id]->Movement->Stop();
-        
-        joints[id]->Position->GetPosition();
-        joints[id]->Position->GetAngle();
         joints[id]->Position->PrintStats();
 
         std::cout << std::endl;

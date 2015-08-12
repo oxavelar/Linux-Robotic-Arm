@@ -40,18 +40,21 @@
 
 namespace config
 {
+    /* The rate at which the quadrature encoder operates */
+    static constexpr int quad_encoder_rate = 4;
+
     /* The physical length of each of the links in meters */
     static constexpr double link_lengths[] = { 0.015, 0.015 };
 
     /* Pair of pins used for these elements */
-    static constexpr int quad_enc_pins[][2] = {{24, 25}, {26, 27}};
+    static constexpr int quad_encoder_pins[][2] = {{24, 25}, {26, 27}};
     static constexpr int dc_motor_pins[][2] = {{ 3,  7}, { 1,  5}};
     
     /* All of the joints will utilize the same webcam port in this case */
-    static constexpr int visual_enc_ports[] = {0, 0};
+    static constexpr int visual_encoder_ports[] = {0, 0};
     
     /* Physical characteristics of the encoders being used */
-    static constexpr long quad_enc_segments[] = {64 * 29, 48 * 75};
+    static constexpr long quad_encoder_segments[] = {64 * 29, 48 * 75};
 
     /* Calculate number of joints based of motors */
     static constexpr int joints_nr = sizeof(dc_motor_pins)/sizeof(dc_motor_pins[0]);
