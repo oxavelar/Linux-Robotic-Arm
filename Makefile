@@ -3,6 +3,7 @@ TARGET_BOARD := Galileo
 
 CC = g++
 CXXFLAGS += -O3 -Wall -Wextra -Werror -std=c++11 -pipe -march=native -flto -fomit-frame-pointer
+LDFLAGS += -Wl
 LDLIBS += -lpthread -lboost_system -lboost_filesystem
 
 SOURCES = demo.cpp RoboticArm.cpp
@@ -26,16 +27,12 @@ CXXFLAGS += -DBASE_PWM_FREQUENCY_HZ=50000 -DBASE_PWM_DUTYCYCLE=50
 CXXFLAGS += -DDEBUG
 
 
-ifeq ($(TARGET_BOARD), Galileo)
-CXXFLAGS += -m32 -static
-endif
-
 
 all:
 	$(MAKE) -j1 build
 
 build: $(DEPS) $(SOURCES) $(OBJECTS)
-	$(CC) $(CXXFLAGS) $(LDLIBS) $(OBJECTS) -o $(PROGRAM)
+	$(CC) $(LDLIBS) $(OBJECTS) -o $(PROGRAM)
 
 $(DEPS):
 	git clone -q https://github.com/oxavelar/HighLatencyGPIO

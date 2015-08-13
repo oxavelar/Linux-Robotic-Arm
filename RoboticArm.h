@@ -18,8 +18,11 @@ class RoboticJoint
         explicit RoboticJoint(const int &id);
         virtual ~RoboticJoint(void);
 
+        void Init(void);
         double GetAngle(void);
         void SetAngle(const double &theta);
+        void SetZero(void);
+
 
         /* Quadrature encoders + DC motors */
         QuadratureEncoder* Position;
@@ -27,7 +30,11 @@ class RoboticJoint
 
     private:
         const int _id;
-        
+        double _reference_angle;
+
+        /* Per joint position correction controls */
+        void _AngularControl(void);
+        std::thread _AutomaticControlThread;
 };
 
 
@@ -37,8 +44,7 @@ class RoboticArm
         explicit RoboticArm(void);
         virtual ~RoboticArm(void);
 
-        void Init();
-        void DemoCircle(void);
+        void Init(void);
         void DebugMessages(void);
         void GetPosition(Point &pos);
         void SetPosition(const Point &pos);

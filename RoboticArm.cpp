@@ -43,40 +43,64 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
 
 RoboticJoint::~RoboticJoint(void)
 {
+    /* Stop the automatic control loop thread */
+    if (_AutomaticControlThread.joinable())
+        _AutomaticControlThread.join();
+
     delete Position;
     delete Movement;
 }
 
 
+void RoboticJoint::Init(void)
+{
+    Movement->Start();
+    /* Register our control thread */
+    _AutomaticControlThread = std::thread(&RoboticJoint::_AngularControl, this);
+}
+
+
 double RoboticJoint::GetAngle(void)
 {
-    double angle = Position->GetAngle();
-    std::cout << __PRETTY_FUNCTION__ << " = " << angle << std::endl;
-    return angle;
+    /* Reads the internal variable, this is used by 
+     * the control loop thread, so just reading it is
+     * enough information of where the joint is it */
+    return _reference_angle;
 }
 
 
 void RoboticJoint::SetAngle(const double &theta)
 {
-    /* Set angle consists of the interaction between Position & Movement */
-    const auto initial_angle = Position->GetAngle();
+    /* Update the internal variable, the control loop
+     * will take charge of getting us here eventually */
+    _reference_angle = theta;
+}
+
+
+void RoboticJoint::SetZero(void)
+{
+    /* This will reset the sensors and the internal state
+     * as our zero reference point */
+    Position->SetZero();
+    _reference_angle = 0;
+}
+
+
+void RoboticJoint::_AngularControl(void)
+{
+    for(;;) {
+
+        /* Set angle consists of the interaction between Position & Movement */
+        const auto k = 3;
+        const auto actual_angle = Position->GetAngle();
+        const auto error_angle = _reference_angle - actual_angle;
+        
+        /* Sign dictates the direction of movement */
+        if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
+        else                     Movement->SetDirection(Motor::Direction::CCW);
     
-    if( initial_angle != theta ) {
-        std::cout << "INFO: Commanded angle for joint " << _id << " is different" << std::endl;
-        std::cout << "      Trying to guess the position now!" << std::endl;
-
-        /* Go right, or go left */
-
-        /* Proceed with caution on a tight controlled loop */
-        Movement->SetSpeed(10.0);
-        Movement->Start();
-        Movement->SetDirection(Motor::Direction::CW);
-        std::cout << "INFO: Going 1 second CW!" << std::endl;
-        usleep(1E06);
-        Movement->SetDirection(Motor::Direction::CCW);
-        std::cout << "INFO: Going 1 second CCW!" << std::endl;
-        usleep(1E06);
-        Movement->Stop();
+        /* Store the computed proportional value to the movement function */
+        Movement->SetSpeed(k * error_angle);
 
     }
 }
@@ -110,22 +134,28 @@ void RoboticArm::Init(void)
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
+        /* PHASE I: */
         /* Get the rotors to a known position on a tight controlled loop */
         double still_moving;
-        double init_speed = 80.00;
-        joints[id]->Movement->SetDirection(Motor::Direction::CW);
+        double init_speed = 5.00;
+        joints[id]->Movement->SetDirection(Motor::Direction::CCW);
         joints[id]->Movement->Start();
         do {
             still_moving = joints[id]->Position->GetAngle();
             joints[id]->Movement->SetSpeed(init_speed);
-            usleep(500);
         } while ((int)joints[id]->Position->GetAngle() != (int)still_moving);
         /* Reset the position coordinates, this is our reference */
         joints[id]->Movement->Stop();
-        joints[id]->Position->SetZero();
+        joints[id]->SetZero();
+        std::cout << "INFO: joint nr " << id << " is in our home position" << std::endl;
 
+        /* PHASE II: */
+        /* Let the the joint correction control thread run and motors start-up */
+        joints[id]->Init();
+        std::cout << "INFO: joint nr " << id << " is now ready to be utilized" << std::endl;
     }
-    std::cout << "INFO: Calibrated all of the joints to a known position" << std::endl;
+    
+     std::cout << std::endl << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
 }
 
 
@@ -155,7 +185,7 @@ void RoboticArm::GetPosition(Point &pos)
     
     /* Fill our N joints angles in our temporary matrix */
     for(auto id = 0; id < _joints_nr; id++) {
-        theta.push_back( joints[id]->GetAngle() );
+        theta.push_back( joints[id]->GetAngle() * M_PI / (double)180.0 );
     }
     
     
@@ -208,9 +238,9 @@ void RoboticArm::SetPosition(const Point &pos)
         break;
     }
     
-    /* Command each of the joints to the desired angle */
+    /* Update each of the joints their new reference angle */
     for(auto id = 0; id < _joints_nr; id++) {
-        joints[id]->SetAngle( theta.back() );
+        joints[id]->SetAngle( 180 * theta.back() / (double)M_PI );
         theta.pop_back();
     }
 }
