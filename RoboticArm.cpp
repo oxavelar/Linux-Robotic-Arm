@@ -59,6 +59,7 @@ void RoboticJoint::Init(void)
     Movement->Start();
     /* Register our control thread */
     _AutomaticControlThread = std::thread(&RoboticJoint::_AngularControl, this);
+    std::cout << "INFO: joint id " << _id << " is in our home position" << std::endl;
 }
 
 
@@ -90,6 +91,8 @@ void RoboticJoint::SetZero(void)
 
 void RoboticJoint::_AngularControl(void)
 {
+    std::cout << "INFO: joint id " << _id << " angular control is now active" << std::endl;
+
     do {
 
         /* Set angle consists of the interaction between position & movement */
@@ -105,6 +108,8 @@ void RoboticJoint::_AngularControl(void)
         Movement->SetSpeed( k * std::abs(error_angle) );
 
     } while(!_control_done);
+
+    std::cout << "INFO: joint id " << _id << " angular control is now deactivated" << std::endl;
 }
 
 
@@ -153,12 +158,13 @@ void RoboticArm::Init(void)
         /* Reset the position coordinates, this is our reference */
         joints[id]->Movement->Stop();
         joints[id]->SetZero();
-        std::cout << "INFO: joint nr " << id << " is in our home position" << std::endl;
         
         /* PHASE II: */
         /* Let the the joint correction control thread run and motors start-up */
         joints[id]->Init();
-        std::cout << "INFO: joint nr " << id << " is now ready to be utilized" << std::endl;
+
+        std::cout << "INFO: joint id " << id << " was fully initialized" << std::endl;
+
     }
     
      std::cout << std::endl << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
