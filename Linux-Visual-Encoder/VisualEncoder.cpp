@@ -15,7 +15,7 @@ VisualEncoder::VisualEncoder(const int &port) : _port(port)
 }
 
 
-~VisualEncoder::VisualEncoder(void)
+VisualEncoder::~VisualEncoder(void)
 {
 
 }
@@ -24,7 +24,7 @@ VisualEncoder::VisualEncoder(const int &port) : _port(port)
 double VisualEncoder::GetAngle(void)
 {
     double degrees;
-    degrees;
+    degrees = 0.00000000000000;
     return degrees;
 }
 

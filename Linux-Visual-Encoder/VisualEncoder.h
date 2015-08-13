@@ -12,7 +12,6 @@ class VisualEncoder
 
         double GetAngle(void);
         void SetZero(void);
-        Direction GetDirection(void);
 
     private:
         /* webcam port used in opencv */
