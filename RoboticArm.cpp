@@ -151,7 +151,7 @@ void RoboticArm::GetPosition(Point &pos)
     std::vector<double> theta;
 
     /* Length of the links in meters, read only */
-    const auto *alpha = &config::link_lengths[0];
+    const auto *L = &config::link_lengths[0];
     
     /* Fill our N joints angles in our temporary matrix */
     for(auto id = 0; id < _joints_nr; id++) {
@@ -162,13 +162,13 @@ void RoboticArm::GetPosition(Point &pos)
     switch(_joints_nr)
     {
     case 1:
-        pos.x = 0;
-        pos.y = 0;
+        pos.x = L[0] * cos(theta[0]);
+        pos.y = L[0] * sin(theta[0]);
         pos.z = 0;
         break;
     case 2:
-        pos.x = alpha[0] * cos(theta[0]) + alpha[1] * cos(theta[0] + theta[1]);
-        pos.y = alpha[0] * sin(theta[0]) + alpha[1] * sin(theta[0] + theta[1]);
+        pos.x = L[0] * cos(theta[0]) + L[1] * cos(theta[0] + theta[1]);
+        pos.y = L[0] * sin(theta[0]) + L[1] * sin(theta[0] + theta[1]);
         pos.z = 0;
         break;
     default:
@@ -189,7 +189,7 @@ void RoboticArm::SetPosition(const Point &pos)
     std::vector<double> theta;
 
     /* Length of the links in meters, read only */
-    const auto *alpha = &config::link_lengths[0];
+    const auto *L = &config::link_lengths[0];
     
 
     switch(_joints_nr)
@@ -198,8 +198,8 @@ void RoboticArm::SetPosition(const Point &pos)
         break;
     case 2:
         double theta0, theta1;
-        theta1 = atan( sqrt( 1 - (pos.x*pos.x + pos.y*pos.y - alpha[0]*alpha[0] - alpha[1]*alpha[1]) / (2 * alpha[0] * alpha[1]) ) );
-        theta0 =  atan(pos.y / pos.x) - atan( (alpha[1] * sin(theta1)) / (alpha[0] + alpha[1] * cos(theta1)) );
+        theta1 = atan( sqrt( 1 - (pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]) ) );
+        theta0 =  atan(pos.y / pos.x) - atan( (L[1] * sin(theta1)) / (L[0] + L[1] * cos(theta1)) );
         theta.push_back(theta0);
         theta.push_back(theta1);
         break;
