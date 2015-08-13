@@ -90,7 +90,7 @@ void RoboticJoint::_AngularControl(void)
 {
     for(;;) {
 
-        /* Set angle consists of the interaction between Position & Movement */
+        /* Set angle consists of the interaction between position & movement */
         const auto k = 3;
         const auto actual_angle = Position->GetAngle();
         const auto error_angle = _reference_angle - actual_angle;
@@ -135,20 +135,24 @@ void RoboticArm::Init(void)
     for(auto id = 0; id < _joints_nr; id++) {
 
         /* PHASE I: */
-        /* Get the rotors to a known position on a tight controlled loop */
+        /* Get the rotors to a known position on a tight controlled loop 
+         * due to rounding aritmethic errors, we use an epsilon comparision
+         * in order to see if the values delta is less than it
+         */
         double still_moving;
         double init_speed = 5.00;
-        joints[id]->Movement->SetDirection(Motor::Direction::CCW);
+        double epsilon = 0.001;
+        joints[id]->Movement->SetDirection(Motor::Direction::CW);
         joints[id]->Movement->Start();
         do {
             still_moving = joints[id]->Position->GetAngle();
             joints[id]->Movement->SetSpeed(init_speed);
-        } while ((int)joints[id]->Position->GetAngle() != (int)still_moving);
+        } while (std::abs(joints[id]->Position->GetAngle() - still_moving) < epsilon);
         /* Reset the position coordinates, this is our reference */
         joints[id]->Movement->Stop();
         joints[id]->SetZero();
         std::cout << "INFO: joint nr " << id << " is in our home position" << std::endl;
-
+        
         /* PHASE II: */
         /* Let the the joint correction control thread run and motors start-up */
         joints[id]->Init();
