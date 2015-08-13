@@ -93,7 +93,7 @@ void RoboticJoint::_AngularControl(void)
     do {
 
         /* Set angle consists of the interaction between position & movement */
-        const auto k = 3;
+        const auto k = 0.20;
         const auto actual_angle = Position->GetAngle();
         const auto error_angle = _reference_angle - actual_angle;
         
@@ -102,7 +102,7 @@ void RoboticJoint::_AngularControl(void)
         else                     Movement->SetDirection(Motor::Direction::CCW);
     
         /* Store the computed proportional value to the movement function */
-        Movement->SetSpeed(k * error_angle);
+        Movement->SetSpeed( k * std::abs(error_angle) );
 
     } while(!_control_done);
 }
