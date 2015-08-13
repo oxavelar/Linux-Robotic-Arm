@@ -26,3 +26,8 @@
 *.exe
 *.out
 *.app
+
+# External dependencies
+HighLatencyGPIO/*
+HighLatencyPWM/*
+
