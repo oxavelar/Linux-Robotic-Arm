@@ -44,9 +44,11 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
 RoboticJoint::~RoboticJoint(void)
 {
     /* Stop the automatic control loop thread */
-    if (_AutomaticControlThread.joinable())
+    if (_AutomaticControlThread.joinable()) {
+        _control_done = true;
         _AutomaticControlThread.join();
-
+    }
+    
     delete Position;
     delete Movement;
 }
@@ -88,7 +90,7 @@ void RoboticJoint::SetZero(void)
 
 void RoboticJoint::_AngularControl(void)
 {
-    for(;;) {
+    do {
 
         /* Set angle consists of the interaction between position & movement */
         const auto k = 3;
@@ -102,7 +104,7 @@ void RoboticJoint::_AngularControl(void)
         /* Store the computed proportional value to the movement function */
         Movement->SetSpeed(k * error_angle);
 
-    }
+    } while(!_control_done);
 }
 
 

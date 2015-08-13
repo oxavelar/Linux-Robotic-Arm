@@ -1,6 +1,5 @@
 #pragma once
-#include <iostream>
-#include <stdint.h>
+#include <atomic>
 #include "Linux-DC-Motor/Motor.h"
 #include "Linux-Quadrature-Encoder/QuadratureEncoder.h"
 
@@ -35,6 +34,7 @@ class RoboticJoint
         /* Per joint position correction controls */
         void _AngularControl(void);
         std::thread _AutomaticControlThread;
+        std::atomic_bool _control_done;
 };
 
 

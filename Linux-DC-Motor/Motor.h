@@ -1,12 +1,11 @@
 #pragma once
-#include <iostream>
 #include <chrono>
 #include <stdint.h>
 #include "../HighLatencyPWM/PWM.hh"
 #include "../HighLatencyGPIO/GPIO.hh"
 
 #ifndef BASE_PWM_FREQUENCY_HZ
-#define BASE_PWM_FREQUENCY_HZ 30000
+#define BASE_PWM_FREQUENCY_HZ 50000
 #endif
 
 #ifndef BASE_PWM_DUTYCYCLE

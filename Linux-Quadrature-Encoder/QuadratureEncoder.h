@@ -1,11 +1,9 @@
 #pragma once
 #include <iostream>
-#include <chrono>
 #include <atomic>
-#include <stdint.h>
+#include <chrono>
 #include "../HighLatencyGPIO/GPIO.hh"
 
-#define QE_MAX_TRACE_DEPTH 64
 
 class QuadratureEncoder
 {
@@ -74,8 +72,7 @@ class QuadratureEncoder
         std::atomic_ullong _channel_a_isr_cnt, _channel_b_isr_cnt;
 
         std::atomic_int _trace_index;
-        char _channel_a_history[QE_MAX_TRACE_DEPTH];
-        char _channel_b_history[QE_MAX_TRACE_DEPTH];
+        std::string _channel_a_history, _channel_b_history;
 
         void _FillTraceHistory(void);
 #endif
