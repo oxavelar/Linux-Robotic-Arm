@@ -2,6 +2,7 @@
 #include <atomic>
 #include "Linux-DC-Motor/Motor.h"
 #include "Linux-Quadrature-Encoder/QuadratureEncoder.h"
+#include "Linux-Visual-Encoder/VisualEncoder.h"
 
 
 class Point

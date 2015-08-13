@@ -13,11 +13,15 @@ SOURCES += HighLatencyGPIO/GPIO.cc \
            HighLatencyPWM/PWM.cc \
            Linux-DC-Motor/Motor.cpp \
            Linux-Quadrature-Encoder/QuadratureEncoder.cpp \
+           Linux-Visual-Encoder/VisualEncoder.cpp \
+
  
 OBJECTS += HighLatencyGPIO/GPIO.o \
            HighLatencyPWM/PWM.o \
            Linux-DC-Motor/Motor.o \
-           Linux-Quadrature-Encoder/QuadratureEncoder.o
+           Linux-Quadrature-Encoder/QuadratureEncoder.o \
+           Linux-Visual-Encoder/VisualEncoder.o \
+
 
 DEPS += HighLatencyGPIO
 DEPS += HighLatencyPWM

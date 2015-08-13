@@ -83,17 +83,12 @@ void QuadratureEncoder::SetZero(void)
 
 QuadratureEncoder::Direction QuadratureEncoder::GetDirection(void)
 {
-    if(_direction == Direction::CW) {
-        std::cout << "INFO: Current direction        +" << std::endl;
-    } else
-        std::cout << "INFO: Current direction        -" << std::endl;
     return _direction;
 }
 
 
 void QuadratureEncoder::PrintStats(void)
 {
-    GetDirection();
     std::cout << "INFO: Internal counter value   " << _counter << std::endl;
 #ifdef DEBUG
     std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_cnt << std::endl;
