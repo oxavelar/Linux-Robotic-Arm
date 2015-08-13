@@ -62,8 +62,8 @@ void RoboticJoint::SetAngle(const double &theta)
     const auto initial_angle = Position->GetAngle();
     
     if( initial_angle != theta ) {
-        std::cout << "INFO: Commanded angle for joint " << _id << " is different";
-        std::cout << "      Trying to guess the position now!";
+        std::cout << "INFO: Commanded angle for joint " << _id << " is different" << std::endl;
+        std::cout << "      Trying to guess the position now!" << std::endl;
 
         /* Go right, or go left */
 
