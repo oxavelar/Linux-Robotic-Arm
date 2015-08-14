@@ -222,23 +222,19 @@ void RoboticArm::SetPosition(const Point &pos)
 {
     /* Makes use of inverse kinematics in order to set position */
 
-    /* Temporary working matrix */
-    std::vector<double> theta;
+    /* Temporary working matrix per joint elements */
+    std::array<double, config::joints_nr> theta;
 
     /* Length of the links in meters, read only */
     const auto *L = &config::link_lengths[0];
 
-    double tmp[16];
-
     switch(_joints_nr)
     {
     case 1:
-        theta.push_back(tmp[0]);
+        theta[0] = 0.0000;
     case 2:
-        tmp[1] = std::atan( std::sqrt( 1 - (pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]) ) );
-        tmp[0] = std::atan(pos.y / pos.x) - std::atan( (L[1] * std::sin(tmp[1])) / (L[0] + L[1] * std::cos(tmp[1])) );
-        theta.push_back(tmp[0]);
-        theta.push_back(tmp[1]);
+        theta[1] = atan( sqrt( 1 - (pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1] / (2 * L[0] * L[1])) ) );
+        theta[0] = atan(pos.y / pos.x) - atan( (L[1] * sin(theta[1])) / (L[0] + L[1] * cos(theta[1])) );
         break;
     default:
         /* oxavelar: To extend this to 3 dimensions for N joints */
@@ -248,8 +244,7 @@ void RoboticArm::SetPosition(const Point &pos)
     
     /* Update each of the joints their new reference angle */
     for(auto id = 0; id < _joints_nr; id++) {
-        joints[id]->SetAngle( theta.back() * 180 / M_PI );
-        theta.pop_back();
+        joints[id]->SetAngle( theta[id] * 180 / M_PI );
     }
 }
 
