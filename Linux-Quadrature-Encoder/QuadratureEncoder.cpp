@@ -178,7 +178,7 @@ void QuadratureEncoder::_TrackChannelPulseWidth(void)
     }
 }
 
-
+#ifdef DEBUG
 void QuadratureEncoder::_FillTraceHistory(void)
 {
     /*
@@ -192,4 +192,4 @@ void QuadratureEncoder::_FillTraceHistory(void)
     _trace_index += 2;
     _trace_index = _trace_index % (QE_MAX_TRACE_DEPTH / 2);
 }
-
+#endif

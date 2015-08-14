@@ -47,11 +47,11 @@ class QuadratureEncoder
         */
         void _GPIO_DataProcess(void);
 
-        std::atomic_int _prev_packed_read;
+        std::atomic<int> _prev_packed_read;
         const signed char _qem[16] = {0,-1,1,'x',1,0,'x',-1,-1,'x',0,1,'x',1,-1,0};
 
         /* Internal state variables */
-        std::atomic_int _counter;
+        std::atomic<int> _counter;
         std::chrono::nanoseconds _pulse_period_ns;
         std::atomic<Direction> _direction;
         
@@ -62,14 +62,14 @@ class QuadratureEncoder
         int _segments_per_revolution;
 
         /* Used to keep track of the actual interrupt pulse-widths */
-        std::atomic_char _internal_toggle;
+        std::atomic<char> _internal_toggle;
         void _TrackChannelPulseWidth(void);
 
         std::chrono::high_resolution_clock::time_point _isr_timestamp;
 
 #ifdef DEBUG
         /* Debug variable or methods */
-        std::atomic_ullong _channel_a_isr_cnt, _channel_b_isr_cnt;
+        std::atomic<unsigned long long> _channel_a_isr_cnt, _channel_b_isr_cnt;
 
         std::atomic_int _trace_index;
         std::string _channel_a_history, _channel_b_history;

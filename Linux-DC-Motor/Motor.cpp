@@ -60,16 +60,12 @@ Motor::~Motor(void)
 
 void Motor::Start(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
     _pwm_active->setState(PWM::State::ENABLED);
 }
 
 
 void Motor::Stop(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
     _pwm_active->setState(PWM::State::DISABLED);
 }
 
@@ -90,7 +86,8 @@ void Motor::SetSpeed(const double &percent)
     if((percent <= 100) and (percent >= 0))
         _pwm_active->setDuty(val);
     else
-        throw std::runtime_error("Invalid speed value");
+        std::cout << "WARNING: Illegal motor speed value = (" << percent << ")" << std::endl;
+        //throw std::runtime_error("Invalid speed value");
 }
 
 

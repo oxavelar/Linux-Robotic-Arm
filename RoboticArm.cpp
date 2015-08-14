@@ -45,7 +45,7 @@ RoboticJoint::~RoboticJoint(void)
 {
     /* Stop the automatic control loop thread */
     if (_AutomaticControlThread.joinable()) {
-        _control_done = true;
+        _control_stopped = true;
         _AutomaticControlThread.join();
     }
     
@@ -56,10 +56,11 @@ RoboticJoint::~RoboticJoint(void)
 
 void RoboticJoint::Init(void)
 {
+    /* Set the motors running, so the control loop can work on it */
     Movement->Start();
     /* Register our control thread */
     _AutomaticControlThread = std::thread(&RoboticJoint::_AngularControl, this);
-    std::cout << "INFO: joint id " << _id << " is in our home position" << std::endl;
+    std::cout << "INFO: Joint ID " << _id << " is in our home position" << std::endl;
 }
 
 
@@ -91,25 +92,34 @@ void RoboticJoint::SetZero(void)
 
 void RoboticJoint::_AngularControl(void)
 {
-    std::cout << "INFO: joint id " << _id << " angular control is now active" << std::endl;
+    std::cout << "INFO: Joint ID " << _id << " angular control is now active" << std::endl;
 
-    do {
-
+    while(!_control_stopped) {
+        
         /* Set angle consists of the interaction between position & movement */
-        const auto k = 0.20;
-        const auto actual_angle = Position->GetAngle();
-        const auto error_angle = _reference_angle - actual_angle;
+        const double k = 0.30;
+        const double actual_angle = Position->GetAngle();
+        const double error_angle = _reference_angle - actual_angle;
         
         /* Sign dictates the direction of movement */
         if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
         else                     Movement->SetDirection(Motor::Direction::CCW);
+
+        std::cout << "k=" << k << std::endl;
+        std::cout << "actual=" << actual_angle << std::endl;
+        std::cout << "reference=" << _reference_angle << std::endl;
+        std::cout << "error=" << error_angle << std::endl;
+        std::cout << std::endl;
     
         /* Store the computed proportional value to the movement function */
         Movement->SetSpeed( k * std::abs(error_angle) );
+        
+        /* Send this task to a low priority state for efficient multi-threading */
+        sched_yield();
+        
+    }
 
-    } while(!_control_done);
-
-    std::cout << "INFO: joint id " << _id << " angular control is now deactivated" << std::endl;
+    std::cout << "INFO: Joint ID " << _id << " angular control is now deactivated" << std::endl;
 }
 
 
@@ -129,7 +139,6 @@ RoboticArm::~RoboticArm(void)
     
     /* Call each of the joints destructors and stop any movement object */
     for(auto id = 0; id < _joints_nr; id++) {
-        joints[id]->Movement->Stop();
         delete joints[id];
     }
 }
@@ -144,18 +153,18 @@ void RoboticArm::Init(void)
         /* PHASE I: */
         /* Get the rotors to a known position on a tight controlled loop 
          * due to rounding aritmethic errors, we use an epsilon comparision
-         * in order to see if the values delta is less than it
+         * in order to see if the values difference is less than it
          */
-        double still_moving;
-        double init_speed = 5.00;
-        double epsilon = 0.001;
+        double difference, init_speed = 20.00, epsilon = 0.001;
         joints[id]->Movement->SetDirection(Motor::Direction::CW);
+        joints[id]->Movement->SetSpeed(init_speed);
         joints[id]->Movement->Start();
         do {
-            still_moving = joints[id]->Position->GetAngle();
-            joints[id]->Movement->SetSpeed(init_speed);
-        } while (std::abs(joints[id]->Position->GetAngle() - still_moving) < epsilon);
-        /* Reset the position coordinates, this is our reference */
+            double old = joints[id]->Position->GetAngle();
+            usleep(100);
+            difference = std::abs(joints[id]->Position->GetAngle() - old);
+        } while (difference > epsilon);
+        /* Reset the position coordinates, this is our new home position */
         joints[id]->Movement->Stop();
         joints[id]->SetZero();
         
@@ -163,25 +172,11 @@ void RoboticArm::Init(void)
         /* Let the the joint correction control thread run and motors start-up */
         joints[id]->Init();
 
-        std::cout << "INFO: joint id " << id << " was fully initialized" << std::endl;
+        std::cout << "INFO: joint ID " << id << " was fully initialized" << std::endl;
 
     }
     
      std::cout << std::endl << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
-}
-
-
-void RoboticArm::DebugMessages(void)
-{
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
-    /* Print all of the joints positions relative to themselves for now */
-    for(auto id = 0; id < _joints_nr; id++) {
-
-        joints[id]->Position->PrintStats();
-
-        std::cout << std::endl;
-    }
 }
 
 
@@ -197,20 +192,20 @@ void RoboticArm::GetPosition(Point &pos)
     
     /* Fill our N joints angles in our temporary matrix */
     for(auto id = 0; id < _joints_nr; id++) {
-        theta.push_back( joints[id]->GetAngle() * M_PI / (double)180.0 );
+        theta.push_back( joints[id]->GetAngle() / 180 * M_PI );
     }
     
     
     switch(_joints_nr)
     {
     case 1:
-        pos.x = L[0] * cos(theta[0]);
-        pos.y = L[0] * sin(theta[0]);
+        pos.x = L[0] * std::cos(theta[0]);
+        pos.y = L[0] * std::sin(theta[0]);
         pos.z = 0;
         break;
     case 2:
-        pos.x = L[0] * cos(theta[0]) + L[1] * cos(theta[0] + theta[1]);
-        pos.y = L[0] * sin(theta[0]) + L[1] * sin(theta[0] + theta[1]);
+        pos.x = L[0] * std::cos(theta[0]) + L[1] * std::cos(theta[0] + theta[1]);
+        pos.y = L[0] * std::sin(theta[0]) + L[1] * std::sin(theta[0] + theta[1]);
         pos.z = 0;
         break;
     default:
@@ -232,27 +227,28 @@ void RoboticArm::SetPosition(const Point &pos)
 
     /* Length of the links in meters, read only */
     const auto *L = &config::link_lengths[0];
-    
+
+    double tmp[16];
 
     switch(_joints_nr)
     {
     case 1:
-        break;
+        theta.push_back(tmp[0]);
     case 2:
-        double theta0, theta1;
-        theta1 = atan( sqrt( 1 - (pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]) ) );
-        theta0 =  atan(pos.y / pos.x) - atan( (L[1] * sin(theta1)) / (L[0] + L[1] * cos(theta1)) );
-        theta.push_back(theta0);
-        theta.push_back(theta1);
+        tmp[1] = std::atan( std::sqrt( 1 - (pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]) ) );
+        tmp[0] = std::atan(pos.y / pos.x) - std::atan( (L[1] * std::sin(tmp[1])) / (L[0] + L[1] * std::cos(tmp[1])) );
+        theta.push_back(tmp[0]);
+        theta.push_back(tmp[1]);
         break;
     default:
         /* oxavelar: To extend this to 3 dimensions for N joints */
-        break;
+        std::cout << "ERROR: Unable to calculate for more than 2 joints for now..." << std::cout;
+        exit(-127);
     }
     
     /* Update each of the joints their new reference angle */
     for(auto id = 0; id < _joints_nr; id++) {
-        joints[id]->SetAngle( 180 * theta.back() / (double)M_PI );
+        joints[id]->SetAngle( theta.back() * 180 / M_PI );
         theta.pop_back();
     }
 }

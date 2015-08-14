@@ -9,7 +9,7 @@
 
 
 RoboticArm *RoboArm;
-Point coordinates;
+Point actual_coordinates, reference_coordinates;
 
 
 void _cleanup(int signum)
@@ -42,28 +42,22 @@ int main(void)
 
     RoboArm->Init();
     usleep(2E06);
+
     
     /* Input a curve or shape to the roboarm to draw it */
     for(;;) {
-        RoboArm->GetPosition(coordinates);
+        RoboArm->GetPosition(actual_coordinates);
         
-        /* Show the cartesian coordinates */
-        std::cout << "( x: "  << coordinates.x
-                  <<  " | y: "  << coordinates.y
-                  <<  " | z: " << coordinates.z
+        std::cout << "( x: "    << actual_coordinates.x
+                  <<  " | y: "  << actual_coordinates.y
+                  <<  " | z: "  << actual_coordinates.z
                   << " )" << std::endl;
 
-        /* Debug information displayed */
-        RoboArm->DebugMessages();
-
-        /* Command the robot to a new position */
-        //Point new_coordinates;
-        //new_coordinates.x = 0.02;
-        //new_coordinates.y = 0.03;
-        RoboArm->SetPosition(coordinates);
+        /* Command the robot to a new position, should not move... */
+        reference_coordinates = actual_coordinates;
+        RoboArm->SetPosition(reference_coordinates);
 
         usleep(3E06);
-        std::cout << std::endl;
     }
 
     return EXIT_SUCCESS;

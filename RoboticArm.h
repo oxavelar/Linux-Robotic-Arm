@@ -30,12 +30,13 @@ class RoboticJoint
 
     private:
         const int _id;
-        double _reference_angle;
+         double _reference_angle;
 
-        /* Per joint position correction controls */
+
+        /* Per joint position correction control */
         void _AngularControl(void);
         std::thread _AutomaticControlThread;
-        std::atomic_bool _control_done;
+        std::atomic<bool> _control_stopped;
 };
 
 
@@ -46,7 +47,6 @@ class RoboticArm
         virtual ~RoboticArm(void);
 
         void Init(void);
-        void DebugMessages(void);
         void GetPosition(Point &pos);
         void SetPosition(const Point &pos);
 
