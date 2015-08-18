@@ -107,11 +107,11 @@ void RoboticJoint::_AngularControl(void)
         if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
         else                     Movement->SetDirection(Motor::Direction::CCW);
 
-        std::cout << "k=" << k << std::endl;
-        std::cout << "actual=" << actual_angle << std::endl;
-        std::cout << "reference=" << _reference_angle << std::endl;
-        std::cout << "error=" << error_angle << std::endl;
-        std::cout << std::endl;
+        //std::cout << "k=" << k << std::endl;
+        //std::cout << "actual=" << actual_angle << std::endl;
+        //std::cout << "reference=" << _reference_angle << std::endl;
+        //std::cout << "error=" << error_angle << std::endl;
+        //std::cout << std::endl;
     
         /* Store the computed proportional value to the movement function */
         Movement->SetSpeed( k * std::abs(error_angle) );
