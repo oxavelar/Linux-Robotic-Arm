@@ -67,7 +67,8 @@ class QuadratureEncoder
 
 #ifdef DEBUG
         /* Debug variable or methods */
-        std::atomic<unsigned long long> _channel_a_isr_cnt, _channel_b_isr_cnt;
+        std::atomic<unsigned long long> _channel_a_isr_count, _channel_b_isr_count;
+        std::atomic<unsigned long long> _gpio_processing_error_count;
 
         std::atomic_int _trace_index;
         std::string _channel_a_history, _channel_b_history;

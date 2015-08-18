@@ -97,7 +97,7 @@ void QuadratureEncoder::_ISR_ChannelA(void)
     _GPIO_DataProcess();
 #ifdef DEBUG
     _FillTraceHistory();
-    _channel_a_isr_cnt++;
+    _channel_a_isr_count++;
 #endif
 }
 
@@ -107,7 +107,7 @@ void QuadratureEncoder::_ISR_ChannelB(void)
     _GPIO_DataProcess();
 #ifdef DEBUG
     _FillTraceHistory();
-    _channel_b_isr_cnt++;
+    _channel_b_isr_count++;
 #endif
 }
 
@@ -129,6 +129,9 @@ void QuadratureEncoder::_GPIO_DataProcess(void)
 
     /* Put a code guard on illegal encoder train pulse values */
     if (delta == 'x') {
+#ifdef DEBUG
+        _gpio_processing_error_count++;
+#endif
         std::cout << "WARNING: Execution might be too slow, reading wrong values from the encoder" << std::endl;
         delta = 0;
     }
@@ -169,9 +172,9 @@ void QuadratureEncoder::_TrackChannelPulseWidth(void)
 void QuadratureEncoder::_PrintStats(void)
 {
     std::cout << "INFO: Internal counter value   " << _counter << std::endl;
-    std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_cnt << std::endl;
-    std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_cnt << std::endl;
-
+    std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_count << std::endl;
+    std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_count << std::endl;
+    std::cout << "INFO: GPIO processing errors   " << _gpio_processing_error_count << std::endl;
     /* Trace table is printed */
     std::string trace_header;
     trace_header.resize(QE_MAX_TRACE_DEPTH, ' ');
@@ -179,6 +182,7 @@ void QuadratureEncoder::_PrintStats(void)
     std::cout << "                               " << trace_header << std::endl;
     std::cout << "INFO: ChannelA history         " << _channel_a_history << std::endl;
     std::cout << "INFO: ChannelB history         " << _channel_b_history << std::endl;
+    std::cout << std::endl;
 }
 
 
