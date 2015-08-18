@@ -19,8 +19,6 @@ class QuadratureEncoder
         void SetZero(void);
         Direction GetDirection(void);
 
-        void PrintStats(void);
-
     private:
         /* Pulse train inputs objects from the GPIO class */
         GPIO *_gpio_a, *_gpio_b;
@@ -74,6 +72,7 @@ class QuadratureEncoder
         std::atomic_int _trace_index;
         std::string _channel_a_history, _channel_b_history;
 
+        void _PrintStats(void);
         void _FillTraceHistory(void);
 #endif
 };

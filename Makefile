@@ -1,5 +1,4 @@
 PROGRAM := linux-robotic-arm.app
-TARGET_BOARD := Galileo
 
 CC = g++
 CXXFLAGS += -O3 -Wall -Wextra -Werror -std=c++11 -pipe -march=native -flto -fomit-frame-pointer
@@ -28,12 +27,12 @@ DEPS += HighLatencyPWM
 
 CXXFLAGS += -DRT_PRIORITY
 CXXFLAGS += -DBASE_PWM_FREQUENCY_HZ=50000 -DBASE_PWM_DUTYCYCLE=50
-#CXXFLAGS += -DDEBUG
-
+CXXFLAGS += -DDEBUG
 
 
 all:
-	$(MAKE) -j1 build
+	$(MAKE) -j1 $(DEPS) > /dev/null
+	$(MAKE) build
 
 build: $(DEPS) $(SOURCES) $(OBJECTS)
 	$(CC) $(LDLIBS) $(OBJECTS) -o $(PROGRAM)

@@ -13,7 +13,6 @@
 #include <cmath>
 #include "QuadratureEncoder.h"
 
-#define QE_MAX_TRACE_DEPTH 64
 
 
 QuadratureEncoder::QuadratureEncoder(const int &pin_a, const int &pin_b, const int &rate):
@@ -48,6 +47,9 @@ QuadratureEncoder::~QuadratureEncoder(void)
 {
     delete _gpio_a;
     delete _gpio_b;
+#if DEBUG
+    _PrintStats();
+#endif
 }
 
 
@@ -84,24 +86,6 @@ void QuadratureEncoder::SetZero(void)
 QuadratureEncoder::Direction QuadratureEncoder::GetDirection(void)
 {
     return _direction;
-}
-
-
-void QuadratureEncoder::PrintStats(void)
-{
-    std::cout << "INFO: Internal counter value   " << _counter << std::endl;
-#ifdef DEBUG
-    std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_cnt << std::endl;
-    std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_cnt << std::endl;
-
-    /* Trace table is printed */
-    std::string trace_header;
-    trace_header.resize(QE_MAX_TRACE_DEPTH, ' ');
-    trace_header.at(_trace_index) = 'v';
-    std::cout << "                               " << trace_header << std::endl;
-    std::cout << "INFO: ChannelA history         " << _channel_a_history << std::endl;
-    std::cout << "INFO: ChannelB history         " << _channel_b_history << std::endl;
-#endif
 }
 
 
@@ -179,6 +163,25 @@ void QuadratureEncoder::_TrackChannelPulseWidth(void)
 }
 
 #ifdef DEBUG
+
+#define QE_MAX_TRACE_DEPTH 64
+
+void QuadratureEncoder::_PrintStats(void)
+{
+    std::cout << "INFO: Internal counter value   " << _counter << std::endl;
+    std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_cnt << std::endl;
+    std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_cnt << std::endl;
+
+    /* Trace table is printed */
+    std::string trace_header;
+    trace_header.resize(QE_MAX_TRACE_DEPTH, ' ');
+    trace_header.at(_trace_index) = 'v';
+    std::cout << "                               " << trace_header << std::endl;
+    std::cout << "INFO: ChannelA history         " << _channel_a_history << std::endl;
+    std::cout << "INFO: ChannelB history         " << _channel_b_history << std::endl;
+}
+
+
 void QuadratureEncoder::_FillTraceHistory(void)
 {
     /*
