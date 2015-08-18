@@ -30,7 +30,7 @@ class RoboticJoint
 
     private:
         const int _id;
-         double _reference_angle;
+        double _reference_angle;
 
 
         /* Per joint position correction control */
@@ -51,7 +51,7 @@ class RoboticArm
         void SetPosition(const Point &pos);
 
     private:
-        int _joints_nr;
+        const int _joints_nr;
         /* A container of joints form a chain, 
          * joints[0] = root 
          * joints[1] = node1

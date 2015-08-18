@@ -13,12 +13,12 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <atomic>
 #include <stdlib.h>
 #include <unistd.h>
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
 
-using namespace std;
 
 RoboticJoint::RoboticJoint(const int &id) : _id(id)
 {
@@ -100,7 +100,7 @@ void RoboticJoint::_AngularControl(void)
     while(!_control_stopped) {
         
         /* Set angle consists of the interaction between position & movement */
-        const double k = 0.40;
+        const double k = 0.60;
         const double actual_angle = Position->GetAngle();
         const double error_angle = _reference_angle - actual_angle;
         
@@ -112,7 +112,7 @@ void RoboticJoint::_AngularControl(void)
         std::cout << "reference=" << _reference_angle << std::endl;
         std::cout << "error=" << error_angle << std::endl;
         std::cout << std::endl;
-        std::cout << "speed%=" << k * std::abs(error_angle) << std::endl;
+        std::cout << "speed=" << k * std::abs(error_angle) << "%" <<std::endl;
         std::cout << std::endl;
 #endif
     
@@ -166,7 +166,6 @@ void RoboticArm::Init(void)
         joints[id]->Movement->Start();
         do {
             double old = joints[id]->Position->GetAngle();
-            usleep(100);
             difference = std::abs(joints[id]->Position->GetAngle() - old);
         } while (difference > epsilon);
         /* Reset the position coordinates, this is our new home position */
@@ -237,7 +236,7 @@ void RoboticArm::SetPosition(const Point &pos)
     switch(_joints_nr)
     {
     case 1:
-        theta[0] = 0.0000;
+        theta[0] = atan2(pos.y, pos.x);
     case 2:
         #define D ((pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]))
         theta[1] = atan( sqrt(1 - D*D) / D );

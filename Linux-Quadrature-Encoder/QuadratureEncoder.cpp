@@ -112,7 +112,7 @@ void QuadratureEncoder::_ISR_ChannelB(void)
 }
 
 
-void QuadratureEncoder::_GPIO_DataProcess(void)
+inline void QuadratureEncoder::_GPIO_DataProcess(void)
 {
     char a, b;
     char current_packed_read;
@@ -131,8 +131,8 @@ void QuadratureEncoder::_GPIO_DataProcess(void)
     if (delta == 'x') {
 #ifdef DEBUG
         _gpio_processing_error_count++;
-#endif
         std::cout << "WARNING: Execution might be too slow, reading wrong values from the encoder" << std::endl;
+#endif
         delta = 0;
     }
     
@@ -203,3 +203,4 @@ void QuadratureEncoder::_FillTraceHistory(void)
     _trace_index = _trace_index % (QE_MAX_TRACE_DEPTH / 2);
 }
 #endif
+

@@ -13,11 +13,11 @@ class QuadratureEncoder
         explicit QuadratureEncoder(const int &pin_a, const int &pin_b, const int &rate=4);
         virtual ~QuadratureEncoder(void);
         
-        void SetParameters(const int &segments);
         double GetAngle(void);
-        std::chrono::nanoseconds GetPeriod(void);
         void SetZero(void);
         Direction GetDirection(void);
+        void SetParameters(const int &segments);
+        std::chrono::nanoseconds GetPeriod(void);
 
     private:
         /* Pulse train inputs objects from the GPIO class */
@@ -43,7 +43,7 @@ class QuadratureEncoder
 
            Note: If a value of 'x' is read it means the code is too slow!
         */
-        void _GPIO_DataProcess(void);
+        inline void _GPIO_DataProcess(void);
 
         std::atomic<int> _prev_packed_read;
         const signed char _qem[16] = {0,-1,1,'x',1,0,'x',-1,-1,'x',0,1,'x',1,-1,0};
