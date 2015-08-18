@@ -96,7 +96,7 @@ void QuadratureEncoder::_ISR_ChannelA(void)
     //_TrackChannelPulseWidth();
     _GPIO_DataProcess();
 #ifdef DEBUG
-    _FillTraceHistory();
+    //_FillTraceHistory();
     _channel_a_isr_count++;
 #endif
 }
@@ -106,7 +106,7 @@ void QuadratureEncoder::_ISR_ChannelB(void)
 {
     _GPIO_DataProcess();
 #ifdef DEBUG
-    _FillTraceHistory();
+    //_FillTraceHistory();
     _channel_b_isr_count++;
 #endif
 }
@@ -176,12 +176,12 @@ void QuadratureEncoder::_PrintStats(void)
     std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_count << std::endl;
     std::cout << "INFO: GPIO processing errors   " << _gpio_processing_error_count << std::endl;
     /* Trace table is printed */
-    std::string trace_header;
-    trace_header.resize(QE_MAX_TRACE_DEPTH, ' ');
-    trace_header.at(_trace_index) = 'v';
-    std::cout << "                               " << trace_header << std::endl;
-    std::cout << "INFO: ChannelA history         " << _channel_a_history << std::endl;
-    std::cout << "INFO: ChannelB history         " << _channel_b_history << std::endl;
+    //std::string trace_header;
+    //trace_header.resize(QE_MAX_TRACE_DEPTH, ' ');
+    //trace_header.at(_trace_index) = 'v';
+    //std::cout << "                               " << trace_header << std::endl;
+    //std::cout << "INFO: ChannelA history         " << _channel_a_history << std::endl;
+    //std::cout << "INFO: ChannelB history         " << _channel_b_history << std::endl;
     std::cout << std::endl;
 }
 
@@ -192,8 +192,11 @@ void QuadratureEncoder::_FillTraceHistory(void)
      * Once this is called it is used to store a representative trace
      * in a char string what the bus is like for debug purposes.
      */
-    _channel_a_history.at(_trace_index) = (_prev_packed_read  &  1) + '0';
-    _channel_b_history.at(_trace_index) = (_prev_packed_read  >> 1) + '0';
+    _channel_a_history.resize(QE_MAX_TRACE_DEPTH, ' ');
+    _channel_b_history.resize(QE_MAX_TRACE_DEPTH, ' ');
+
+    _channel_a_history[_trace_index] = (_prev_packed_read  &  1) + '0';
+    _channel_b_history[_trace_index] = (_prev_packed_read  >> 1) + '0';
 
     /* Positions the character in the buffer, each two characters */
     _trace_index += 2;

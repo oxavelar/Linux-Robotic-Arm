@@ -18,6 +18,7 @@
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
 
+using namespace std;
 
 RoboticJoint::RoboticJoint(const int &id) : _id(id)
 {
@@ -99,19 +100,21 @@ void RoboticJoint::_AngularControl(void)
     while(!_control_stopped) {
         
         /* Set angle consists of the interaction between position & movement */
-        const double k = 0.30;
+        const double k = 0.40;
         const double actual_angle = Position->GetAngle();
         const double error_angle = _reference_angle - actual_angle;
         
         /* Sign dictates the direction of movement */
         if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
         else                     Movement->SetDirection(Motor::Direction::CCW);
-
-        //std::cout << "k=" << k << std::endl;
-        //std::cout << "actual=" << actual_angle << std::endl;
-        //std::cout << "reference=" << _reference_angle << std::endl;
-        //std::cout << "error=" << error_angle << std::endl;
-        //std::cout << std::endl;
+#ifdef DEBUG
+        std::cout << "actual=" << actual_angle << std::endl;
+        std::cout << "reference=" << _reference_angle << std::endl;
+        std::cout << "error=" << error_angle << std::endl;
+        std::cout << std::endl;
+        std::cout << "speed%=" << k * std::abs(error_angle) << std::endl;
+        std::cout << std::endl;
+#endif
     
         /* Store the computed proportional value to the movement function */
         Movement->SetSpeed( k * std::abs(error_angle) );
@@ -236,7 +239,8 @@ void RoboticArm::SetPosition(const Point &pos)
     case 1:
         theta[0] = 0.0000;
     case 2:
-        theta[1] = atan( sqrt( 1 - (pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1] / (2 * L[0] * L[1])) ) );
+        #define D ((pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]))
+        theta[1] = atan( sqrt(1 - D*D) / D );
         theta[0] = atan(pos.y / pos.x) - atan( (L[1] * sin(theta[1])) / (L[0] + L[1] * cos(theta[1])) );
         break;
     default:

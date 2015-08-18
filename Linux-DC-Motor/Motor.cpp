@@ -30,9 +30,6 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
     _pwm_a->setDuty(_pwm_dutycycle_ns);
     _pwm_b->setDuty(_pwm_dutycycle_ns);
 
-    _pwm_a->setState(PWM::State::DISABLED);
-    _pwm_b->setState(PWM::State::DISABLED);
-
     /* Defaults to channel A as active */
     _pwm_active = _pwm_a;
 
@@ -50,9 +47,7 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
 
 Motor::~Motor(void)
 {
-    /* Just to be on the safe side */
-    Stop();
-    /* Deleting the PWM object will disable it's output too */
+    /* Deleting the PWM object will disable the output */
     delete _pwm_a;
     delete _pwm_b;
 }
@@ -82,12 +77,11 @@ double Motor::GetSpeed(void)
 void Motor::SetSpeed(const double &percent)
 {
     /* Translates the speed percentage to a PWM duty cycle */
-    double val = (double)_pwm_active->getPeriod() * percent / (double)100;
+    PWM::Duty val = (double)_pwm_active->getPeriod() * percent / (double)100;
     if((percent <= 100) and (percent >= 0))
         _pwm_active->setDuty(val);
     else
-        std::cout << "WARNING: Illegal motor speed value = (" << percent << ")" << std::endl;
-        //throw std::runtime_error("Invalid speed value");
+        throw std::runtime_error("Invalid speed value");
 }
 
 

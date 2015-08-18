@@ -20,7 +20,7 @@ void _cleanup(int signum)
     std::cout << "\nINFO: Caught signal " << signum << std::endl;
 
     /* Finishes up gracefully the curses screen */
-    endwin();
+    //endwin();
 
    /* Delete all of the robotic-arm objects */
     delete RoboArm;
@@ -43,6 +43,7 @@ const std::string timestamp(void)
 }
 
 
+#if 0
 void WaitKeyPress(Point &coordinates)
 {
     int key;
@@ -66,50 +67,44 @@ void WaitKeyPress(Point &coordinates)
             break;
     }
 }
+#endif
 
 
 int main(void)
 {
-    /* Let curses know we just want keypads for control */
-    /* keep stdout as NULL too, just care for keypresses */
-    newterm(NULL, stdin, stdout);
-    nonl();
-    intrflush(stdscr, FALSE);
-    keypad(stdscr, TRUE);
-    refresh();
-
 #ifdef RT_PRIORITY
     /* Higher priority for interrupt procesisng */
     /* https://rt.wiki.kernel.org/index.php/HOWTO:_Build_an_RT-application */
-    struct sched_param sp = { .sched_priority = 99 };
-    if( sched_setscheduler(0, SCHED_FIFO, &sp) != 0 ) {
-        printw("Linux-Robotic-Arm: %s: WARNING: Failed to increase process priority!\n\n", timestamp().c_str());
+    struct sched_param sp = { .sched_priority = 50 };
+    if( sched_setscheduler(0, SCHED_RR, &sp) != 0 ) {
+        printf("Linux-Robotic-Arm: %s: WARNING: Failed to increase process priority!\n\n", timestamp().c_str());
     }
 #endif
 
-    /* Two joints robotic arm for the demo, please check RoboticArtm_Config.h */
+    /* Please check RoboticArtm_Config.h for number of joints*/
     RoboArm = new RoboticArm();
     
     /* Register a signal handler to exit gracefully */
     signal(SIGINT, _cleanup);
 
     RoboArm->Init();
-    usleep(2E06);
+    usleep(1E06);
 
-    
     /* Input a curve or shape to the roboarm to draw it */
     for(;;) {
 
         RoboArm->GetPosition(coordinates);
         
-        printw("Linux-Robotic-Arm: %s: INFO: x= %+8.9f | y= %+8.9f | z= %+8.9f \n",
+        printf("Linux-Robotic-Arm: %s: INFO: x= %+8.9f | y= %+8.9f | z= %+8.9f \n",
                 timestamp().c_str(), coordinates.x, coordinates.y, coordinates.z);
 
         /* Arrow keys will increase position by 1% distance increments in a x,y plane, uses curses library */
-        WaitKeyPress(coordinates);
+        //WaitKeyPress(coordinates);
       
         /* Command the robot to a new position once that coordinates was updated */
-        //RoboArm->SetPosition(coordinates);
+        RoboArm->SetPosition(coordinates);
+
+        usleep(2E6);
 
     }
 
