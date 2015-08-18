@@ -5,19 +5,22 @@
 #include <sched.h>
 #include <chrono>
 #include <ctime>
-#include <sstream>
-#include <iomanip>
 #include <string>
+#include <curses.h>
 #include "RoboticArm.h"
+#include "RoboticArm_Config.h"
 
 
 RoboticArm *RoboArm;
-Point actual_coordinates, reference_coordinates;
+Point coordinates;
 
 
 void _cleanup(int signum)
 {
-   std::cout << "\nINFO: Caught signal " << signum << std::endl;
+    std::cout << "\nINFO: Caught signal " << signum << std::endl;
+
+    /* Finishes up gracefully the curses screen */
+    endwin();
 
    /* Delete all of the robotic-arm objects */
     delete RoboArm;
@@ -26,34 +29,66 @@ void _cleanup(int signum)
 }
 
 
-const std::string datetime(void)
+const std::string timestamp(void)
 {
-    time_t     now = time(0);
-    struct tm  tstruct;
-    char       buf[80];
+    time_t now = time(0);
+    struct tm tstruct;
+    char buf[80];
     tstruct = *localtime(&now);
     // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
     // for more information about date/time format
-    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+    strftime(buf, sizeof(buf), "%X", &tstruct);
 
     return buf;
 }
 
 
+void WaitKeyPress(Point &coordinates)
+{
+    int key;
+    key = getch();
+    
+    switch(key)
+    {
+        case KEY_LEFT:
+            coordinates.x -= (1 * config::link_lengths[0] / 100);
+            break;
+        case KEY_RIGHT:
+            coordinates.x += (1 * config::link_lengths[0] / 100);
+            break;
+        case KEY_UP:
+            coordinates.y += (1 * config::link_lengths[0] / 100);
+            break;
+        case KEY_DOWN:
+            coordinates.y -= (1 * config::link_lengths[0] / 100);
+            break;
+        default:
+            break;
+    }
+}
+
+
 int main(void)
 {
-    /* Two joints robotic arm for the demo */
+    /* Two joints robotic arm for the demo, please check RoboticArtm_Config.h */
     RoboArm = new RoboticArm();
     
     /* Register a signal handler to exit gracefully */
     signal(SIGINT, _cleanup);
+
+    /* Let curses know we just want keypads for control */
+    newterm(NULL, stdin, stdout);
+    nonl();
+    intrflush(stdscr, FALSE);
+    keypad(stdscr, TRUE);
+    refresh();
 
 #ifdef RT_PRIORITY
     /* Higher priority for interrupt procesisng */
     /* https://rt.wiki.kernel.org/index.php/HOWTO:_Build_an_RT-application */
     struct sched_param sp = { .sched_priority = 99 };
     if( sched_setscheduler(0, SCHED_FIFO, &sp) != 0 ) {
-        std::cout << "WARNING: Failed to increase process priority!" << std::endl;
+        printw("Linux-Robotic-Arm: %s: WARNING: Failed to increase process priority!\n\n", timestamp().c_str());
     }
 #endif
 
@@ -63,17 +98,18 @@ int main(void)
     
     /* Input a curve or shape to the roboarm to draw it */
     for(;;) {
-        RoboArm->GetPosition(actual_coordinates);
+
+        RoboArm->GetPosition(coordinates);
         
-        /* fprintf is used in our demo app, elsewhere use streams */
-        fprintf(stdout, "Linux-Robotic-Arm: info: %s - x: %4.9f | y: %4.9f | z: %4.9f \n",
-                datetime().c_str(), actual_coordinates.x, actual_coordinates.y, actual_coordinates.z);
+        printw("Linux-Robotic-Arm: %s: INFO: x= %+8.9f | y= %+8.9f | z= %+8.9f \n",
+                timestamp().c_str(), coordinates.x, coordinates.y, coordinates.z);
 
-        /* Command the robot to a new position, should not move... */
-        reference_coordinates = actual_coordinates;
-        RoboArm->SetPosition(reference_coordinates);
+        /* Arrow keys will increase position by 1% distance increments in a x,y plane, uses curses library */
+        WaitKeyPress(coordinates);
+      
+        /* Command the robot to a new position once that coordinates was updated */
+        //RoboArm->SetPosition(coordinates);
 
-        usleep(3E06);
     }
 
     return EXIT_SUCCESS;

@@ -4,7 +4,7 @@ TARGET_BOARD := Galileo
 CC = g++
 CXXFLAGS += -O3 -Wall -Wextra -Werror -std=c++11 -pipe -march=native -flto -fomit-frame-pointer
 LDFLAGS += -Wl
-LDLIBS += -lpthread -lboost_system -lboost_filesystem
+LDLIBS += -lpthread -lboost_system -lboost_filesystem -lcurses
 
 SOURCES = demo.cpp RoboticArm.cpp
 OBJECTS = demo.o RoboticArm.o
