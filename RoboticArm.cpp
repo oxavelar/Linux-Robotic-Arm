@@ -225,7 +225,8 @@ void RoboticArm::SetPosition(const Point &pos)
     /* Makes use of inverse kinematics in order to set position */
 
     /* Temporary working matrix per joint elements */
-    std::array<double, config::joints_nr> theta;
+    //std::array<double, config::joints_nr> theta;
+    double theta[config::joints_nr];
 
     /* Length of the links in meters, read only */
     const auto *L = &config::link_lengths[0];
