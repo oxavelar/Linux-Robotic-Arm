@@ -6,7 +6,7 @@
 #include <chrono>
 #include <ctime>
 #include <string>
-#include <curses.h>
+#include <ncurses.h>
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
 
@@ -71,6 +71,7 @@ void WaitKeyPress(Point &coordinates)
 int main(void)
 {
     /* Let curses know we just want keypads for control */
+    /* keep stdout as NULL too, just care for keypresses */
     newterm(NULL, stdin, stdout);
     nonl();
     intrflush(stdscr, FALSE);
