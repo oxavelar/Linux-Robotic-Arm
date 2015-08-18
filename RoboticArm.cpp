@@ -21,6 +21,7 @@
 
 RoboticJoint::RoboticJoint(const int &id) : _id(id)
 {
+
 #ifndef VISUAL_ENCODER
 
     Position = new QuadratureEncoder(config::quad_encoder_pins[_id][0],
@@ -38,6 +39,7 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
     /* H-Bridge 2 PWM pins motor abstraction */
     Movement = new Motor(config::dc_motor_pins[_id][0],
                          config::dc_motor_pins[_id][1]);
+
 }
 
 
@@ -199,13 +201,13 @@ void RoboticArm::GetPosition(Point &pos)
     switch(_joints_nr)
     {
     case 1:
-        pos.x = L[0] * std::cos(theta[0]);
-        pos.y = L[0] * std::sin(theta[0]);
+        pos.x = L[0] * cos(theta[0]);
+        pos.y = L[0] * sin(theta[0]);
         pos.z = 0;
         break;
     case 2:
-        pos.x = L[0] * std::cos(theta[0]) + L[1] * std::cos(theta[0] + theta[1]);
-        pos.y = L[0] * std::sin(theta[0]) + L[1] * std::sin(theta[0] + theta[1]);
+        pos.x = L[0] * cos(theta[0]) + L[1] * cos(theta[0] + theta[1]);
+        pos.y = L[0] * sin(theta[0]) + L[1] * sin(theta[0] + theta[1]);
         pos.z = 0;
         break;
     default:

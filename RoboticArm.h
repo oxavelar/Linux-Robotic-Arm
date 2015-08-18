@@ -52,6 +52,12 @@ class RoboticArm
 
     private:
         int _joints_nr;
+        /* A container of joints form a chain, 
+         * joints[0] = root 
+         * joints[1] = node1
+         * :
+         * joints[n] = nodeN
+         */
         std::vector<RoboticJoint*> joints;
 };
 

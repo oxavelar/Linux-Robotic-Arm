@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <unistd.h>
 #include <signal.h>
 #include <sched.h>
-#include <pthread.h>
+#include <chrono>
+#include <ctime>
+#include <sstream>
+#include <iomanip>
+#include <string>
 #include "RoboticArm.h"
 
 
@@ -20,6 +23,20 @@ void _cleanup(int signum)
     delete RoboArm;
 
     exit(signum);
+}
+
+
+const std::string datetime(void)
+{
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+
+    return buf;
 }
 
 
@@ -48,10 +65,9 @@ int main(void)
     for(;;) {
         RoboArm->GetPosition(actual_coordinates);
         
-        std::cout << "( x: "    << actual_coordinates.x
-                  <<  " | y: "  << actual_coordinates.y
-                  <<  " | z: "  << actual_coordinates.z
-                  << " )" << std::endl;
+        /* fprintf is used in our demo app, elsewhere use streams */
+        fprintf(stdout, "Linux-Robotic-Arm: info: %s - x: %4.9f | y: %4.9f | z: %4.9f \n",
+                datetime().c_str(), actual_coordinates.x, actual_coordinates.y, actual_coordinates.z);
 
         /* Command the robot to a new position, should not move... */
         reference_coordinates = actual_coordinates;
