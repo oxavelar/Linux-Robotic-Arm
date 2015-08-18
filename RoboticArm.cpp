@@ -16,6 +16,7 @@
 #include <atomic>
 #include <stdlib.h>
 #include <unistd.h>
+#include "toolbox.h"
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
 
@@ -63,7 +64,7 @@ void RoboticJoint::Init(void)
     Movement->Start();
     /* Register our control thread */
     _AutomaticControlThread = std::thread(&RoboticJoint::_AngularControl, this);
-    std::cout << "INFO: Joint ID " << _id << " is in our home position" << std::endl;
+    logger << "INFO: Joint ID " << _id << " is in our home position" << std::endl;
 }
 
 
@@ -95,7 +96,7 @@ void RoboticJoint::SetZero(void)
 
 void RoboticJoint::_AngularControl(void)
 {
-    std::cout << "INFO: Joint ID " << _id << " angular control is now active" << std::endl;
+    logger << "INFO: Joint ID " << _id << " angular control is now active" << std::endl;
 
     while(!_control_stopped) {
         
@@ -108,12 +109,12 @@ void RoboticJoint::_AngularControl(void)
         if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
         else                     Movement->SetDirection(Motor::Direction::CCW);
 #ifdef DEBUG
-        std::cout << "actual=" << actual_angle << std::endl;
-        std::cout << "reference=" << _reference_angle << std::endl;
-        std::cout << "error=" << error_angle << std::endl;
-        std::cout << std::endl;
-        std::cout << "speed=" << k * std::abs(error_angle) << "%" <<std::endl;
-        std::cout << std::endl;
+        logger << "actual=" << actual_angle << std::endl;
+        logger << "reference=" << _reference_angle << std::endl;
+        logger << "error=" << error_angle << std::endl;
+        logger << std::endl;
+        logger << "speed=" << k * std::abs(error_angle) << "%" <<std::endl;
+        logger << std::endl;
 #endif
     
         /* Store the computed proportional value to the movement function */
@@ -124,7 +125,7 @@ void RoboticJoint::_AngularControl(void)
         
     }
 
-    std::cout << "INFO: Joint ID " << _id << " angular control is now deactivated" << std::endl;
+    logger << "INFO: Joint ID " << _id << " angular control is now deactivated" << std::endl;
 }
 
 
@@ -134,13 +135,13 @@ RoboticArm::RoboticArm(void) : _joints_nr(config::joints_nr)
     for(auto id = 0; id < _joints_nr; id++) {
         joints.push_back(new RoboticJoint(id));
     }
-    std::cout << "INFO: Created a " << _joints_nr << " joints arm object" << std::endl;
+    logger << "INFO: Created a " << _joints_nr << " joints arm object" << std::endl;
 }
 
 
 RoboticArm::~RoboticArm(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    logger << __PRETTY_FUNCTION__ << std::endl;
     
     /* Call each of the joints destructors and stop any movement object */
     for(auto id = 0; id < _joints_nr; id++) {
@@ -151,7 +152,7 @@ RoboticArm::~RoboticArm(void)
 
 void RoboticArm::Init(void)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    logger << __PRETTY_FUNCTION__ << std::endl;
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
@@ -176,11 +177,11 @@ void RoboticArm::Init(void)
         /* Let the the joint correction control thread run and motors start-up */
         joints[id]->Init();
 
-        std::cout << "INFO: joint ID " << id << " was fully initialized" << std::endl;
+        logger << "INFO: joint ID " << id << " was fully initialized" << std::endl;
 
     }
     
-     std::cout << std::endl << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
+     logger << std::endl << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
 }
 
 
@@ -244,7 +245,7 @@ void RoboticArm::SetPosition(const Point &pos)
         break;
     default:
         /* oxavelar: To extend this to 3 dimensions for N joints */
-        std::cout << "ERROR: Unable to calculate for more than 2 joints for now..." << std::cout;
+        logger << "ERROR: Unable to calculate for more than 2 joints for now..." << std::endl;
         exit(-127);
     }
     

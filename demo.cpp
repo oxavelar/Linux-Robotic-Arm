@@ -3,10 +3,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sched.h>
-#include <chrono>
-#include <ctime>
-#include <string>
-#include <ncurses.h>
+#include "toolbox.h"
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
 
@@ -29,18 +26,6 @@ void _cleanup(int signum)
 }
 
 
-const std::string timestamp(void)
-{
-    time_t now = time(0);
-    struct tm tstruct;
-    char buf[80];
-    tstruct = *localtime(&now);
-    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
-    // for more information about date/time format
-    strftime(buf, sizeof(buf), "%X", &tstruct);
-
-    return buf;
-}
 
 
 #if 0
@@ -77,7 +62,7 @@ int main(void)
     /* https://rt.wiki.kernel.org/index.php/HOWTO:_Build_an_RT-application */
     struct sched_param sp = { .sched_priority = 50 };
     if( sched_setscheduler(0, SCHED_RR, &sp) != 0 ) {
-        printf("Linux-Robotic-Arm: %s: WARNING: Failed to increase process priority!\n\n", timestamp().c_str());
+        logger << "WARNING: Failed to increase process priority!\n" << std::endl;
     }
 #endif
 
@@ -95,8 +80,9 @@ int main(void)
 
         RoboArm->GetPosition(coordinates);
         
-        printf("Linux-Robotic-Arm: %s: INFO: x= %+8.9f | y= %+8.9f | z= %+8.9f \n",
-                timestamp().c_str(), coordinates.x, coordinates.y, coordinates.z);
+        char buffer[80];
+        sprintf(buffer, "x= %+8.9f | y= %+8.9f | z= %+8.9f \n", coordinates.x, coordinates.y, coordinates.z);
+        logger << "INFO: " << buffer;
 
         /* Arrow keys will increase position by 1% distance increments in a x,y plane, uses curses library */
         //WaitKeyPress(coordinates);
