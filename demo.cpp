@@ -70,12 +70,6 @@ void WaitKeyPress(Point &coordinates)
 
 int main(void)
 {
-    /* Two joints robotic arm for the demo, please check RoboticArtm_Config.h */
-    RoboArm = new RoboticArm();
-    
-    /* Register a signal handler to exit gracefully */
-    signal(SIGINT, _cleanup);
-
     /* Let curses know we just want keypads for control */
     newterm(NULL, stdin, stdout);
     nonl();
@@ -91,6 +85,12 @@ int main(void)
         printw("Linux-Robotic-Arm: %s: WARNING: Failed to increase process priority!\n\n", timestamp().c_str());
     }
 #endif
+
+    /* Two joints robotic arm for the demo, please check RoboticArtm_Config.h */
+    RoboArm = new RoboticArm();
+    
+    /* Register a signal handler to exit gracefully */
+    signal(SIGINT, _cleanup);
 
     RoboArm->Init();
     usleep(2E06);
