@@ -1,9 +1,9 @@
 PROGRAM := linux-robotic-arm.app
 
 CC = g++
-CXXFLAGS += -O3 -Wall -Wextra -Werror -std=c++11 -pipe -march=native -flto -fomit-frame-pointer
+CXXFLAGS += -O3 -std=c++11 -Wall -Wextra -Werror -pipe -march=native -flto -fomit-frame-pointer -Wno-error=reorder
 LDFLAGS += -Wl
-LDLIBS += -lpthread -lboost_system -lboost_filesystem
+LDLIBS += -lpthread -lboost_system -lboost_filesystem -lncurses
 
 SOURCES = demo.cpp RoboticArm.cpp
 OBJECTS = demo.o RoboticArm.o
