@@ -7,7 +7,7 @@
 #include <ncurses.h>
 
 #define appname "Linux-Robotic-Arm"
-#define logger std::cout << appname << ": " << toolbox::timestamp().c_str() << ": "
+#define logger std::cout << "[" << toolbox::timestamp().c_str() << "] " appname ": "
 
 namespace toolbox
 {

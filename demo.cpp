@@ -40,8 +40,7 @@ void _cleanup(int signum)
 void InitializeScreen(void)
 {
     initscr();
-    nonl();
-    intrflush(stdscr, FALSE);
+    scrollok(stdscr, TRUE);
     keypad(stdscr, TRUE);
     refresh();
 }
@@ -83,12 +82,13 @@ int main(void)
 #endif
 
     /* Please check RoboticArtm_Config.h for number of joints*/
-    //RoboArm = new RoboticArm();
+    RoboArm = new RoboticArm();
     
     /* Register a signal handler to exit gracefully */
-    //signal(SIGINT, _cleanup);
+    signal(SIGINT, _cleanup);
 
-    //RoboArm->Init();
+    RoboArm->Init();
+    
     usleep(5E06);
 
     logger << "INFO: Press the arrow keys to control the robotic arm!" << std::endl << std::endl;
@@ -98,14 +98,14 @@ int main(void)
         /* Arrow keys will increase position by 1% distance increments in a x,y plane, uses curses library */
         WaitKeyPress(coordinates);
 
-        //RoboArm->GetPosition(coordinates);
+        RoboArm->GetPosition(coordinates);
         
         char buffer[80];
         sprintf(buffer, "x= %+8.9f | y= %+8.9f | z= %+8.9f", coordinates.x, coordinates.y, coordinates.z);
         logger << "INFO: " << buffer << std::endl;;
       
         /* Command the robot to a new position once that coordinates was updated */
-        //RoboArm->SetPosition(coordinates);
+        RoboArm->SetPosition(coordinates);
     }
 
     return EXIT_SUCCESS;
