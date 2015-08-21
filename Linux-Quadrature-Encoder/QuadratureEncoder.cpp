@@ -18,8 +18,6 @@
 QuadratureEncoder::QuadratureEncoder(const int &pin_a, const int &pin_b, const int &rate):
     _encoder_rate(rate)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
     /* Encoder rate on single edge is 2x, and 4x for both edges */
     GPIO::Edge interrupt_mode;
     if      (_encoder_rate == 2)    interrupt_mode = GPIO::Edge::RISING;
@@ -48,7 +46,7 @@ QuadratureEncoder::~QuadratureEncoder(void)
     delete _gpio_a;
     delete _gpio_b;
 #if DEBUG
-    _PrintStats();
+    _PrintDebugStats();
 #endif
 }
 
@@ -70,9 +68,6 @@ double QuadratureEncoder::GetAngle(void)
 
 std::chrono::nanoseconds QuadratureEncoder::GetPeriod(void)
 {
-    std::cout << "INFO: Last pulsewidth duration " << _pulse_period_ns.count() 
-              << " ns" << std::endl;
-
     return _pulse_period_ns;
 }
 
@@ -167,21 +162,23 @@ void QuadratureEncoder::_TrackChannelPulseWidth(void)
 
 #ifdef DEBUG
 
-#define QE_MAX_TRACE_DEPTH 64
+/* The following piece of code is only useful for debug statistics it will collect
+ *  data and information regardin the way the interrupts  are collected by the
+ *  QuadratureEncoder module, they can be called wherever u want, but right now 
+ *  it is only shown by the destructor.
+ */
 
-void QuadratureEncoder::_PrintStats(void)
+void QuadratureEncoder::_PrintDebugStats(void)
 {
     std::cout << "INFO: Internal counter value   " << _counter << std::endl;
     std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_count << std::endl;
     std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_count << std::endl;
     std::cout << "INFO: GPIO processing errors   " << _gpio_processing_error_count << std::endl;
-    /* Trace table is printed */
-    //std::string trace_header;
-    //trace_header.resize(QE_MAX_TRACE_DEPTH, ' ');
-    //trace_header.at(_trace_index) = 'v';
-    //std::cout << "                               " << trace_header << std::endl;
-    //std::cout << "INFO: ChannelA history         " << _channel_a_history << std::endl;
-    //std::cout << "INFO: ChannelB history         " << _channel_b_history << std::endl;
+    /* Trace table is printed by putting a fake cursor where it was left off */
+    _trace_header[_trace_index] = 'v';
+    std::cout << "INFO: Last sample point        " << _trace_header << std::endl;
+    std::cout << "INFO: ChannelA history         " << _channel_a_history << std::endl;
+    std::cout << "INFO: ChannelB history         " << _channel_b_history << std::endl;
     std::cout << std::endl;
 }
 
@@ -192,15 +189,13 @@ void QuadratureEncoder::_FillTraceHistory(void)
      * Once this is called it is used to store a representative trace
      * in a char string what the bus is like for debug purposes.
      */
-    _channel_a_history.resize(QE_MAX_TRACE_DEPTH, ' ');
-    _channel_b_history.resize(QE_MAX_TRACE_DEPTH, ' ');
 
     _channel_a_history[_trace_index] = (_prev_packed_read  &  1) + '0';
     _channel_b_history[_trace_index] = (_prev_packed_read  >> 1) + '0';
 
     /* Positions the character in the buffer, each two characters */
     _trace_index += 2;
-    _trace_index = _trace_index % (QE_MAX_TRACE_DEPTH / 2);
+    _trace_index = _trace_index % (_trace_depth / 2);
 }
 #endif
 

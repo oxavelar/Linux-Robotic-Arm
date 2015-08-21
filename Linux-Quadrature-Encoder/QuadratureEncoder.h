@@ -66,14 +66,16 @@ class QuadratureEncoder
         std::chrono::high_resolution_clock::time_point _isr_timestamp;
 
 #ifdef DEBUG
+        static const int _trace_depth = 64;
         /* Debug variable or methods */
         std::atomic<unsigned long long> _channel_a_isr_count, _channel_b_isr_count;
         std::atomic<unsigned long long> _gpio_processing_error_count;
+        
+        std::atomic<int> _trace_index;
+        char _trace_header[_trace_depth];
+        char _channel_a_history[_trace_depth], _channel_b_history[_trace_depth];
 
-        std::atomic_int _trace_index;
-        std::string _channel_a_history, _channel_b_history;
-
-        void _PrintStats(void);
+        void _PrintDebugStats(void);
         void _FillTraceHistory(void);
 #endif
 };
