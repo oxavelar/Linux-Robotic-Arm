@@ -47,6 +47,9 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
 
 RoboticJoint::~RoboticJoint(void)
 {
+    /* Kill off any movement */
+    Movement->Stop();
+    
     /* Stop the automatic control loop thread */
     if (_AutomaticControlThread.joinable()) {
         _control_stopped = true;
@@ -101,14 +104,14 @@ void RoboticJoint::_AngularControl(void)
     while(!_control_stopped) {
         
         /* Set angle consists of the interaction between position & movement */
-        const double k = 0.60;
+        const double k = 0.001;
         const double actual_angle = Position->GetAngle();
         const double error_angle = _reference_angle - actual_angle;
         
         /* Sign dictates the direction of movement */
         if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
         else                     Movement->SetDirection(Motor::Direction::CCW);
-#ifdef DEBUG
+#ifdef DEBUG_ANGULAR_CONTROL
         logger << "actual=" << actual_angle << std::endl;
         logger << "reference=" << _reference_angle << std::endl;
         logger << "error=" << error_angle << std::endl;
@@ -141,8 +144,6 @@ RoboticArm::RoboticArm(void) : _joints_nr(config::joints_nr)
 
 RoboticArm::~RoboticArm(void)
 {
-    logger << __PRETTY_FUNCTION__ << std::endl;
-    
     /* Call each of the joints destructors and stop any movement object */
     for(auto id = 0; id < _joints_nr; id++) {
         delete joints[id];
@@ -161,18 +162,19 @@ void RoboticArm::Init(void)
          * due to rounding aritmethic errors, we use an epsilon comparision
          * in order to see if the values difference is less than it
          */
-        double difference, init_speed = 20.00, epsilon = 0.001;
+        double difference, init_speed = 0.01, epsilon = 0.001;
         joints[id]->Movement->SetDirection(Motor::Direction::CW);
         joints[id]->Movement->SetSpeed(init_speed);
         joints[id]->Movement->Start();
         do {
             double old = joints[id]->Position->GetAngle();
+            usleep(1E06);
             difference = std::abs(joints[id]->Position->GetAngle() - old);
         } while (difference > epsilon);
         /* Reset the position coordinates, this is our new home position */
         joints[id]->Movement->Stop();
         joints[id]->SetZero();
-        
+
         /* PHASE II: */
         /* Let the the joint correction control thread run and motors start-up */
         joints[id]->Init();
@@ -191,14 +193,14 @@ void RoboticArm::GetPosition(Point &pos)
 
     /* Temporary working matrix */
     std::vector<double> theta;
-
-    /* Length of the links in meters, read only */
-    const auto *L = &config::link_lengths[0];
     
     /* Fill our N joints angles in our temporary matrix */
     for(auto id = 0; id < _joints_nr; id++) {
         theta.push_back( joints[id]->GetAngle() / 180 * M_PI );
     }
+    
+    /* Length of the links in meters, read only */
+    const auto *L = &config::link_lengths[0];
     
     
     switch(_joints_nr)
@@ -226,14 +228,14 @@ void RoboticArm::GetPosition(Point &pos)
 void RoboticArm::SetPosition(const Point &pos)
 {
     /* Makes use of inverse kinematics in order to set position */
-
-    /* Temporary working matrix per joint elements */
-    //std::array<double, config::joints_nr> theta;
-    double theta[config::joints_nr];
-
+    
+    /* Temporary working matrix */
+    std::vector<double> theta(_joints_nr);
+    
     /* Length of the links in meters, read only */
     const auto *L = &config::link_lengths[0];
-
+    
+    
     switch(_joints_nr)
     {
     case 1:

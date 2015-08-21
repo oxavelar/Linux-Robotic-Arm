@@ -60,8 +60,8 @@ int main(void)
 #ifdef RT_PRIORITY
     /* Higher priority for interrupt procesisng */
     /* https://rt.wiki.kernel.org/index.php/HOWTO:_Build_an_RT-application */
-    struct sched_param sp = { .sched_priority = 50 };
-    if( sched_setscheduler(0, SCHED_RR, &sp) != 0 ) {
+    struct sched_param sp = { .sched_priority = 90 };
+    if( sched_setscheduler(0, SCHED_FIFO, &sp) != 0 ) {
         logger << "WARNING: Failed to increase process priority!\n" << std::endl;
     }
 #endif
@@ -73,7 +73,7 @@ int main(void)
     signal(SIGINT, _cleanup);
 
     RoboArm->Init();
-    usleep(1E06);
+    usleep(5E06);
 
     /* Input a curve or shape to the roboarm to draw it */
     for(;;) {
