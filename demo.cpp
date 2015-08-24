@@ -78,7 +78,7 @@ int main(void)
     toolbox::ncurses_stream redirector(std::cout);
     
 #ifdef RT_PRIORITY
-    SetProcessPriority(90);
+    SetProcessPriority(40);
 #endif
 
     /* Please check RoboticArtm_Config.h for number of joints*/
@@ -95,17 +95,26 @@ int main(void)
 
     for(;;) {
 
+        /* Used for single line message */
+        char buffer[80];        
+        
+        RoboArm->GetPosition(coordinates);
+
         /* Arrow keys will increase position by 1% distance increments in a x,y plane, uses curses library */
         WaitKeyPress(coordinates);
 
-        RoboArm->GetPosition(coordinates);
-        
-        char buffer[80];
-        sprintf(buffer, "x= %+8.9f | y= %+8.9f | z= %+8.9f", coordinates.x, coordinates.y, coordinates.z);
-        logger << "INFO: " << buffer << std::endl;;
-      
         /* Command the robot to a new position once that coordinates was updated */
         RoboArm->SetPosition(coordinates);
+        
+        sprintf(buffer, "( x= %+8.6f | y= %+8.6f | z= %+8.6f )", coordinates.x, coordinates.y, coordinates.z);
+        logger << "INFO: Computed - " << buffer << std::endl;
+
+        /* Updated coordinates and print it out */
+        RoboArm->GetPosition(coordinates);
+
+        sprintf(buffer, "( x= %+8.6f | y= %+8.6f | z= %+8.6f )", coordinates.x, coordinates.y, coordinates.z);
+        logger << "INFO: Measured - " << buffer << std::endl;
+        
     }
 
     return EXIT_SUCCESS;

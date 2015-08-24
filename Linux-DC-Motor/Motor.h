@@ -35,5 +35,7 @@ class Motor
     private:
         /* External world interactions to the H-Bridge */
         PWM *_pwm_a, *_pwm_b, *_pwm_active;
+        /* Used to keep track of stopped motor */
+        double _speed_backup;
 };
 

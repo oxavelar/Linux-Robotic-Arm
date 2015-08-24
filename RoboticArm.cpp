@@ -104,25 +104,27 @@ void RoboticJoint::_AngularControl(void)
     while(!_control_stopped) {
         
         /* Set angle consists of the interaction between position & movement */
-        const double k = 0.001;
+        const double k = 0.5;
         const double actual_angle = Position->GetAngle();
         const double error_angle = _reference_angle - actual_angle;
         
         /* Sign dictates the direction of movement */
         if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
         else                     Movement->SetDirection(Motor::Direction::CCW);
+        
+        /* Store the computed proportional value to the movement function */
+        Movement->SetSpeed( k * std::abs(error_angle) );
+        
 #ifdef DEBUG_ANGULAR_CONTROL
         logger << "actual=" << actual_angle << std::endl;
         logger << "reference=" << _reference_angle << std::endl;
         logger << "error=" << error_angle << std::endl;
         logger << std::endl;
-        logger << "speed=" << k * std::abs(error_angle) << "%" <<std::endl;
+        logger << "speed=" << k * std::abs(error_angle) << "%" << std::endl;
+        logger << "speed=" << Movement->GetSpeed() << "%" << std::endl;
         logger << std::endl;
 #endif
-    
-        /* Store the computed proportional value to the movement function */
-        Movement->SetSpeed( k * std::abs(error_angle) );
-        
+
         /* Send this task to a low priority state for efficient multi-threading */
         sched_yield();
         
@@ -162,7 +164,7 @@ void RoboticArm::Init(void)
          * due to rounding aritmethic errors, we use an epsilon comparision
          * in order to see if the values difference is less than it
          */
-        double difference, init_speed = 0.01, epsilon = 0.001;
+        double difference, init_speed = 0.5, epsilon = 0.000001;
         joints[id]->Movement->SetDirection(Motor::Direction::CW);
         joints[id]->Movement->SetSpeed(init_speed);
         joints[id]->Movement->Start();
@@ -183,7 +185,7 @@ void RoboticArm::Init(void)
 
     }
     
-     logger << std::endl << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
+     logger << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
 }
 
 
