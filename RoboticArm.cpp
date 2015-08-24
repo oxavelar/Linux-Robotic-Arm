@@ -104,7 +104,7 @@ void RoboticJoint::_AngularControl(void)
     while(!_control_stopped) {
         
         /* Set angle consists of the interaction between position & movement */
-        const double k = 0.7;
+        const double k = 2;
         const double actual_angle = Position->GetAngle();
         const double error_angle = _reference_angle - actual_angle;
         
@@ -124,7 +124,7 @@ void RoboticJoint::_AngularControl(void)
         logger << "speed=" << Movement->GetSpeed() << "%" << std::endl;
         logger << std::endl;
 #endif
-
+        
         /* Send this task to a low priority state for efficient multi-threading */
         sched_yield();
         
