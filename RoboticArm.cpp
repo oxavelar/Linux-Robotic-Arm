@@ -41,7 +41,7 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
     /* H-Bridge 2 PWM pins motor abstraction */
     Movement = new Motor(config::dc_motor_pins[_id][0],
                          config::dc_motor_pins[_id][1]);
-
+    
 }
 
 

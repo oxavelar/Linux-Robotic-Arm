@@ -88,8 +88,6 @@ int main(void)
     signal(SIGINT, _cleanup);
 
     RoboArm->Init();
-    
-    usleep(5E06);
 
     logger << "INFO: Press the arrow keys to control the robotic arm!" << std::endl << std::endl;
 
