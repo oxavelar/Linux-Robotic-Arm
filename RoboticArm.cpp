@@ -1,6 +1,15 @@
 /* 
- * The following classes makes use of lower position objects in order
- * to model a different N joints robotic arm.
+ * The following classes makes use of position objects and movement in order
+ * to model a different type of N joints robotic arm. Different kinematics
+ * configuration will use different sensors and actuators and solutions.
+ *
+ * The demo and application models a RR arm on a Intel Galileo2 system running
+ * Linux.
+ *
+ * It makes use of inverse and forward kinematics calculations on different
+ * position sensors in order to obtain the rotor angular state, and then spawns
+ * unique control threads per joint in order to keep the joints to the reference
+ * /target angle value.
  *
  * Forward Kinematics :     ANGLES -> CARTESIAN
  * Inverse Kinematics :     CARTESIAN -> ANGLES
@@ -8,6 +17,9 @@
  *
  * References:
  * http://cdn.intechopen.com/pdfs/379.pdf
+ *
+ * Authors: Omar X. Avelar & Juan C. Razo
+ *
  */
 
 #include <iostream>
@@ -204,25 +216,34 @@ void RoboticArm::GetPosition(Point &pos)
     /* Length of the links in meters, read only */
     const auto *L = &config::link_lengths[0];
     
-    
+    /* Temporary coordinate system variable, to check for unsolvable solutions */
+    Point tpos;    
+
+
     switch(_joints_nr)
     {
     case 1:
-        pos.x = L[0] * cos(theta[0]);
-        pos.y = L[0] * sin(theta[0]);
-        pos.z = 0;
+        tpos.x = L[0] * cos(theta[0]);
+        tpos.y = L[0] * sin(theta[0]);
+        tpos.z = 0;
         break;
     case 2:
-        pos.x = L[0] * cos(theta[0]) + L[1] * cos(theta[0] + theta[1]);
-        pos.y = L[0] * sin(theta[0]) + L[1] * sin(theta[0] + theta[1]);
-        pos.z = 0;
+        tpos.x = L[0] * cos(theta[0]) + L[1] * cos(theta[0] + theta[1]);
+        tpos.y = L[0] * sin(theta[0]) + L[1] * sin(theta[0] + theta[1]);
+        tpos.z = 0;
         break;
     default:
         /* oxavelar: To extend this to 3 dimensions for N joints */
-        pos.x = 0;
-        pos.y = 0;
-        pos.z = 0;
+        logger << "ERROR: Unable to calculate for more than 2 joints for now..." << std::endl;
+        exit(-127);
         break;
+    }
+
+    /* Only update the target position if a solution in the 3D space was found */
+    if (std::isnan(tpos.x) or std::isnan(tpos.y) or std::isnan(tpos.z)) {
+        logger << "ERROR: Desired target position is not achievable by this robot" << std::endl;
+    } else {
+        pos = tpos;
     }
 }
 
@@ -251,6 +272,7 @@ void RoboticArm::SetPosition(const Point &pos)
         /* oxavelar: To extend this to 3 dimensions for N joints */
         logger << "ERROR: Unable to calculate for more than 2 joints for now..." << std::endl;
         exit(-127);
+        break;
     }
     
     /* Update each of the joints their new reference angle */

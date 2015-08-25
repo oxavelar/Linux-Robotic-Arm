@@ -5,8 +5,6 @@
 #include "Linux-Visual-Encoder/VisualEncoder.h"
 
 
-
-
 class Point
 {
     public:
