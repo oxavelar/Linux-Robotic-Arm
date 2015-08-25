@@ -11,12 +11,11 @@
  * unique control threads per joint in order to keep the joints to the reference
  * /target angle value.
  *
- * Forward Kinematics :     ANGLES -> CARTESIAN
- * Inverse Kinematics :     CARTESIAN -> ANGLES
  *
  *
  * References:
  * http://cdn.intechopen.com/pdfs/379.pdf
+ * http://www.cis.upenn.edu/~badler/gmod/0528a.pdf
  *
  * Authors: Omar X. Avelar & Juan C. Razo
  *
@@ -62,12 +61,6 @@ RoboticJoint::~RoboticJoint(void)
     /* Kill off any movement */
     Movement->Stop();
     
-    /* Stop the automatic control loop thread */
-    if (_AutomaticControlThread.joinable()) {
-        _control_stopped = true;
-        _AutomaticControlThread.join();
-    }
-    
     delete Position;
     delete Movement;
 }
@@ -77,9 +70,10 @@ void RoboticJoint::Init(void)
 {
     /* Set the motors running, so the control loop can work on it */
     Movement->Start();
-    /* Register our control thread */
-    _AutomaticControlThread = std::thread(&RoboticJoint::_AngularControl, this);
     logger << "INFO: Joint ID " << _id << " is in our home position" << std::endl;
+    /* Register our control thread and spawn it out of this process */
+    std::thread(&RoboticJoint::_AngularControl, this).detach();
+
 }
 
 
@@ -113,7 +107,7 @@ void RoboticJoint::_AngularControl(void)
 {
     logger << "INFO: Joint ID " << _id << " angular control is now active" << std::endl;
 
-    while(!_control_stopped) {
+    while(true) {
         
         /* Set angle consists of the interaction between position & movement */
         const double k = 2;

@@ -35,8 +35,6 @@ class RoboticJoint
 
         /* Per joint position correction control */
         void _AngularControl(void);
-        std::thread _AutomaticControlThread;
-        std::atomic<bool> _control_stopped;
 };
 
 
