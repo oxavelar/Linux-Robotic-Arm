@@ -32,9 +32,10 @@ class RoboticJoint
         const int _id;
         double _reference_angle;
 
-
         /* Per joint position correction control */
         void AngularControl(void);
+        std::thread AutomaticControlThread;
+        char _control_stopped;
 };
 
 

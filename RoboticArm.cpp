@@ -58,6 +58,12 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
 
 RoboticJoint::~RoboticJoint(void)
 {
+    /* Stop the automatic control loop thread */
+    if (AutomaticControlThread.joinable()) {
+        _control_stopped = true;
+        AutomaticControlThread.join();
+    }
+    
     /* Kill off any movement */
     Movement->Stop();
     
@@ -71,8 +77,8 @@ void RoboticJoint::Init(void)
     /* Set the motors running, so the control loop can work on it */
     Movement->Start();
     logger << "INFO: Joint ID " << _id << " is in our home position" << std::endl;
-    /* Register our control thread and spawn it out of this process */
-    std::thread(&RoboticJoint::AngularControl, this).detach();
+    /* Register our control thread */
+    AutomaticControlThread = std::thread(&RoboticJoint::AngularControl, this);
 }
 
 
