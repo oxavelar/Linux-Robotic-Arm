@@ -34,7 +34,7 @@ class RoboticJoint
 
 
         /* Per joint position correction control */
-        void _AngularControl(void);
+        void AngularControl(void);
 };
 
 

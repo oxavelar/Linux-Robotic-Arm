@@ -72,8 +72,7 @@ void RoboticJoint::Init(void)
     Movement->Start();
     logger << "INFO: Joint ID " << _id << " is in our home position" << std::endl;
     /* Register our control thread and spawn it out of this process */
-    std::thread(&RoboticJoint::_AngularControl, this).detach();
-
+    std::thread(&RoboticJoint::AngularControl, this).detach();
 }
 
 
@@ -103,22 +102,22 @@ void RoboticJoint::SetZero(void)
 }
 
 
-void RoboticJoint::_AngularControl(void)
+void RoboticJoint::AngularControl(void)
 {
     logger << "INFO: Joint ID " << _id << " angular control is now active" << std::endl;
 
-    while(true) {
+    for(;;) {
         
-        /* Set angle consists of the interaction between position & movement */
+        /* Consists of the interaction between position & movement */
         const double k = 2;
         const double actual_angle = Position->GetAngle();
         const double error_angle = _reference_angle - actual_angle;
         
         /* Sign dictates the direction of movement */
-        if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
-        else                     Movement->SetDirection(Motor::Direction::CCW);
+        if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CCW);
+        else                     Movement->SetDirection(Motor::Direction::CW);
         
-        /* Store the computed proportional value to the movement function */
+        /* Store the motor control value to the movement function */
         Movement->SetSpeed( k * std::abs(error_angle) );
         
 #ifdef DEBUG_ANGULAR_CONTROL

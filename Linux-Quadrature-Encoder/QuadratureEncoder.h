@@ -24,8 +24,8 @@ class QuadratureEncoder
         GPIO *_gpio_a, *_gpio_b;
         
         /* GPIO Interrupt routine user code */
-        void _ISR_ChannelA(void);
-        void _ISR_ChannelB(void);
+        void ISR_ChannelA(void);
+        void ISR_ChannelB(void);
 
         /* Callback references to be used by GPIO class */
         std::function<void(GPIO::Value)> _channel_a_callback;
@@ -43,7 +43,7 @@ class QuadratureEncoder
 
            Note: If a value of 'x' is read it means the code is too slow!
         */
-        inline void _GPIO_DataProcess(void);
+        inline void GPIO_DataProcess(void);
 
         std::atomic<int> _prev_packed_read;
         const signed char _qem[16] = {0,-1,1,'x',1,0,'x',-1,-1,'x',0,1,'x',1,-1,0};
@@ -61,7 +61,7 @@ class QuadratureEncoder
 
         /* Used to keep track of the actual interrupt pulse-widths */
         std::atomic<char> _internal_toggle;
-        void _TrackChannelPulseWidth(void);
+        void TrackChannelPulseWidth(void);
 
         std::chrono::high_resolution_clock::time_point _isr_timestamp;
 
@@ -75,7 +75,7 @@ class QuadratureEncoder
         char _trace_header[_trace_depth];
         char _channel_a_history[_trace_depth], _channel_b_history[_trace_depth];
 
-        void _PrintDebugStats(void);
-        void _FillTraceHistory(void);
+        void PrintDebugStats(void);
+        void FillTraceHistory(void);
 #endif
 };

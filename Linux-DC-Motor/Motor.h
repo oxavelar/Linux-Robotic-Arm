@@ -5,7 +5,7 @@
 #include "../HighLatencyGPIO/GPIO.hh"
 
 #ifndef BASE_PWM_FREQUENCY_HZ
-#define BASE_PWM_FREQUENCY_HZ 50000
+#define BASE_PWM_FREQUENCY_HZ 25000
 #endif
 
 #ifndef BASE_PWM_DUTYCYCLE

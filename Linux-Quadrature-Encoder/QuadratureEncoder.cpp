@@ -25,8 +25,8 @@ QuadratureEncoder::QuadratureEncoder(const int &pin_a, const int &pin_b, const i
     else    throw std::runtime_error("Invalid encoder rate selected, only 2x or 4x supported");
 
     /* Register our local GPIO callbacks to use for SW interrupts */
-    _channel_a_callback = std::bind(&QuadratureEncoder::_ISR_ChannelA, this);
-    _channel_b_callback = std::bind(&QuadratureEncoder::_ISR_ChannelB, this);
+    _channel_a_callback = std::bind(&QuadratureEncoder::ISR_ChannelA, this);
+    _channel_b_callback = std::bind(&QuadratureEncoder::ISR_ChannelB, this);
     
     /* Initialize channels GPIO objects and assign local callbacks */
     _gpio_a = new GPIO(pin_a, interrupt_mode, _channel_a_callback);
@@ -46,12 +46,11 @@ QuadratureEncoder::~QuadratureEncoder(void)
     delete _gpio_a;
     delete _gpio_b;
 #if DEBUG
-    _PrintDebugStats();
+    PrintDebugStats();
 #endif
 }
 
 
-/// External API for the user, exposed to be used by higher classes
 void QuadratureEncoder::SetParameters(const int &segments)
 {
     _segments_per_revolution = segments;
@@ -84,30 +83,27 @@ QuadratureEncoder::Direction QuadratureEncoder::GetDirection(void)
 }
 
 
-/// Internal Quadrature Encoder ISR Handlers and methods
-void QuadratureEncoder::_ISR_ChannelA(void)
+void QuadratureEncoder::ISR_ChannelA(void)
 {
-    /* Obtain the pulsewidth between transitions, rely only on channel A */
-    //_TrackChannelPulseWidth();
-    _GPIO_DataProcess();
+    GPIO_DataProcess();
 #ifdef DEBUG
-    //_FillTraceHistory();
+    FillTraceHistory();
     _channel_a_isr_count++;
 #endif
 }
 
 
-void QuadratureEncoder::_ISR_ChannelB(void)
+void QuadratureEncoder::ISR_ChannelB(void)
 {
-    _GPIO_DataProcess();
+    GPIO_DataProcess();
 #ifdef DEBUG
-    //_FillTraceHistory();
+    FillTraceHistory();
     _channel_b_isr_count++;
 #endif
 }
 
 
-inline void QuadratureEncoder::_GPIO_DataProcess(void)
+inline void QuadratureEncoder::GPIO_DataProcess(void)
 {
     char a, b;
     char current_packed_read;
@@ -142,7 +138,7 @@ inline void QuadratureEncoder::_GPIO_DataProcess(void)
 }
 
 
-void QuadratureEncoder::_TrackChannelPulseWidth(void)
+void QuadratureEncoder::TrackChannelPulseWidth(void)
 {
     /* 
      * Will only be called from a single ISR, a single channel
@@ -168,7 +164,7 @@ void QuadratureEncoder::_TrackChannelPulseWidth(void)
  *  it is only shown by the destructor.
  */
 
-void QuadratureEncoder::_PrintDebugStats(void)
+void QuadratureEncoder::PrintDebugStats(void)
 {
     std::cout << "INFO: Internal counter value   " << _counter << std::endl;
     std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_count << std::endl;
@@ -184,7 +180,7 @@ void QuadratureEncoder::_PrintDebugStats(void)
 }
 
 
-void QuadratureEncoder::_FillTraceHistory(void)
+void QuadratureEncoder::FillTraceHistory(void)
 {
     /*
      * Once this is called it is used to store a representative trace
