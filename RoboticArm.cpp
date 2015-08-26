@@ -59,7 +59,8 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
 RoboticJoint::~RoboticJoint(void)
 {
     /* Stop the automatic control loop thread */
-    delete AutomaticControlThread;
+    if (AutomaticControlThread != NULL)
+        delete AutomaticControlThread;
     
     /* Kill off any movement */
     Movement->Stop();

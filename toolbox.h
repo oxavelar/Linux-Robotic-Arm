@@ -26,29 +26,29 @@ namespace toolbox
     
     class ncursesbuf: public std::streambuf {
         public:
-          ncursesbuf() {}
-          virtual int overflow(int c)
-          {
-            printw("%c", c);
-            return 0;
-          }
+            explicit ncursesbuf() {}
+            virtual int overflow(int c)
+            {
+                printw("%c", c);
+                return 0;
+            }
     };
 
     class ncurses_stream : public std::ostream {
         public:
-          std::ostream &src;
-          std::streambuf * const srcbuf;
-          ncursesbuf tbuf;
-
-          ncurses_stream(std::ostream &o) : 
+            explicit ncurses_stream(std::ostream &o) : 
             src(o), srcbuf(o.rdbuf()), std::ostream(&tbuf)
-          {
-            o.rdbuf(rdbuf());
-          }
+            {
+                o.rdbuf(rdbuf());
+            }
 
-          ~ncurses_stream() {
-            src.rdbuf(srcbuf);
-          }
+            ~ncurses_stream() {
+                src.rdbuf(srcbuf);
+            }
+        private:
+            std::ostream &src;
+            std::streambuf * const srcbuf;
+            ncursesbuf tbuf;
     };
 }
 
