@@ -18,14 +18,14 @@ void SetProcessPriority(const int &number)
     /* https://rt.wiki.kernel.org/index.php/HOWTO:_Build_an_RT-application */
     struct sched_param sp = { .sched_priority = number };
     if( sched_setscheduler(0, SCHED_FIFO, &sp) != 0 ) {
-        logger << "WARNING: Failed to increase process priority!\n" << std::endl;
+        logger << "W: Failed to increase process priority!\n" << std::endl;
     }
 }
 
 
 void _cleanup(int signum)
 {
-    std::cout << "\nINFO: Caught signal " << signum << std::endl;
+    logger << "\nI: Caught signal " << signum << std::endl;
 
     /* Finishes up gracefully the curses screen */
     endwin();
@@ -89,7 +89,7 @@ int main(void)
 
     RoboArm->Init();
 
-    logger << "INFO: Press the arrow keys to control the robotic arm!" << std::endl << std::endl;
+    logger << "I: Press the arrow keys to control the robotic arm!" << std::endl << std::endl;
 
     for(;;) {
 
@@ -106,13 +106,13 @@ int main(void)
         RoboArm->SetPosition(coordinates);
         
         sprintf(buffer, "( x= %+8.6f | y= %+8.6f | z= %+8.6f )", coordinates.x, coordinates.y, coordinates.z);
-        logger << "INFO: Computed - " << buffer << std::endl;
+        logger << "I: Computed - " << buffer << std::endl;
 
         /* Updated coordinates and print it out */
         RoboArm->GetPosition(coordinates);
 
         sprintf(buffer, "( x= %+8.6f | y= %+8.6f | z= %+8.6f )", coordinates.x, coordinates.y, coordinates.z);
-        logger << "INFO: Measured - " << buffer << std::endl;
+        logger << "I: Measured - " << buffer << std::endl;
         
     }
 

@@ -33,11 +33,11 @@ QuadratureEncoder::QuadratureEncoder(const int &pin_a, const int &pin_b, const i
     _gpio_b = new GPIO(pin_b, interrupt_mode, _channel_b_callback);
     
     /* Useful information to be printed regarding set-up */
-    std::cout << "INFO: Userspace quadrature encoder created @ (pinA="
+    std::cout << "I: Userspace quadrature encoder created @ (pinA="
               << pin_a
               << " pinB="
               << pin_b << ")" << std::endl; 
-    std::cout << "      operating at a rate of " << rate << "x" << std::endl;
+    std::cout << "   operating at a rate of " << rate << "x" << std::endl;
 }
 
 
@@ -122,7 +122,7 @@ inline void QuadratureEncoder::GPIO_DataProcess(void)
     if (delta == 'x') {
 #ifdef DEBUG
         _gpio_processing_error_count++;
-        std::cout << "WARNING: Execution might be too slow, reading wrong values from the encoder" << std::endl;
+        std::cout << "W: Execution might be too slow, reading wrong values from the encoder" << std::endl;
 #endif
         delta = 0;
     }
@@ -166,17 +166,17 @@ void QuadratureEncoder::TrackChannelPulseWidth(void)
 
 void QuadratureEncoder::PrintDebugStats(void)
 {
-    std::cout << "INFO: Internal counter value   " << _counter << std::endl;
-    std::cout << "INFO: ChannelA interrupts      " << _channel_a_isr_count << std::endl;
-    std::cout << "INFO: ChannelB interrupts      " << _channel_b_isr_count << std::endl;
-    std::cout << "INFO: GPIO processing errors   " << _gpio_processing_error_count << std::endl;
+    std::cout << "D: Internal counter value   " << _counter << std::endl;
+    std::cout << "D: ChannelA interrupts      " << _channel_a_isr_count << std::endl;
+    std::cout << "D: ChannelB interrupts      " << _channel_b_isr_count << std::endl;
+    std::cout << "D: GPIO processing errors   " << _gpio_processing_error_count << std::endl;
     std::cout << std::endl;
     /* Trace table is printed by putting a fake cursor where it was left off */
     //_trace_header[_trace_index] = 'v';
-    //std::cout << "INFO: Last sample point        " << (char*)_trace_header << std::endl;
-    //std::cout << "INFO: ChannelA history         " << (char*)_channel_a_history << std::endl;
-    //std::cout << "INFO: ChannelB history         " << (char*)_channel_b_history << std::endl;
-    //std::cout << std::endl;
+    std::cout << "D: Last sample point        " << (char*)_trace_header << std::endl;
+    std::cout << "D: ChannelA history         " << (char*)_channel_a_history << std::endl;
+    std::cout << "D: ChannelB history         " << (char*)_channel_b_history << std::endl;
+    std::cout << std::endl;
 }
 
 

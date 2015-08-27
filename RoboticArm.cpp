@@ -76,7 +76,7 @@ void RoboticJoint::Init(void)
 {
     /* Set the motors running, so the control loop can work on it */
     Movement->Start();
-    logger << "INFO: Joint ID " << _id << " is in our home position" << std::endl;
+    logger << "I: Joint ID " << _id << " is in our home position" << std::endl;
     /* Register our control thread */
     AutomaticControlThread = std::thread(&RoboticJoint::AngularControl, this);
 }
@@ -110,7 +110,7 @@ void RoboticJoint::SetZero(void)
 
 void RoboticJoint::AngularControl(void)
 {
-    logger << "INFO: Joint ID " << _id << " angular control is now active" << std::endl;
+    logger << "I: Joint ID " << _id << " angular control is now active" << std::endl;
 
     while(!_control_thread_stop_event) {
         
@@ -141,7 +141,7 @@ void RoboticJoint::AngularControl(void)
         
     }
 
-    logger << "INFO: Joint ID " << _id << " angular control is now deactivated" << std::endl;
+    logger << "I: Joint ID " << _id << " angular control is now deactivated" << std::endl;
 }
 
 
@@ -151,7 +151,7 @@ RoboticArm::RoboticArm(void) : _joints_nr(config::joints_nr)
     for(auto id = 0; id < _joints_nr; id++) {
         joints.push_back(new RoboticJoint(id));
     }
-    logger << "INFO: Created a " << _joints_nr << " joints arm object" << std::endl;
+    logger << "I: Created a " << _joints_nr << " joints arm object" << std::endl;
 }
 
 
@@ -193,7 +193,7 @@ void RoboticArm::Init(void)
         } while (difference < epsilon);
         /* Return it to the speed value where it should not move */
         min_speed -= delta;
-        logger << "INFO: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
+        logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
         joint->Movement->SetMinSpeed(min_speed);
         joint->Movement->Stop();
 
@@ -218,14 +218,14 @@ void RoboticArm::Init(void)
         /* Let the the joint correction control thread run and motors start-up */
         joint->Init();
         
-        logger << "INFO: joint ID " << id << " was fully initialized" << std::endl;
+        logger << "I: joint ID " << id << " was fully initialized" << std::endl;
         
         /* oxavelar: debugging single rotor for now */
         break;
 
     }
     
-    logger << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
+    logger << "I: Success, RoboticArm is now ready to operate!" << std::endl;
 }
 
 
@@ -281,14 +281,14 @@ void RoboticArm::ForwardKinematics(Point &pos, const std::vector<double> &theta)
             break;
         default:
             /* oxavelar: To extend this to 3 dimensions for N joints */
-            logger << "ERROR: Unable to calculate for more than 2 joints for now..." << std::endl;
+            logger << "E: Unable to calculate for more than 2 joints for now..." << std::endl;
             exit(-127);
             break;
     }
 
     /* Only update the target position if a solution in the 3D space was found */
     if (std::isnan(tpos.x) or std::isnan(tpos.y) or std::isnan(tpos.z)) {
-        logger << "ERROR: Desired target position is not achievable by this robot" << std::endl;
+        logger << "E: Desired target position is not achievable by this robot" << std::endl;
     } else {
         pos = tpos;
     }
@@ -312,7 +312,7 @@ void RoboticArm::InverseKinematics(const Point &pos, std::vector<double> &theta)
             break;
         default:
             /* oxavelar: To extend this to 3 dimensions for N joints */
-            logger << "ERROR: Unable to calculate for more than 2 joints for now..." << std::endl;
+            logger << "E: Unable to calculate for more than 2 joints for now..." << std::endl;
             exit(-127);
             break;
     }

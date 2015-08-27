@@ -38,12 +38,12 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
     _pwm_active = _pwm_a;
 
     /* Useful information to be printed regarding set-up */
-    std::cout << "INFO: Userspace motor created @ (pinPWM_A=" 
+    std::cout << "I: Userspace motor created @ (pinPWM_A=" 
               << pin_pwm_a
               << " pinPWM_B="
               << pin_pwm_b
               << ")" << std::endl;
-    std::cout << "      operating on a PWM frequency of "
+    std::cout << "   operating on a PWM frequency of "
               << BASE_PWM_FREQUENCY_HZ << "Hz with " << BASE_PWM_DUTYCYCLE
               << "% duty cycle" << std::endl;
 }
