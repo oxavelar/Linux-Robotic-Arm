@@ -115,9 +115,9 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const double k = 8;
-        const double actual_angle = Position->GetAngle();
-        const double error_angle = _reference_angle - actual_angle;
+        const auto k = 8;
+        const auto actual_angle = Position->GetAngle();
+        const auto error_angle = _reference_angle - actual_angle;
         
         /* Sign dictates the direction of movement */
         if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CCW);
@@ -170,13 +170,17 @@ void RoboticArm::Init(void)
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        RoboticJoint *joint = joints[id];
+        RoboticJoint * const joint = joints[id];
+        
         double difference, min_speed = 0;
-        double const epsilon = 0.000001;
+        const double epsilon = 0.000001;
         const double delta = 0.1;
+
         /* PHASE 0: */
         /* Calibrate each motor independently to find the minimum speed
-         * value that produces real movement
+         * value that produces real movement, due to rounding aritmethic
+         * errors we use an epsilon comparision in order to see if the
+         * value difference is more than that
          */
         joint->Movement->SetSpeed(0);
         joint->Movement->SetDirection(Motor::Direction::CCW);
@@ -184,13 +188,14 @@ void RoboticArm::Init(void)
         do {
             min_speed += delta;
             joint->Movement->SetSpeed(min_speed);
-            double old = joint->Position->GetAngle();
+            auto old = joint->Position->GetAngle();
             usleep(100E03);
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference < epsilon);
+        min_speed -= delta;
         logger << "INFO: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
+        joint->Movement->SetMinSpeed(min_speed);
         joint->Movement->Stop();
-        joint->Movement->SetMinSpeed(min_speed - delta);
 
         /* PHASE I: */
         /* Get the rotors to a known position on a tight controlled loop 
@@ -201,7 +206,7 @@ void RoboticArm::Init(void)
         //joint->Movement->SetSpeed(1);
         joint->Movement->Start();
         do {
-            double old = joint->Position->GetAngle();
+            auto old = joint->Position->GetAngle();
             usleep(100E03);
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference > epsilon);
@@ -214,51 +219,70 @@ void RoboticArm::Init(void)
         joint->Init();
         logger << "INFO: joint ID " << id << " was fully initialized" << std::endl;
         
+        /* oxavelar: debugging single rotor for now */
         break;
 
     }
     
-    usleep(1E06);
     logger << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
 }
 
 
 void RoboticArm::GetPosition(Point &pos)
 {
-    /* Makes use of forward kinematics in order to get position */
-
-    /* Temporary working matrix */
+    /* Temporary working matrix to fill sensor data */
     std::vector<double> theta;
     
-    /* Fill our N joints angles in our temporary matrix */
+    /* Fill our N joints angles in our temporary matrix in radians */
     for(auto id = 0; id < _joints_nr; id++) {
         theta.push_back( joints[id]->GetAngle() / 180 * M_PI );
     }
+
+    /* Makes use of forward kinematics in order to get position */
+    ForwardKinematics(pos, theta);
+}
+
+
+void RoboticArm::SetPosition(const Point &pos)
+{
+    /* Temporary working matrix to store our reference angles */
+    std::vector<double> theta(_joints_nr);
+
+    /* Makes use of inverse kinematics in order to set position */
+    InverseKinematics(pos, theta);
     
+    /* Update each of the joints their new reference angle */
+    for(auto id = 0; id < _joints_nr; id++) {
+        joints[id]->SetAngle( theta[id] * 180 / M_PI );
+    }
+}
+
+
+void RoboticArm::ForwardKinematics(Point &pos, const std::vector<double> &theta)
+{
+    /* Temporary coordinate variable, to check for unsolvable solutions */
+    Point tpos;
+
     /* Length of the links in meters, read only */
     const auto *L = &config::link_lengths[0];
-    
-    /* Temporary coordinate system variable, to check for unsolvable solutions */
-    Point tpos;    
 
-
-    switch(_joints_nr)
+    switch(theta.size())
     {
-    case 1:
-        tpos.x = L[0] * cos(theta[0]);
-        tpos.y = L[0] * sin(theta[0]);
-        tpos.z = 0;
-        break;
-    case 2:
-        tpos.x = L[0] * cos(theta[0]) + L[1] * cos(theta[0] + theta[1]);
-        tpos.y = L[0] * sin(theta[0]) + L[1] * sin(theta[0] + theta[1]);
-        tpos.z = 0;
-        break;
-    default:
-        /* oxavelar: To extend this to 3 dimensions for N joints */
-        logger << "ERROR: Unable to calculate for more than 2 joints for now..." << std::endl;
-        exit(-127);
-        break;
+        case 1:
+            tpos.x = L[0] * cos(theta[0]);
+            tpos.y = L[0] * sin(theta[0]);
+            tpos.z = 0;
+            break;
+        case 2:
+            tpos.x = L[0] * cos(theta[0]) + L[1] * cos(theta[0] + theta[1]);
+            tpos.y = L[0] * sin(theta[0]) + L[1] * sin(theta[0] + theta[1]);
+            tpos.z = 0;
+            break;
+        default:
+            /* oxavelar: To extend this to 3 dimensions for N joints */
+            logger << "ERROR: Unable to calculate for more than 2 joints for now..." << std::endl;
+            exit(-127);
+            break;
     }
 
     /* Only update the target position if a solution in the 3D space was found */
@@ -270,36 +294,26 @@ void RoboticArm::GetPosition(Point &pos)
 }
 
 
-void RoboticArm::SetPosition(const Point &pos)
+void RoboticArm::InverseKinematics(const Point &pos, std::vector<double> &theta)
 {
-    /* Makes use of inverse kinematics in order to set position */
-    
-    /* Temporary working matrix */
-    std::vector<double> theta(_joints_nr);
-    
     /* Length of the links in meters, read only */
     const auto *L = &config::link_lengths[0];
-    
-    
-    switch(_joints_nr)
+
+    switch(theta.size())
     {
-    case 1:
-        theta[0] = atan2(pos.y, pos.x);
-    case 2:
-        #define D ((pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]))
-        theta[1] = atan( sqrt(1 - D*D) / D );
-        theta[0] = atan(pos.y / pos.x) - atan( (L[1] * sin(theta[1])) / (L[0] + L[1] * cos(theta[1])) );
-        break;
-    default:
-        /* oxavelar: To extend this to 3 dimensions for N joints */
-        logger << "ERROR: Unable to calculate for more than 2 joints for now..." << std::endl;
-        exit(-127);
-        break;
-    }
-    
-    /* Update each of the joints their new reference angle */
-    for(auto id = 0; id < _joints_nr; id++) {
-        joints[id]->SetAngle( theta[id] * 180 / M_PI );
+
+        case 1:
+            theta[0] = atan2(pos.y, pos.x);
+        case 2:
+            #define D ((pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]))
+            theta[1] = atan( sqrt(1 - D*D) / D );
+            theta[0] = atan(pos.y / pos.x) - atan( (L[1] * sin(theta[1])) / (L[0] + L[1] * cos(theta[1])) );
+            break;
+        default:
+            /* oxavelar: To extend this to 3 dimensions for N joints */
+            logger << "ERROR: Unable to calculate for more than 2 joints for now..." << std::endl;
+            exit(-127);
+            break;
     }
 }
 

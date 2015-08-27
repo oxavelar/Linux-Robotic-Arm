@@ -58,6 +58,9 @@ class RoboticArm
          * joints[n] = nodeN
          */
         std::vector<RoboticJoint*> joints;
+
+        void ForwardKinematics(Point &pos, const std::vector<double> &theta);
+        void InverseKinematics(const Point &pos, std::vector<double> &theta);
 };
 
 
