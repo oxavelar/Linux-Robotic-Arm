@@ -96,6 +96,7 @@ int main(void)
         /* Used for single line message */
         char buffer[80];        
         
+        /* First obtain the actual coordinates of the robot, to move it at will */
         RoboArm->GetPosition(coordinates);
 
         /* Arrow keys will increase position by 1% distance increments in a x,y plane, uses curses library */

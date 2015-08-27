@@ -166,7 +166,6 @@ RoboticArm::~RoboticArm(void)
 
 void RoboticArm::Init(void)
 {
-    logger << __PRETTY_FUNCTION__ << std::endl;
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
@@ -176,7 +175,7 @@ void RoboticArm::Init(void)
         const double epsilon = 0.000001;
         const double delta = 0.1;
 
-        /* PHASE 0: */
+        /* PHASE I: */
         /* Calibrate each motor independently to find the minimum speed
          * value that produces real movement, due to rounding aritmethic
          * errors we use an epsilon comparision in order to see if the
@@ -192,12 +191,13 @@ void RoboticArm::Init(void)
             usleep(100E03);
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference < epsilon);
+        /* Return it to the speed value where it should not move */
         min_speed -= delta;
         logger << "INFO: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
         joint->Movement->SetMinSpeed(min_speed);
         joint->Movement->Stop();
 
-        /* PHASE I: */
+        /* PHASE II: */
         /* Get the rotors to a known position on a tight controlled loop 
          * due to rounding aritmethic errors, we use an epsilon comparision
          * in order to see if the values difference is less than it
@@ -214,9 +214,10 @@ void RoboticArm::Init(void)
         joint->Movement->Stop();
         joint->SetZero();
 
-        /* PHASE II: */
+        /* PHASE III: */
         /* Let the the joint correction control thread run and motors start-up */
         joint->Init();
+        
         logger << "INFO: joint ID " << id << " was fully initialized" << std::endl;
         
         /* oxavelar: debugging single rotor for now */
