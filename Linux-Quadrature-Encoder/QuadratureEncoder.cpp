@@ -87,7 +87,7 @@ void QuadratureEncoder::ISR_ChannelA(void)
 {
     GPIO_DataProcess();
 #ifdef DEBUG
-    FillTraceHistory();
+    //FillTraceHistory();
     _channel_a_isr_count++;
 #endif
 }
@@ -97,7 +97,7 @@ void QuadratureEncoder::ISR_ChannelB(void)
 {
     GPIO_DataProcess();
 #ifdef DEBUG
-    FillTraceHistory();
+    //FillTraceHistory();
     _channel_b_isr_count++;
 #endif
 }

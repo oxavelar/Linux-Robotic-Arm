@@ -59,8 +59,10 @@ RoboticJoint::RoboticJoint(const int &id) : _id(id)
 RoboticJoint::~RoboticJoint(void)
 {
     /* Stop the automatic control loop thread */
-    if (AutomaticControlThread != NULL)
-        delete AutomaticControlThread;
+    if (AutomaticControlThread.joinable()) {
+        _control_thread_stop_event = true;
+        AutomaticControlThread.join();
+    }
     
     /* Kill off any movement */
     Movement->Stop();
@@ -76,7 +78,7 @@ void RoboticJoint::Init(void)
     Movement->Start();
     logger << "INFO: Joint ID " << _id << " is in our home position" << std::endl;
     /* Register our control thread */
-    AutomaticControlThread = new std::thread(&RoboticJoint::AngularControl, this);
+    AutomaticControlThread = std::thread(&RoboticJoint::AngularControl, this);
 }
 
 
@@ -110,10 +112,10 @@ void RoboticJoint::AngularControl(void)
 {
     logger << "INFO: Joint ID " << _id << " angular control is now active" << std::endl;
 
-    for(;;) {
+    while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const double k = 2;
+        const double k = 8;
         const double actual_angle = Position->GetAngle();
         const double error_angle = _reference_angle - actual_angle;
         
@@ -124,7 +126,7 @@ void RoboticJoint::AngularControl(void)
         /* Store the motor control value to the movement function */
         Movement->SetSpeed( k * std::abs(error_angle) );
         
-#ifdef DEBUG_ANGULAR_CONTROL
+#ifdef DEBUG
         logger << "actual=" << actual_angle << std::endl;
         logger << "reference=" << _reference_angle << std::endl;
         logger << "error=" << error_angle << std::endl;
@@ -168,33 +170,56 @@ void RoboticArm::Init(void)
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
+        RoboticJoint *joint = joints[id];
+        double difference, min_speed = 0;
+        double const epsilon = 0.000001;
+        const double delta = 0.1;
+        /* PHASE 0: */
+        /* Calibrate each motor independently to find the minimum speed
+         * value that produces real movement
+         */
+        joint->Movement->SetSpeed(0);
+        joint->Movement->SetDirection(Motor::Direction::CCW);
+        joint->Movement->Start();
+        do {
+            min_speed += delta;
+            joint->Movement->SetSpeed(min_speed);
+            double old = joint->Position->GetAngle();
+            usleep(100E03);
+            difference = std::abs(joint->Position->GetAngle() - old);
+        } while (difference < epsilon);
+        logger << "INFO: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
+        joint->Movement->Stop();
+        joint->Movement->SetMinSpeed(min_speed - delta);
+
         /* PHASE I: */
         /* Get the rotors to a known position on a tight controlled loop 
          * due to rounding aritmethic errors, we use an epsilon comparision
          * in order to see if the values difference is less than it
          */
-        double difference, init_speed = 0.5, epsilon = 0.000001;
-        joints[id]->Movement->SetDirection(Motor::Direction::CW);
-        joints[id]->Movement->SetSpeed(init_speed);
-        joints[id]->Movement->Start();
+        joint->Movement->SetDirection(Motor::Direction::CW);
+        //joint->Movement->SetSpeed(1);
+        joint->Movement->Start();
         do {
-            double old = joints[id]->Position->GetAngle();
-            usleep(1E06);
-            difference = std::abs(joints[id]->Position->GetAngle() - old);
+            double old = joint->Position->GetAngle();
+            usleep(100E03);
+            difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference > epsilon);
         /* Reset the position coordinates, this is our new home position */
-        joints[id]->Movement->Stop();
-        joints[id]->SetZero();
+        joint->Movement->Stop();
+        joint->SetZero();
 
         /* PHASE II: */
         /* Let the the joint correction control thread run and motors start-up */
-        joints[id]->Init();
-
+        joint->Init();
         logger << "INFO: joint ID " << id << " was fully initialized" << std::endl;
+        
+        break;
 
     }
     
-     logger << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
+    usleep(1E06);
+    logger << "INFO: Success, RoboticArm is now ready to operate!" << std::endl;
 }
 
 

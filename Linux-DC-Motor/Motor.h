@@ -26,6 +26,7 @@ class Motor
         void Start(void);
         double GetSpeed(void);
         void SetSpeed(const double &percent);
+        void SetMinSpeed(const double &percent);
 
         Direction GetDirection(void);
         void SetDirection(const Direction &dir);
@@ -37,5 +38,6 @@ class Motor
         PWM *_pwm_a, *_pwm_b, *_pwm_active;
         /* Used to keep track of stopped motor */
         double _speed_backup;
+        double _minimum_duty;
 };
 

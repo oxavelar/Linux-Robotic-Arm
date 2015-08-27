@@ -76,7 +76,6 @@ int main(void)
     InitializeScreen();
     /* Redirect all of std::cout to a curses complaint window */
     toolbox::ncurses_stream redirector_cout(std::cout);
-    toolbox::ncurses_stream redirector_cerr(std::cerr);
     
 #ifdef RT_PRIORITY
     SetProcessPriority(50);

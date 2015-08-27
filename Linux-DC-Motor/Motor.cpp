@@ -88,13 +88,20 @@ void Motor::SetSpeed(const double &percent)
     double val = (double)_pwm_active->getPeriod() * percent / (double)100;
     
     /* Saturate to period value to be safe */
-    val = std::min((double)_pwm_active->getPeriod(), val);
+    val = std::min((double)_pwm_active->getPeriod(), val + _minimum_duty);
     
-    if((int)percent > 0) {
+    if((int)percent >= 0) {
         _pwm_active->setDuty(val);
     } else {
-        //throw std::runtime_error("Unsupported negative speed values");
+        throw std::runtime_error("Unsupported negative speed values");
     }
+}
+
+
+void Motor::SetMinSpeed(const double &percent)
+{
+    /* Minimum motor operating duty cycle */
+    _minimum_duty = (double)_pwm_active->getPeriod() * percent / (double)100;
 }
 
 
