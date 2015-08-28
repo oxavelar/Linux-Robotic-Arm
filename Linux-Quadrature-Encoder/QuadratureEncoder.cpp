@@ -87,7 +87,6 @@ void QuadratureEncoder::ISR_ChannelA(void)
 {
     GPIO_DataProcess();
 #ifdef DEBUG
-    //FillTraceHistory();
     _channel_a_isr_count++;
 #endif
 }
@@ -97,7 +96,6 @@ void QuadratureEncoder::ISR_ChannelB(void)
 {
     GPIO_DataProcess();
 #ifdef DEBUG
-    //FillTraceHistory();
     _channel_b_isr_count++;
 #endif
 }
@@ -171,27 +169,6 @@ void QuadratureEncoder::PrintDebugStats(void)
     std::cout << "D: ChannelB interrupts      " << _channel_b_isr_count << std::endl;
     std::cout << "D: GPIO processing errors   " << _gpio_processing_error_count << std::endl;
     std::cout << std::endl;
-    /* Trace table is printed by putting a fake cursor where it was left off */
-    //_trace_header[_trace_index] = 'v';
-    std::cout << "D: Last sample point        " << (char*)_trace_header << std::endl;
-    std::cout << "D: ChannelA history         " << (char*)_channel_a_history << std::endl;
-    std::cout << "D: ChannelB history         " << (char*)_channel_b_history << std::endl;
-    std::cout << std::endl;
-}
-
-
-void QuadratureEncoder::FillTraceHistory(void)
-{
-    /*
-     * Once this is called it is used to store a representative trace
-     * in a char string what the bus is like for debug purposes.
-     */
-
-    _channel_a_history[_trace_index] = (_prev_packed_read  &  1) + '0';
-    _channel_b_history[_trace_index] = (_prev_packed_read  >> 1) + '0';
-
-    /* Positions the character in the buffer, each two characters */
-    _trace_index = _trace_index + 2 % (_trace_depth / 2);
 }
 #endif
 

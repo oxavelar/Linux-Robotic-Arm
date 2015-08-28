@@ -196,7 +196,7 @@ void RoboticArm::Init(void)
         logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
         joint->Movement->SetMinSpeed(min_speed);
         joint->Movement->Stop();
-
+        
         /* PHASE II: */
         /* Get the rotors to a known position on a tight controlled loop 
          * due to rounding aritmethic errors, we use an epsilon comparision
@@ -213,7 +213,7 @@ void RoboticArm::Init(void)
         /* Reset the position coordinates, this is our new home position */
         joint->Movement->Stop();
         joint->SetZero();
-
+        
         /* PHASE III: */
         /* Let the the joint correction control thread run and motors start-up */
         joint->Init();

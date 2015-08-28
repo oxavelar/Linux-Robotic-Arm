@@ -93,7 +93,7 @@ void Motor::SetSpeed(const double &percent)
     if((int)percent >= 0) {
         _pwm_active->setDuty(val);
     } else {
-        throw std::runtime_error("Unsupported negative speed values");
+        //throw std::runtime_error("Unsupported negative speed values");
     }
 }
 
@@ -133,12 +133,8 @@ Motor::State Motor::GetState(void)
     /* Assume it is running for now ...*/
     State status = State::RUNNING;
 
-    /* The following conditions mean it is actually stopped, check them */    
-    if( _pwm_active->getState() == PWM::State::DISABLED )
-        status = State::STOPPED;
-    /* If both pwm duties are equal, it is also means it is stopped */
-    else if( _pwm_a->getDuty() == _pwm_a->getDuty() )
-        status = State::STOPPED;
+    /* If both pwm duties are equal, it means it is stopped */
+    if( _pwm_a->getDuty() == _pwm_a->getDuty() ) status = State::STOPPED;
     
     return(status);
 }
