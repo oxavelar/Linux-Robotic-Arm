@@ -40,7 +40,6 @@ class Motor
         /* Used to keep track of stopped motor */
         double _speed_backup;
         /* We can set hard limits to the percentage of PWM channels */
-        double _minimum_duty = 0;
-        double _maximum_duty = 100;
+        double _minimum_duty, _maximum_duty;
 };
 

@@ -188,7 +188,7 @@ void RoboticArm::Init(void)
             min_speed += delta;
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
-            usleep(1E03);
+            usleep(100E03);
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference < epsilon);
         /* Return it to the speed value where it should not move */
@@ -196,7 +196,7 @@ void RoboticArm::Init(void)
         
         logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
         joint->Movement->SetMinSpeed(min_speed);
-        joint->Movement->SetMaxSpeed(min_speed + 5);
+        joint->Movement->SetMaxSpeed(min_speed + 1);
         joint->Movement->Stop();
         
         /* PHASE II: */

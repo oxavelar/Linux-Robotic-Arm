@@ -30,6 +30,10 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
     _pwm_a->setDuty(_pwm_dutycycle_ns);
     _pwm_b->setDuty(_pwm_dutycycle_ns);
 
+    /* Duty value limits according to target time values */
+    _maximum_duty = 100 * _pwm_period_ns;
+    _minimum_duty =   0 * _pwm_period_ns;
+
     /* Starts up the PWM pins */    
     _pwm_a->setState(PWM::State::ENABLED);
     _pwm_b->setState(PWM::State::ENABLED);
