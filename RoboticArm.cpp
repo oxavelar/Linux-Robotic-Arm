@@ -115,7 +115,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 8;
+        const auto k = 0.7;
         const auto actual_angle = Position->GetAngle();
         const auto error_angle = _reference_angle - actual_angle;
         
@@ -188,13 +188,15 @@ void RoboticArm::Init(void)
             min_speed += delta;
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
-            usleep(100E03);
+            usleep(1E03);
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference < epsilon);
         /* Return it to the speed value where it should not move */
         min_speed -= delta;
+        
         logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
         joint->Movement->SetMinSpeed(min_speed);
+        joint->Movement->SetMaxSpeed(min_speed + 5);
         joint->Movement->Stop();
         
         /* PHASE II: */
@@ -203,7 +205,7 @@ void RoboticArm::Init(void)
          * in order to see if the values difference is less than it
          */
         joint->Movement->SetDirection(Motor::Direction::CW);
-        //joint->Movement->SetSpeed(1);
+        //joint->Movement->SetSpeed(10.0);
         joint->Movement->Start();
         do {
             auto old = joint->Position->GetAngle();

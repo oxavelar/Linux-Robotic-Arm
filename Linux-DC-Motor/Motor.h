@@ -27,6 +27,7 @@ class Motor
         double GetSpeed(void);
         void SetSpeed(const double &percent);
         void SetMinSpeed(const double &percent);
+        void SetMaxSpeed(const double &percent);
 
         Direction GetDirection(void);
         void SetDirection(const Direction &dir);
@@ -38,6 +39,8 @@ class Motor
         PWM *_pwm_a, *_pwm_b, *_pwm_active;
         /* Used to keep track of stopped motor */
         double _speed_backup;
-        double _minimum_duty;
+        /* We can set hard limits to the percentage of PWM channels */
+        double _minimum_duty = 0;
+        double _maximum_duty = 100;
 };
 
