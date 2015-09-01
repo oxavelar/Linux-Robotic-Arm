@@ -205,7 +205,7 @@ void RoboticArm::CalibrateMovement(void)
         logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
         
         joint->Movement->SetMinSpeed(min_speed);
-        joint->Movement->SetMaxSpeed(min_speed + 1);
+        joint->Movement->SetMaxSpeed(min_speed + 0.3);
         
         /* oxavelar: debugging single rotor for now */
         break;
