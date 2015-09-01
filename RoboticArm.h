@@ -59,6 +59,9 @@ class RoboticArm
          */
         std::vector<RoboticJoint*> joints;
 
+        void CalibrateMovement(void);
+        void CalibratePosition(void);
+
         void ForwardKinematics(Point &pos, const std::vector<double> &theta);
         void InverseKinematics(const Point &pos, std::vector<double> &theta);
 };
