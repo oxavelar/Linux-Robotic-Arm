@@ -115,13 +115,13 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 0.7;
+        const auto k = 4;
         const auto actual_angle = Position->GetAngle();
         const auto error_angle = _reference_angle - actual_angle;
         
         /* Sign dictates the direction of movement */
-        if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CCW);
-        else                     Movement->SetDirection(Motor::Direction::CW);
+        if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
+        else                     Movement->SetDirection(Motor::Direction::CCW);
         
         /* Store the motor control value to the movement function */
         Movement->SetSpeed( k * std::abs(error_angle) );
@@ -168,7 +168,7 @@ void RoboticArm::CalibrateMovement(void)
 {
     double difference;
     const double epsilon = 0.000001;
-    const double delta = 0.02;
+    const double delta = 0.05;
 
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
@@ -197,7 +197,7 @@ void RoboticArm::CalibrateMovement(void)
         logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
         
         joint->Movement->SetMinSpeed(min_speed);
-        joint->Movement->SetMaxSpeed(min_speed + 0.10);
+        joint->Movement->SetMaxSpeed(min_speed + 0.2);
         
         /* oxavelar: debugging single rotor for now */
         break;

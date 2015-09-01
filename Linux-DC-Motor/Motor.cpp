@@ -91,8 +91,8 @@ void Motor::SetSpeed(const double &percent)
     /* Translates the speed percentage to a PWM duty cycle */
     double val = (double)_pwm_active->getPeriod() * percent / (double)100;
     
-    /* Saturate to period values to be safe, add minimum duty offset */
-    val = std::min(_maximum_duty, val + _minimum_duty);
+    /* Saturate our value range to fit our conditions */
+    val = std::min(std::max(val, _minimum_duty), _maximum_duty);
     
     if((int)percent >= 0) {
         _pwm_active->setDuty(val);
