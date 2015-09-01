@@ -31,6 +31,8 @@
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
 
+#define epsilon 10E-14
+
 
 RoboticJoint::RoboticJoint(const int &id) : _id(id)
 {
@@ -189,7 +191,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->Start();
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
-        } while (difference <= DBL_EPSILON);
+        } while (difference <= epsilon);
         
         /* Fine tuning, go back by 1% to where we stop moving in steady state */
         do {
@@ -197,18 +199,20 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            usleep(5E06);
+            usleep(2E06);
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
-        } while (difference >= DBL_EPSILON);
+        } while (difference >= epsilon);
         
         logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
         
         joint->Movement->SetMinSpeed(min_speed);
-        joint->Movement->SetMaxSpeed(min_speed + 0.3);
         
-        /* oxavelar: debugging single rotor for now */
+#if true
+        /* oxavelar: debugging single rotor for now on Galileo V1*/
+        joint->Movement->SetMaxSpeed(min_speed + 2);
         break;
+#endif
         
     }
 }
@@ -235,7 +239,7 @@ void RoboticArm::CalibratePosition(void)
             joint->Movement->Start();
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
-        } while (difference >= DBL_EPSILON);
+        } while (difference >= epsilon);
         
         /* Reset the position coordinates, this is our new home position */
         joint->SetZero();

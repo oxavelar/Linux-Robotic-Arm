@@ -76,6 +76,7 @@ int main(void)
     InitializeScreen();
     /* Redirect all of std::cout to a curses complaint window */
     toolbox::ncurses_stream redirector_cout(std::cout);
+    toolbox::ncurses_stream redirector_cerr(std::cerr);
     
 #ifdef RT_PRIORITY
     SetProcessPriority(50);
@@ -105,13 +106,13 @@ int main(void)
         /* Command the robot to a new position once that coordinates was updated */
         RoboArm->SetPosition(coordinates);
         
-        sprintf(buffer, "( x= %+8.6f | y= %+8.6f | z= %+8.6f )", coordinates.x, coordinates.y, coordinates.z);
+        sprintf(buffer, " x= %+3.4f | y= %+3.4f | z= %+3.4f", coordinates.x, coordinates.y, coordinates.z);
         logger << "I: Computed - " << buffer << std::endl;
 
         /* Updated coordinates and print it out */
         RoboArm->GetPosition(coordinates);
 
-        sprintf(buffer, "( x= %+8.6f | y= %+8.6f | z= %+8.6f )", coordinates.x, coordinates.y, coordinates.z);
+        sprintf(buffer, " x= %+3.4f | y= %+3.4f | z= %+3.4f", coordinates.x, coordinates.y, coordinates.z);
         logger << "I: Measured - " << buffer << std::endl;
         
     }
