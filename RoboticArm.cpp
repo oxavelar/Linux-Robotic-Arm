@@ -114,10 +114,10 @@ void RoboticJoint::AngularControl(void)
 
     while(!_control_thread_stop_event) {
         
-        /* Consists of the interaction between position & movement */
-        const auto k = 4;
-        const auto actual_angle = Position->GetAngle();
-        const auto error_angle = _reference_angle - actual_angle;
+        /* Consists of the interaction between position & movement, limit angle */
+        const auto k = 0.7;
+        const auto actual_angle = std::min((double)360, Position->GetAngle());
+        const auto error_angle = actual_angle - _reference_angle;
         
         /* Sign dictates the direction of movement */
         if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
@@ -127,12 +127,11 @@ void RoboticJoint::AngularControl(void)
         Movement->SetSpeed( k * std::abs(error_angle) );
         
 #ifdef DEBUG
-        logger << "actual=" << actual_angle << std::endl;
-        logger << "reference=" << _reference_angle << std::endl;
-        logger << "error=" << error_angle << std::endl;
-        logger << std::endl;
-        logger << "speed=" << k * std::abs(error_angle) << "%" << std::endl;
-        logger << "speed=" << Movement->GetSpeed() << "%" << std::endl;
+        logger << "D: Joint ID " << _id << " actual=" << actual_angle << std::endl;
+        logger << "D: Joint ID " << _id << " reference=" << _reference_angle << std::endl;
+        logger << "D: Joint ID " << _id << " error=" << error_angle << std::endl;
+        logger << "D: Joint ID " << _id << " computed speed=" << k * std::abs(error_angle) << "%" << std::endl;
+        logger << "D: Joint ID " << _id << " measured speed=" << Movement->GetSpeed() << "%" << std::endl;
         logger << std::endl;
 #endif
         
@@ -167,8 +166,7 @@ RoboticArm::~RoboticArm(void)
 void RoboticArm::CalibrateMovement(void)
 {
     double difference;
-    const double epsilon = 0.000001;
-    const double delta = 0.05;
+    const double delta = 0.1;
 
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
@@ -182,6 +180,8 @@ void RoboticArm::CalibrateMovement(void)
          */
         double min_speed = 0;
         joint->Movement->SetDirection(Motor::Direction::CCW);
+
+        /* Coarse tuning, aproximate where the threshold movement is */
         do {
             min_speed += delta;
             joint->Movement->SetSpeed(min_speed);
@@ -189,15 +189,23 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->Start();
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
-        } while (difference < epsilon);
+        } while (difference <= DBL_EPSILON);
         
-        /* Return it to a speed value where it should not move */
-        min_speed -= delta;
+        /* Fine tuning, go back by 1% to where we stop moving in steady state */
+        do {
+            min_speed -= (0.1 * delta);
+            joint->Movement->SetSpeed(min_speed);
+            auto old = joint->Position->GetAngle();
+            joint->Movement->Start();
+            usleep(5E06);
+            joint->Movement->Stop();
+            difference = std::abs(joint->Position->GetAngle() - old);
+        } while (difference >= DBL_EPSILON);
         
         logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
         
         joint->Movement->SetMinSpeed(min_speed);
-        joint->Movement->SetMaxSpeed(min_speed + 0.2);
+        joint->Movement->SetMaxSpeed(min_speed + 1);
         
         /* oxavelar: debugging single rotor for now */
         break;
@@ -209,7 +217,6 @@ void RoboticArm::CalibrateMovement(void)
 void RoboticArm::CalibratePosition(void)
 {
     double difference;
-    const double epsilon = 0.000001;
 
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
@@ -228,7 +235,7 @@ void RoboticArm::CalibratePosition(void)
             joint->Movement->Start();
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
-        } while (difference > epsilon);
+        } while (difference >= DBL_EPSILON);
         
         /* Reset the position coordinates, this is our new home position */
         joint->SetZero();

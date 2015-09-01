@@ -118,8 +118,8 @@ void Motor::SetMaxSpeed(const double &percent)
 Motor::Direction Motor::GetDirection(void)
 {
     Direction dir = Direction::CW;
-    if     ( _pwm_active == _pwm_a ) dir = Direction::CW;
-    else if( _pwm_active == _pwm_b ) dir = Direction::CCW;
+    if     ( _pwm_active == _pwm_a ) return Direction::CW;
+    else if( _pwm_active == _pwm_b ) return Direction::CCW;
     return(dir);
 }
 
