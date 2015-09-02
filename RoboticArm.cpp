@@ -31,7 +31,7 @@
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
 
-#define epsilon 10E-14
+#define epsilon 10E-9
 
 
 RoboticJoint::RoboticJoint(const int &id) : _id(id)
@@ -117,7 +117,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement, limit angle */
-        const auto k = 0.7;
+        const auto k = 0.4;
         const auto actual_angle = std::min((double)360, Position->GetAngle());
         const auto error_angle = actual_angle - _reference_angle;
         

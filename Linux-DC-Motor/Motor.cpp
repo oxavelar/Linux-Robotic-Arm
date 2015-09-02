@@ -94,11 +94,8 @@ void Motor::SetSpeed(const double &percent)
     /* Saturate our value range to fit our conditions */
     val = std::min(std::max(val, _minimum_duty), _maximum_duty);
     
-    if((int)percent >= 0) {
-        _pwm_active->setDuty(val);
-    } else {
-        //throw std::runtime_error("Unsupported negative speed values");
-    }
+    /* Value is protected from 0 to 100 ranges at most */
+    _pwm_active->setDuty(val);
 }
 
 
