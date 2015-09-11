@@ -207,13 +207,10 @@ void RoboticArm::CalibrateMovement(void)
         logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
         
         joint->Movement->SetMinSpeed(min_speed);
-        
-#if true
-        /* oxavelar: debugging single rotor for now on Galileo V1*/
-        joint->Movement->SetMaxSpeed(min_speed + 2);
+ 
+        /* oxavelar: remove me after 2nd rotor is here */
         break;
-#endif
-        
+       
     }
 }
 

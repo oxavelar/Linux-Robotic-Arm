@@ -4,23 +4,22 @@
  * definitions, this will be dependency injected into the source
  * code that makes use of the following static members.
  *
- * The following is Intel's Galileo layout for the pins.
+ * The following is Intel's Edison layout for the pins.
  *
- *   +==========+=========+=======================+==========
- *   |  SYS_FS  |   LABEL |           DESCRIPTION |   COLOR |
- *   +==========+=========+=======================+==========
- *   |  gpio24  |     IO6 |       QE Channel A #1 |   White |
- *   |  gpio25  |    IO11 |       QE Channel B #1 |  Yellow |
- *   |  gpio26  |     IO8 |       QE Channel A #2 |   White |
- *   |  gpio27  |     IO7 |       QE Channel B #2 |  Yellow |
- *   |    pwm3  |     IO3 |   Motor DC Ctrl CW #1 |     Red |
- *   |    pwm7  |    IO10 |  Motor DC Ctrl CCW #1 |    Blue |
- *   |    pwm1  |     IO9 |   Motor DC Ctrl CW #2 |     Red |
- *   |    pwm5  |     IO5 |  Motor DC Ctrl CCW #2 |    Blue |
- *   |  video0  | USB HST |         USB HD WebCam |         |
- *   +==========+=========+====================== +=========+
+ *   +===========+=========+=======================+==========
+ *   |   SYS_FS  |   LABEL |           DESCRIPTION |   COLOR |
+ *   +===========+=========+=======================+==========
+ *   |   gpio41  |    IO10 |       QE Channel A #1 |   White |
+ *   |   gpio43  |    IO11 |       QE Channel B #1 |  Yellow |
+ *   |   gpio49  |     IO8 |       QE Channel A #2 |   White |
+ *   |   gpio48  |     IO7 |       QE Channel B #2 |  Yellow |
+ *   |     pwm0  |     IO3 |   Motor DC Ctrl CW #1 |     Red |
+ *   |     pwm2  |     IO6 |  Motor DC Ctrl CCW #1 |    Blue |
+ *   |     pwm3  |     IO9 |   Motor DC Ctrl CW #2 |     Red |
+ *   |     pwm1  |     IO5 |  Motor DC Ctrl CCW #2 |    Blue |
+ *   |   video0  | USB HST |         USB HD WebCam |         |
+ *   +===========+=========+====================== +=========+
  *
- * Note: Galileo's cannot go slower than ~125 Hz on Linux SYSFS PWM.
  * Note: Pololu encoders cable colors match the ones above.
  * 
  * The quadrature encoders in this project are a Pololu brand ones.
@@ -31,6 +30,7 @@
  *
  *
  * References:
+ * http://www.emutexlabs.com/project/215-intel-edison-gpio-pin-multiplexing-guide
  * http://www.malinov.com/Home/sergey-s-blog/intelgalileo-programminggpiofromlinux
  * https://www.pololu.com/product/1443
  * https://www.pololu.com/product/2286
@@ -47,8 +47,8 @@ namespace config
     static constexpr double link_lengths[] = { 0.015, 0.015 };
 
     /* Pair of pins used for these elements */
-    static constexpr int quad_encoder_pins[][2] = {{24, 25}, {26, 27}};
-    static constexpr int dc_motor_pins[][2] = {{ 3,  7}, { 1,  5}};
+    static constexpr int quad_encoder_pins[][2]  = {{41, 43}, {49, 48}};
+    static constexpr int dc_motor_pins[][2]      = {{  0,  2}, { 3,  1}};
     
     /* All of the joints will utilize the same webcam port in this case */
     static constexpr int visual_encoder_ports[] = {0, 0};
