@@ -12,9 +12,6 @@
 
 echo "I: Intel Edison IO Pre-Configuration"
 
-echo "D: Disabling core1 to test this as single thread!"
-echo 0 > /sys/devices/system/cpu/cpu1/online
-
 # Setting tri-state to make IO changes
 echo 214 > /sys/class/gpio/export
 echo low > /sys/class/gpio/gpio214/direction

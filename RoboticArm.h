@@ -30,12 +30,12 @@ class RoboticJoint
 
     private:
         const int _id;
-        double _reference_angle;
+        std::atomic<double> _reference_angle;
 
         /* Per joint position correction control */
         void AngularControl(void);
         std::thread AutomaticControlThread;
-        bool _control_thread_stop_event;
+        std::atomic<bool> _control_thread_stop_event;
 };
 
 
@@ -65,6 +65,4 @@ class RoboticArm
         void ForwardKinematics(Point &pos, const std::vector<double> &theta);
         void InverseKinematics(const Point &pos, std::vector<double> &theta);
 };
-
-
 
