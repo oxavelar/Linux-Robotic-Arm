@@ -81,7 +81,6 @@ void RoboticJoint::Init(void)
     logger << "I: Joint ID " << _id << " is in our home position" << std::endl;
     /* Register our control thread */
     AutomaticControlThread = std::thread(&RoboticJoint::AngularControl, this);
-    logger << std::flush;
 }
 
 
@@ -264,6 +263,7 @@ void RoboticArm::Init(void)
     }
 
     logger << "I: Robot was successfully initialized" << std::endl;
+    logger << std::flush;
 }
 
 
