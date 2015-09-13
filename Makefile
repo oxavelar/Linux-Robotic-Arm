@@ -1,7 +1,7 @@
 PROGRAM := linux-robotic-arm.app
 
 CC = g++
-CXXFLAGS += -O3 -std=c++11 -Wall -Wextra -Werror -pipe -march=native -flto -fomit-frame-pointer -Wno-reorder
+CXXFLAGS += -O3 -std=c++11 -Wall -Wextra -Werror -Wno-reorder -fomit-frame-pointer -pipe -march=native -flto
 LDLIBS += -lpthread -lboost_system -lboost_filesystem -lncurses
 
 SOURCES = demo.cpp RoboticArm.cpp
@@ -27,7 +27,7 @@ DEPS += HighLatencyPWM
 CXXFLAGS += -DNO_RT_PRIORITY
 CXXFLAGS += -DBASE_PWM_FREQUENCY_HZ=8000 -DBASE_PWM_DUTYCYCLE=0
 CXXFLAGS += -DNO_VISUAL_ENCODER
-CXXFLAGS += -DNO_EBUG
+CXXFLAGS += -DNO_DEBUG -DDEBUG_LEVEL=50
 
 
 all:

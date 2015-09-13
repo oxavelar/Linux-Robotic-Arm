@@ -128,7 +128,7 @@ void RoboticJoint::AngularControl(void)
         /* Store the motor control value to the movement function */
         Movement->SetSpeed( k * std::abs(error_angle) );
         
-#ifdef DEBUG
+#if (DEBUG_LEVEL >= 10)
         logger << "D: Joint ID " << _id << " actual=" << actual_angle << std::endl;
         logger << "D: Joint ID " << _id << " reference=" << _reference_angle << std::endl;
         logger << "D: Joint ID " << _id << " error=" << error_angle << std::endl;
@@ -204,7 +204,7 @@ void RoboticArm::CalibrateMovement(void)
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference >= epsilon);
         
-        logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl;
+        logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl << std::flush;
         
         joint->Movement->SetMinSpeed(min_speed);
  
@@ -223,7 +223,7 @@ void RoboticArm::CalibratePosition(void)
     for(auto id = 0; id < _joints_nr; id++) {
 
         RoboticJoint * const joint = joints[id];
-        
+       
         /* Get the rotors to a known position on a tight controlled loop 
          * due to rounding aritmethic errors, we use an epsilon comparision
          * in order to see if the values difference is less than it
