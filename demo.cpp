@@ -78,7 +78,7 @@ int main(void)
     toolbox::ncurses_stream redirector_cout(std::cout);
     
 #ifdef RT_PRIORITY
-    SetProcessPriority(50);
+    SetProcessPriority(RT_PRIORITY);
 #endif
 
     /* Please check RoboticArtm_Config.h for number of joints*/
