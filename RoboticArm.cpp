@@ -81,6 +81,7 @@ void RoboticJoint::Init(void)
     logger << "I: Joint ID " << _id << " is in our home position" << std::endl;
     /* Register our control thread */
     AutomaticControlThread = std::thread(&RoboticJoint::AngularControl, this);
+    logger << std::flush;
 }
 
 
@@ -116,9 +117,9 @@ void RoboticJoint::AngularControl(void)
 
     while(!_control_thread_stop_event) {
         
-        /* Consists of the interaction between position & movement, limit angle */
-        const auto k = 0.4;
-        const auto actual_angle = std::min((double)360, Position->GetAngle());
+        /* Consists of the interaction between position & movement */
+        const auto k = 40;
+        const auto actual_angle = Position->GetAngle();
         const auto error_angle = actual_angle - _reference_angle;
         
         /* Sign dictates the direction of movement */
@@ -193,7 +194,7 @@ void RoboticArm::CalibrateMovement(void)
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference <= epsilon);
         
-        /* Fine tuning, go back by 1% to where we stop moving in steady state */
+        /* Fine tuning, go back by 10% of deltas to where we stop moving in steady state */
         do {
             min_speed -= (0.1 * delta);
             joint->Movement->SetSpeed(min_speed);
@@ -204,9 +205,10 @@ void RoboticArm::CalibrateMovement(void)
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference >= epsilon);
         
-        logger << "I: joint ID " << id << " min speed is ~" << min_speed << "%" << std::endl << std::flush;
+        logger << "I: joint ID " << id << " min speed found for movement is ~" << min_speed << "%" << std::endl;
+        logger << "I: joint ID " << id << " applying range compression to remap values" << std::endl;
         
-        joint->Movement->SetMinSpeed(min_speed);
+        joint->Movement->ApplyRangeLimits(min_speed, min_speed + 20);
  
         /* oxavelar: remove me after 2nd rotor is here */
         break;
@@ -229,7 +231,7 @@ void RoboticArm::CalibratePosition(void)
          * in order to see if the values difference is less than it
          */
         joint->Movement->SetDirection(Motor::Direction::CW);
-        joint->Movement->SetSpeed(10.0);
+        joint->Movement->SetSpeed(100);
         joint->Movement->Start();
         do {
             auto old = joint->Position->GetAngle();

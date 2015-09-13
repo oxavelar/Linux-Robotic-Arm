@@ -76,7 +76,6 @@ int main(void)
     InitializeScreen();
     /* Redirect all of std::cout to a curses complaint window */
     toolbox::ncurses_stream redirector_cout(std::cout);
-    toolbox::ncurses_stream redirector_cerr(std::cerr);
     
 #ifdef RT_PRIORITY
     SetProcessPriority(50);
@@ -100,7 +99,7 @@ int main(void)
         /* First obtain the actual coordinates of the robot, to move it at will */
         RoboArm->GetPosition(coordinates);
 
-        /* Arrow keys will increase position by 1% distance increments in a x,y plane, uses curses library */
+        /* Arrows will increase position by 1% increments in a x,y plane, uses curses library */
         WaitKeyPress(coordinates);
 
         /* Command the robot to a new position once that coordinates was updated */

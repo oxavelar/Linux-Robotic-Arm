@@ -30,16 +30,15 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
     _pwm_a->setDuty(_pwm_dutycycle_ns);
     _pwm_b->setDuty(_pwm_dutycycle_ns);
 
-    /* Duty value limits according to target time values */
-    _maximum_duty = 100 * _pwm_period_ns;
-    _minimum_duty =   0 * _pwm_period_ns;
-
     /* Starts up the PWM pins */    
     _pwm_a->setState(PWM::State::ENABLED);
     _pwm_b->setState(PWM::State::ENABLED);
 
     /* Defaults to channel A as active */
     _pwm_active = _pwm_a;
+
+    /* Duty value limits ranges from 0% to 100% */
+    ApplyRangeLimits();
 
     /* Useful information to be printed regarding set-up */
     std::cout << "I: Userspace motor created @ (pinPWM_A=" 
@@ -79,9 +78,10 @@ void Motor::Stop(void)
 
 double Motor::GetSpeed(void)
 {
-    double speed;
     /* Reverse translates the PWM duty cycle to speed % */
-    speed = (double)_pwm_active->getDuty() * 100 / (double)_pwm_active->getPeriod();
+    double speed;
+    speed = (double)_pwm_active->getDuty() / (_maximum_duty - _minimum_duty);
+    speed = speed  * double(100) / _range_compression_factor;
     return(speed);
 }
 
@@ -89,28 +89,35 @@ double Motor::GetSpeed(void)
 void Motor::SetSpeed(const double &percent)
 {
     /* Translates the speed percentage to a PWM duty cycle */
-    double val = (double)_pwm_active->getPeriod() * percent / (double)100;
+    double val = (_maximum_duty - _minimum_duty) * percent / (double)100;
     
     /* Saturate our value range to fit our conditions */
     val = std::min(std::max(val, _minimum_duty), _maximum_duty);
     
-    /* Value is protected from 0 to 100 ranges at most */
+    /* Value is now protected from 0 to 100 ranges at most */
     _pwm_active->setDuty(val);
 }
 
 
-void Motor::SetMinSpeed(const double &percent)
+void Motor::ApplyRangeLimits(const double &percent_l, const double &percent_h)
 {
-    /* Minimum motor operating duty cycle */
-    _minimum_duty = (double)_pwm_active->getPeriod() * percent / (double)100;
+    if (percent_h > percent_l) {
+        /* Used for calculations later */
+        _minimum_percent = percent_l;
+        _maximum_percent = percent_h;
+        
+        /* Minimum motor operating duty cycle */
+        _minimum_duty = (double)_pwm_active->getPeriod() / (double)100 * percent_l;
+        /* Maximum motor operating duty cycle */
+        _maximum_duty = (double)_pwm_active->getPeriod() / (double)100 * percent_h;
+        
+        /* Updates our compressed range for calculations */
+        _range_compression_factor = (percent_h - percent_l) / (double)100;
+    } else {
+        throw std::runtime_error("Invalid speed range limit values");
+    }
 }
 
-
-void Motor::SetMaxSpeed(const double &percent)
-{
-    /* Maximum motor operating duty cycle */
-    _maximum_duty = (double)_pwm_active->getPeriod() * percent / (double)100;
-}
 
 Motor::Direction Motor::GetDirection(void)
 {

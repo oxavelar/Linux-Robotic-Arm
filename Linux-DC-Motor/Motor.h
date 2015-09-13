@@ -1,6 +1,5 @@
 #pragma once
 #include <chrono>
-#include <stdint.h>
 #include "../HighLatencyPWM/PWM.hh"
 #include "../HighLatencyGPIO/GPIO.hh"
 
@@ -9,7 +8,7 @@
 #endif
 
 #ifndef BASE_PWM_DUTYCYCLE
-#define BASE_PWM_DUTYCYCLE 50
+#define BASE_PWM_DUTYCYCLE 0
 #endif
 
 
@@ -26,8 +25,8 @@ class Motor
         void Start(void);
         double GetSpeed(void);
         void SetSpeed(const double &percent);
-        void SetMinSpeed(const double &percent);
-        void SetMaxSpeed(const double &percent);
+        void ApplyRangeLimits(const double &percent_l = 0, 
+                              const double &percent_h = 100);
 
         Direction GetDirection(void);
         void SetDirection(const Direction &dir);
@@ -40,6 +39,8 @@ class Motor
         /* Used to keep track of stopped motor */
         double _speed_backup;
         /* We can set hard limits to the percentage of PWM channels */
+        double _range_compression_factor;
+        double _minimum_percent, _maximum_percent;
         double _minimum_duty, _maximum_duty;
 };
 
