@@ -88,7 +88,7 @@ double RoboticJoint::GetAngle(void)
 {
     /* Reads the internal variable, this is used by 
      * the control loop thread, so just reading it is
-     * enough information of where the joint is it */
+     * enough information of where the joint is */
     return _reference_angle;
 }
 
@@ -117,7 +117,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 8;
+        const auto k = 25;
         const auto actual_angle = Position->GetAngle();
         const auto error_angle = actual_angle - _reference_angle;
         
@@ -189,7 +189,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            usleep(10E3);
+            usleep(1E3);
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference <= epsilon);
@@ -200,7 +200,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            usleep(2E6);
+            usleep(100E3);
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference >= epsilon);
