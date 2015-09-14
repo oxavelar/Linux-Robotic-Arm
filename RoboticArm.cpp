@@ -189,6 +189,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
+            usleep(10E3);
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference <= epsilon);
@@ -199,7 +200,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            usleep(2E06);
+            usleep(2E6);
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
         } while (difference >= epsilon);
