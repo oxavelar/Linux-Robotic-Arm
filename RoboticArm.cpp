@@ -186,16 +186,32 @@ void RoboticArm::CalibrateMovement(void)
         /* Coarse tuning, aproximate where the threshold movement is */
         do {
             min_speed += delta;
+
+            /* Make sure we have not reached 100% */
+            if((int)min_speed == 100) {
+                logger << "E: joint ID " << id << " is unable to move or detect movement!" << std::endl;
+                exit(-99);
+            }
+            
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
             usleep(1E3);
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
+            
         } while (difference <= epsilon);
+        
         
         /* Fine tuning, go back by 10% of deltas to where we stop moving in steady state */
         do {
+
+            /* Make sure we have not reached 0% + delta */
+            if(min_speed >= delta) {
+                logger << "E: joint ID " << id << " is unable to stop at 0%!" << std::endl;
+                exit(-100);
+            }
+
             min_speed -= (0.1 * delta);
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
@@ -203,10 +219,11 @@ void RoboticArm::CalibrateMovement(void)
             usleep(100E3);
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
+            
         } while (difference >= epsilon);
         
         logger << "I: joint ID " << id << " min speed found for movement is ~" << min_speed << "%" << std::endl;
-        logger << "I: joint ID " << id << " applying range compression to remap values" << std::endl;
+        logger << "I: joint ID " << id << " applying range compression to remap  0% to 100% values" << std::endl;
         
         joint->Movement->ApplyRangeLimits(min_speed, min_speed + 20);
  
@@ -234,10 +251,12 @@ void RoboticArm::CalibratePosition(void)
         joint->Movement->SetSpeed(100);
         joint->Movement->Start();
         do {
+            
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
+            
         } while (difference >= epsilon);
         
         /* Reset the position coordinates, this is our new home position */
