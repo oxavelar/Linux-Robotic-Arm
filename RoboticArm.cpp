@@ -207,7 +207,7 @@ void RoboticArm::CalibrateMovement(void)
         do {
 
             /* Make sure we have not reached 0% + delta */
-            if(min_speed >= delta) {
+            if(min_speed <= (delta + epsilon)) {
                 logger << "E: joint ID " << id << " is unable to stop at 0%!" << std::endl;
                 exit(-100);
             }
