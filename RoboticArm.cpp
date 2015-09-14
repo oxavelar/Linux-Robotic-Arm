@@ -200,14 +200,14 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
-        } while (difference <= epsilon);
+        } while(difference <= epsilon);
         
         
         /* Fine tuning, go back by 10% of deltas to where we stop moving in steady state */
         do {
 
             /* Make sure we have not reached 0% + delta */
-            if(min_speed <= (delta + epsilon)) {
+            if((delta + epsilon) > min_speed) {
                 logger << "E: joint ID " << id << " is unable to stop at 0%!" << std::endl;
                 exit(-100);
             }
@@ -220,7 +220,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
-        } while (difference >= epsilon);
+        } while(difference >= epsilon);
         
         logger << "I: joint ID " << id << " min speed found for movement is ~" << min_speed << "%" << std::endl;
         logger << "I: joint ID " << id << " applying range compression to remap  0% to 100% values" << std::endl;
@@ -257,7 +257,7 @@ void RoboticArm::CalibratePosition(void)
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
-        } while (difference >= epsilon);
+        } while(difference >= epsilon);
         
         /* Reset the position coordinates, this is our new home position */
         joint->SetZero();
