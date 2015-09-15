@@ -34,7 +34,10 @@
 #define epsilon 10E-9
 
 
-RoboticJoint::RoboticJoint(const int &id) : _id(id)
+RoboticJoint::RoboticJoint(const int &id) :
+    _id(id),
+    _reference_angle(0),
+    _control_thread_stop_event(false)
 {
 
 #ifndef VISUAL_ENCODER
@@ -189,7 +192,7 @@ void RoboticArm::CalibrateMovement(void)
 
             /* Make sure we have not reached 100% */
             if((int)min_speed == 100) {
-                logger << "E: joint ID " << id << " is unable to move or detect movement!" << std::endl;
+                logger << "E: Joint ID " << id << " is unable to move or detect movement!" << std::endl;
                 exit(-99);
             }
             
@@ -208,7 +211,7 @@ void RoboticArm::CalibrateMovement(void)
 
             /* Make sure we have not reached 0% + delta */
             if((delta + epsilon) > min_speed) {
-                logger << "E: joint ID " << id << " is unable to stop at 0%!" << std::endl;
+                logger << "E: Joint ID " << id << " is unable to stop at 0%!" << std::endl;
                 exit(-100);
             }
 
@@ -222,8 +225,8 @@ void RoboticArm::CalibrateMovement(void)
             
         } while(difference >= epsilon);
         
-        logger << "I: joint ID " << id << " min speed found for movement is ~" << min_speed << "%" << std::endl;
-        logger << "I: joint ID " << id << " applying range compression to remap  0% to 100% values" << std::endl;
+        logger << "I: Joint ID " << id << " min speed found for movement is ~" << min_speed << "%" << std::endl;
+        logger << "I: Joint ID " << id << " applying range compression to remap  0% to 100% values" << std::endl;
         
         joint->Movement->ApplyRangeLimits(min_speed, min_speed + 20);
  
