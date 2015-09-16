@@ -6,7 +6,7 @@
 #include <streambuf>
 #include <ncurses.h>
 
-#define appname "Linux-Robotic-Arm"
+#define appname "Robotic-Arm"
 #define logger std::cout << "[" << toolbox::timestamp().c_str() << "] " appname ": "
 
 namespace toolbox
