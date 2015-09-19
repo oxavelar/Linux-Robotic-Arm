@@ -120,7 +120,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 37;
+        const auto k = 12;
         const auto actual_angle = Position->GetAngle();
         const auto error_angle = actual_angle - _reference_angle;
         
