@@ -12,6 +12,18 @@ It makes use of inverse and forward kinematics calculations on different positio
 A robot joint is formed by a positioning (imaging/encoder) and movement (actuator/motor) objects, by having this abstraction we can make a robotic arm operate with different layers and or objects.
 <img align="center" src="http://imgh.us/SW_Joint.svgz">
 
+
+Testing has shown and we would recomend tweak the following parameters in the Linux scheduler through the sysctl.conf interface in order to get better response times.
+
+```
+kernel.sched_latency_ns = 10000
+kernel.sched_min_granularity_ns = 20000
+kernel.sched_wakeup_granularity_ns = 3000000
+```
+
+I have tested the above parameters in an Intel Edison and an Intel Galileo board.
+
+
 Contributors:
 Omar X. Avelar
 Juan C. Razo
