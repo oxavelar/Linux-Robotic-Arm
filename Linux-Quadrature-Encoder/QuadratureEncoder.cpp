@@ -88,6 +88,7 @@ void QuadratureEncoder::ISR_ChannelA(void)
 {
     GPIO_DataProcess();
 #ifdef DEBUG
+     std::cout << "I: Handler " << __PRETTY_FUNCTION__ << " executed" << std::endl;
     _channel_a_isr_count++;
 #endif
 }
@@ -97,6 +98,7 @@ void QuadratureEncoder::ISR_ChannelB(void)
 {
     GPIO_DataProcess();
 #ifdef DEBUG
+     std::cout << "I: Handler " << __PRETTY_FUNCTION__ << " executed" << std::endl;
     _channel_b_isr_count++;
 #endif
 }
