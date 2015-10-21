@@ -18,7 +18,7 @@ Testing has shown and we would recomend tweak the following parameters in the Li
 ```
 kernel.sched_latency_ns = 10000
 kernel.sched_min_granularity_ns = 20000
-kernel.sched_wakeup_granularity_ns = 3000000
+kernel.sched_wakeup_granularity_ns = 750000
 ```
 
 I have tested the above parameters in an Intel Edison and an Intel Galileo board.
