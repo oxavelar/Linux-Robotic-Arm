@@ -28,6 +28,8 @@
 *.app
 
 # External dependencies
+HighLatencyGPIO
+HighLatencyPWM
 HighLatencyGPIO/*
 HighLatencyPWM/*
 
