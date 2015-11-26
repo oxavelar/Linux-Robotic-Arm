@@ -229,9 +229,11 @@ void RoboticArm::CalibrateMovement(void)
         logger << "I: Joint ID " << id << " applying range compression to remap  0% to 100% values" << std::endl;
         
         joint->Movement->ApplyRangeLimits(min_speed, min_speed + 20);
- 
+
+#if DEBUG
         /* oxavelar: remove me after 2nd rotor is here */
         break;
+#endif
        
     }
 }
