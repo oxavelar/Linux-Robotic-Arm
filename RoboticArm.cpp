@@ -230,10 +230,8 @@ void RoboticArm::CalibrateMovement(void)
         
         joint->Movement->ApplyRangeLimits(min_speed, min_speed + 20);
 
-#if DEBUG
         /* oxavelar: remove me after 2nd rotor is here */
         break;
-#endif
        
     }
 }
