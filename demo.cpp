@@ -27,16 +27,13 @@ void _cleanup(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
 
-   /* Delete all of the robotic-arm objects */
-    delete RoboArm;
-
     /* Finishes up gracefully the curses screen */
-    sleep(5);
     endwin();
-
-    logger << "I: Press any key to exit...\n" << std::endl;
-    system("read -r REPLY");
-
+    system("reset");
+    
+    /* Delete all of the robotic-arm objects */
+    delete RoboArm;
+    
     exit(signum);
 }
 
