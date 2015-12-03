@@ -80,8 +80,8 @@ double Motor::GetSpeed(void)
 {
     /* Reverse translates the PWM duty cycle to speed % */
     double speed;
-    speed = (double)_pwm_active->getDuty() / (_maximum_duty - _minimum_duty);
-    speed = speed  * double(100) / _range_compression_factor;
+    speed = _pwm_active->getDuty() - _minimum_duty;
+    speed = speed / _range_compression_factor / _pwm_active->getPeriod();
     return(speed);
 }
 
@@ -92,7 +92,7 @@ void Motor::SetSpeed(const double &percent)
     double val = (_maximum_duty - _minimum_duty) * percent / (double)100;
     
     /* Saturate our value range to fit our conditions */
-    val = std::min(std::max(val, _minimum_duty), _maximum_duty);
+    val = std::min(val + _minimum_duty, _maximum_duty);
     
     /* Value is now protected from 0 to 100 ranges at most */
     _pwm_active->setDuty(val);
