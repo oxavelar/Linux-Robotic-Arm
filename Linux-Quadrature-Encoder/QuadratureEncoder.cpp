@@ -61,7 +61,7 @@ double QuadratureEncoder::GetAngle(void)
 {
     double degrees;
     degrees = 360 * _counter / (double)_segments_per_revolution;
-    degrees = std::fmod(degrees, 360);
+    //degrees = std::fmod(degrees, 360);
     return degrees;
 }
 

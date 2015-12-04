@@ -120,7 +120,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 80;
+        const auto k = 200;
         const auto actual_angle = Position->GetAngle();
         const auto error_angle = actual_angle - _reference_angle;
         
@@ -226,7 +226,7 @@ void RoboticArm::CalibrateMovement(void)
         } while(difference >= epsilon);
         
         logger << "I: Joint ID " << id << " min speed found for movement is ~" << min_speed << "%" << std::endl;
-        logger << "I: Joint ID " << id << " applying range compression to remap  0% to 100% values" << std::endl;
+        logger << "I: Joint ID " << id << " set speed remap for 0% to 100% values" << std::endl;
         
         /* Now we can have a range from minimum speed to full */
         joint->Movement->ApplyRangeLimits(min_speed, 100);
@@ -252,13 +252,13 @@ void RoboticArm::CalibratePosition(void)
          * in order to see if the values difference is less than it
          */
         joint->Movement->SetDirection(Motor::Direction::CW);
-        joint->Movement->SetSpeed(30);
+        joint->Movement->SetSpeed(100);
         joint->Movement->Start();
         do {
             
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            usleep(1E5);
+            usleep(0.5E6);
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
@@ -351,7 +351,7 @@ void RoboticArm::ForwardKinematics(Point &pos, const std::vector<double> &theta)
 
     /* Only update the target position if a solution in the 3D space was found */
     if (std::isnan(tpos.x) or std::isnan(tpos.y) or std::isnan(tpos.z)) {
-        logger << "E: Desired target position is not achievable by this robot" << std::endl;
+        logger << "E: Actual position should not be achievable by this robot" << std::endl;
     } else {
         pos = tpos;
     }
@@ -362,6 +362,9 @@ void RoboticArm::InverseKinematics(const Point &pos, std::vector<double> &theta)
 {
     /* Length of the links in meters, read only */
     const auto *L = &config::link_lengths[0];
+
+    /* Backup our angles */
+    const std::vector<double> theta_backup = theta;
 
     switch(theta.size())
     {
@@ -378,6 +381,15 @@ void RoboticArm::InverseKinematics(const Point &pos, std::vector<double> &theta)
             logger << "E: Unable to calculate for more than 2 joints for now..." << std::endl;
             exit(-127);
             break;
+    }
+
+    /* Verify that each solved angle is a valid number before setting things up, abort and log */
+    for(auto id = 0; id < _joints_nr; id++) {
+        if(std::isnan(theta[id])) {
+            logger << "E: Desired target position is not achievable by this robot" << std::endl;
+            theta = theta_backup;
+            break;
+        }
     }
 }
 

@@ -82,8 +82,8 @@ double Motor::GetSpeed(void)
     double speed;
     
     speed = _pwm_active->getDuty() - _minimum_duty;
-    speed = (double)speed / (double)_range_compression_factor;
-    speed = 100 * (double)speed / (double)_pwm_active->getPeriod();
+    speed = speed / (double)_range_compression_factor;
+    speed = 100 * speed / (double)_maximum_duty;
     
     return(speed);
 }
