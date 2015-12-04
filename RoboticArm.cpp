@@ -120,7 +120,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 12;
+        const auto k = 80;
         const auto actual_angle = Position->GetAngle();
         const auto error_angle = actual_angle - _reference_angle;
         
@@ -228,6 +228,7 @@ void RoboticArm::CalibrateMovement(void)
         logger << "I: Joint ID " << id << " min speed found for movement is ~" << min_speed << "%" << std::endl;
         logger << "I: Joint ID " << id << " applying range compression to remap  0% to 100% values" << std::endl;
         
+        /* Now we can have a range from minimum speed to full */
         joint->Movement->ApplyRangeLimits(min_speed, 100);
 
         /* oxavelar: remove me after 2nd rotor is here */

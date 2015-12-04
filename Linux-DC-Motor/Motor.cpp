@@ -80,8 +80,11 @@ double Motor::GetSpeed(void)
 {
     /* Reverse translates the PWM duty cycle to speed % */
     double speed;
+    
     speed = _pwm_active->getDuty() - _minimum_duty;
-    speed = speed / _range_compression_factor / _pwm_active->getPeriod();
+    speed = (double)speed / (double)_range_compression_factor;
+    speed = 100 * (double)speed / (double)_pwm_active->getPeriod();
+    
     return(speed);
 }
 
