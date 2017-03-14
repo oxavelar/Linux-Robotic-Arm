@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sched.h>
+#include <boost/timer/timer.hpp>
 #include "toolbox.h"
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
@@ -17,7 +18,7 @@ void SetProcessPriority(const int &number)
     /* Higher priority for interrupt procesisng */
     /* https://rt.wiki.kernel.org/index.php/HOWTO:_Build_an_RT-application */
     struct sched_param sp = { .sched_priority = number };
-    if( sched_setscheduler(0, SCHED_FIFO, &sp) != 0 ) {
+    if( sched_setscheduler(0, SCHED_RR, &sp) != 0 ) {
         logger << "W: Failed to increase process priority!\n" << std::endl;
     }
 }
@@ -71,6 +72,39 @@ void WaitKeyPress(Point &coordinates)
     }
 }
 
+void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
+{
+    /* Target vs Measured coordinate variables */
+    Point t_coordinates, m_coordinates;
+
+    logger << "I: Entering diagnostics mode, used for testing and checking latency" << std::endl << std::endl;
+
+    for(auto s = 0; s < max_samples; s++) {
+
+        /* Calculation for two random x,y parameters, this is hardcoded at the moment */
+        t_coordinates.x += (rand() - 0.5) * (33 * config::link_lengths[0] / 100);
+        t_coordinates.y += (rand() - 0.5) * (33 * config::link_lengths[0] / 100);
+        t_coordinates.z += (rand() - 0.5) * ( 0 * config::link_lengths[0] / 100);
+
+        /* Profiling with boost libraries to get cpu time and wall time */
+        boost::timer::auto_cpu_timer *t = new boost::timer::auto_cpu_timer();
+
+        /* Command the robot to a new position once that coordinates was updated */
+        RoboArm->SetPosition(coordinates);
+
+        /* Keep here until the robot reaches it's destination */
+        do {
+            RoboArm->GetPosition(coordinates);
+        } while((t_coordinates.x != m_coordinates.x) &&
+                (t_coordinates.y != m_coordinates.y) &&
+                (t_coordinates.z != m_coordinates.z));
+       
+        delete t; 
+    }
+
+    logger << "I: Finished running diagnostics mode" << std::endl << std::endl;
+}
+
 
 int main(void)
 {
@@ -90,12 +124,18 @@ int main(void)
 
     RoboArm->Init();
 
+#ifdef DIAGNOSTICS_MODE
+    /* Perform N samples of measurements and print statistics */
+    RunDiagnostics(RoboArm, 10);
+    exit(-1);
+#endif
+
     logger << "I: Press the arrow keys to control the robotic arm!" << std::endl << std::endl;
 
     for(;;) {
 
         /* Used for single line message */
-        char buffer[80];        
+        char buffer[80];
         
         /* First obtain the actual coordinates of the robot, to move it at will */
         RoboArm->GetPosition(coordinates);
