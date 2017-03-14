@@ -136,6 +136,10 @@ int main(void)
 
         /* Used for single line message */
         char buffer[80];
+
+        /* Not used right now, but can be used for analytics */
+        auto load = toolbox::get_cpu_load();
+        logger << "I: CPU Utilization - " << load << std::endl;
         
         /* First obtain the actual coordinates of the robot, to move it at will */
         RoboArm->GetPosition(coordinates);

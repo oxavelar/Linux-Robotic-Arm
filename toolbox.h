@@ -5,12 +5,31 @@
 #include <string>
 #include <streambuf>
 #include <ncurses.h>
+#include <fcntl.h>
 
 #define appname "Robotic-Arm"
 #define logger std::cout << "[" << toolbox::timestamp().c_str() << "] " appname ": "
 
 namespace toolbox
 {
+    inline double get_cpu_load(void)
+    {
+       int file_handler;
+       char file_buffer[512];
+       double load;
+       
+       file_handler = open("/proc/loadavg", O_RDONLY);
+       if(file_handler > 0) {
+           read(file_handler, file_buffer, sizeof(file_buffer) - 1);
+           sscanf(file_buffer, "%lf", &load);
+           close(file_handler);
+           load = 100.0 * load;
+       } else {
+           load = -EINVAL;
+       }
+       return load;
+    }
+
     inline const std::string timestamp(void)
     {
         time_t now = time(0);
