@@ -12,7 +12,7 @@
 RoboticArm *RoboArm;
 Point coordinates;
 
-
+#ifdef RT_PRIORITY
 void SetProcessPriority(const int &number)
 {
     /* Higher priority for interrupt procesisng */
@@ -22,7 +22,7 @@ void SetProcessPriority(const int &number)
         logger << "W: Failed to increase process priority!\n" << std::endl;
     }
 }
-
+#endif
 
 void _cleanup(int signum)
 {
@@ -72,6 +72,7 @@ void WaitKeyPress(Point &coordinates)
     }
 }
 
+#ifdef DIAGNOSTICS_MODE
 void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 {
     /* Target vs Measured coordinate variables */
@@ -104,7 +105,13 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 
     logger << "I: Finished running diagnostics mode" << std::endl << std::endl;
 }
+#endif
 
+void SPrintCoordinates(const Point &coordinates, char *buffer)
+{
+    sprintf(buffer, " x= %+3.4f | y= %+3.4f | z= %+3.4f", 
+            coordinates.x, coordinates.y, coordinates.z);
+}
 
 int main(void)
 {
@@ -126,8 +133,7 @@ int main(void)
 
 #ifdef DIAGNOSTICS_MODE
     /* Perform N samples of measurements and print statistics */
-    RunDiagnostics(RoboArm, 10);
-    exit(-1);
+    RunDiagnostics(RoboArm, 100);
 #endif
 
     logger << "I: Press the arrow keys to control the robotic arm!" << std::endl << std::endl;
@@ -150,13 +156,13 @@ int main(void)
         /* Command the robot to a new position once that coordinates was updated */
         RoboArm->SetPosition(coordinates);
         
-        sprintf(buffer, " x= %+3.4f | y= %+3.4f | z= %+3.4f", coordinates.x, coordinates.y, coordinates.z);
+	SPrintCoordinates(coordinates, buffer);
         logger << "I: Computed - " << buffer << std::endl;
 
         /* Updated coordinates and print it out */
         RoboArm->GetPosition(coordinates);
 
-        sprintf(buffer, " x= %+3.4f | y= %+3.4f | z= %+3.4f", coordinates.x, coordinates.y, coordinates.z);
+	SPrintCoordinates(coordinates, buffer);
         logger << "I: Measured - " << buffer << std::endl;
         
     }
