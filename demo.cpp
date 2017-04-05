@@ -91,7 +91,7 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
         boost::timer::auto_cpu_timer *t = new boost::timer::auto_cpu_timer();
 
         /* Command the robot to a new position once that coordinates was updated */
-        RoboArm->SetPosition(coordinates);
+        RoboArm->SetPosition(t_coordinates);
 
         /* Keep here until the robot reaches it's destination */
         do {
