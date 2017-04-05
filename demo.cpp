@@ -28,9 +28,11 @@ void _cleanup(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
 
+#ifdef NCURSES_SUPPORT
     /* Finishes up gracefully the curses screen */
     endwin();
     system("reset");
+#endif
     
     /* Delete all of the robotic-arm objects */
     delete RoboArm;
@@ -38,7 +40,7 @@ void _cleanup(int signum)
     exit(signum);
 }
 
-
+#ifdef NCURSES_SUPPORT
 void InitializeScreen(void)
 {
     initscr();
@@ -46,7 +48,6 @@ void InitializeScreen(void)
     keypad(stdscr, TRUE);
     refresh();
 }
-
 
 void WaitKeyPress(Point &coordinates)
 {
@@ -71,6 +72,7 @@ void WaitKeyPress(Point &coordinates)
             break;
     }
 }
+#endif
 
 #ifdef DIAGNOSTICS
 void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
@@ -115,9 +117,11 @@ void SPrintCoordinates(const Point &coordinates, char *buffer)
 
 int main(void)
 {
+#ifdef NCURSES_SUPPORT
     InitializeScreen();
     /* Redirect all of std::cout to a curses complaint window */
     toolbox::ncurses_stream redirector_cout(std::cout);
+#endif
     
 #ifdef RT_PRIORITY
     SetProcessPriority(RT_PRIORITY);
@@ -144,14 +148,18 @@ int main(void)
         char buffer[80];
 
         /* Not used right now, but can be used for analytics */
+        /* NOTE: This is buggy right now */
+/*
         auto load = toolbox::get_cpu_load();
         logger << "I: CPU Utilization - " << load << std::endl;
-        
+*/
         /* First obtain the actual coordinates of the robot, to move it at will */
         RoboArm->GetPosition(coordinates);
 
+#ifdef NCURSES_SUPPORT
         /* Arrows will increase position by 1% increments in a x,y plane, uses curses library */
         WaitKeyPress(coordinates);
+#endif
 
         /* Command the robot to a new position once that coordinates was updated */
         RoboArm->SetPosition(coordinates);
