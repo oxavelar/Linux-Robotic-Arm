@@ -79,6 +79,10 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 {
     /* Target vs Measured coordinate variables */
     Point t_coordinates, m_coordinates;
+    /* Clear target in case of compiler optimization is enabled */
+    t_coordinates.x = 0;
+    t_coordinates.y = 0;
+    t_coordinates.z = 0;
 
     logger << "I: Entering diagnostics mode, used for testing and checking latency" << std::endl << std::endl;
 
