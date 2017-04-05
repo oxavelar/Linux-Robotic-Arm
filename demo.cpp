@@ -72,7 +72,7 @@ void WaitKeyPress(Point &coordinates)
     }
 }
 
-#ifdef DIAGNOSTICS_MODE
+#ifdef DIAGNOSTICS
 void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 {
     /* Target vs Measured coordinate variables */
@@ -131,7 +131,7 @@ int main(void)
 
     RoboArm->Init();
 
-#ifdef DIAGNOSTICS_MODE
+#ifdef DIAGNOSTICS
     /* Perform N samples of measurements and print statistics */
     RunDiagnostics(RoboArm, 100);
 #endif
