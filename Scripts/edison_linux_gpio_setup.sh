@@ -38,6 +38,12 @@ echo override-enable > /sys/kernel/debug/gpio_debug/gpio13/current_override_outd
 echo 253 > /sys/class/gpio/unexport
 echo 221 > /sys/class/gpio/unexport
 
+echo "I: PWM1 Noise workaround"
+echo 1 > /sys/class/pwm/pwmchip0/export
+echo 1 > /sys/class/pwm/pwmchip0/pwm1/enable
+echo 0 > /sys/class/pwm/pwmchip0/pwm1/enable
+echo 1 > /sys/class/pwm/pwmchip0/unexport
+
 echo "I: Enabling PWM2 on IO6"
 echo 254 > /sys/class/gpio/export
 echo 222 > /sys/class/gpio/export
