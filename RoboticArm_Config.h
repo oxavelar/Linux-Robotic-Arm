@@ -14,9 +14,9 @@
  *   |   gpio41  |    IO10 |       QE Channel A #2 |   White |
  *   |   gpio43  |    IO11 |       QE Channel B #2 |  Yellow |
  *   |     pwm0  |     IO3 |   Motor DC Ctrl CW #1 |     Red |
- *   |     pwm2  |     IO6 |  Motor DC Ctrl CCW #1 |    Blue |
- *   |     pwm3  |     IO9 |   Motor DC Ctrl CW #2 |     Red |
- *   |     pwm1  |     IO5 |  Motor DC Ctrl CCW #2 |    Blue |
+ *   |     pwm1  |     IO5 |  Motor DC Ctrl CCW #1 |    Blue |
+ *   |     pwm2  |     IO6 |   Motor DC Ctrl CW #2 |     Red |
+ *   |     pwm3  |     IO9 |  Motor DC Ctrl CCW #2 |    Blue |
  *   |   video0  | USB HST |         USB HD WebCam |         |
  *   +===========+=========+====================== +=========+
  *
@@ -48,7 +48,7 @@ namespace config
 
     /* Pair of pins used for these elements */
     static constexpr int quad_encoder_pins[][2]  = {{ 49,  48}, { 41,  43}};
-    static constexpr int dc_motor_pins[][2]      = {{  0,   2}, {  3,   1}};
+    static constexpr int dc_motor_pins[][2]      = {{  0,   1}, {  2,   3}};
     
     /* All of the joints will utilize the same webcam port in this case */
     static constexpr int visual_encoder_ports[] = {0, 0};
