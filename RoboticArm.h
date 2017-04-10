@@ -4,11 +4,21 @@
 #include "Linux-Quadrature-Encoder/QuadratureEncoder.h"
 #include "Linux-Visual-Encoder/VisualEncoder.h"
 
+#define epsilon 10E-9
+
 
 class Point
 {
     public:
         double x, y, z;
+        bool operator==(const Point &p) {
+            bool eq = false;
+            eq |= (std::abs(p.x - x) < epsilon);
+            eq |= (std::abs(p.y - y) < epsilon);
+            eq |= (std::abs(p.z - z) < epsilon);
+          return eq;
+        };
+        bool operator!=(const Point &p) { return !operator==(p); };
 };
 
 

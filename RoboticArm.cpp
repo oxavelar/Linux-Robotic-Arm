@@ -31,7 +31,6 @@
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
 
-#define epsilon 10E-9
 
 
 RoboticJoint::RoboticJoint(const int &id) :
@@ -203,7 +202,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
-        } while(difference <= epsilon);
+        } while(difference < epsilon);
         
         
         /* Fine tuning, go back by 10% of deltas to where we stop moving in steady state */

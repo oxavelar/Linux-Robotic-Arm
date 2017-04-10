@@ -79,19 +79,20 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 {
     /* Target vs Measured coordinate variables */
     Point t_coordinates, m_coordinates;
-    /* Clear target in case of compiler optimization is enabled */
-    t_coordinates.x = 0;
-    t_coordinates.y = 0;
-    t_coordinates.z = 0;
 
     logger << "I: Entering diagnostics mode, used for testing and checking latency" << std::endl << std::endl;
+
+    /* Initializing the rng seed */
+    std::srand(std::time(0));
 
     for(auto s = 0; s < max_samples; s++) {
 
         /* Calculation for two random x,y parameters, this is hardcoded at the moment */
-        t_coordinates.x += (rand() - 0.5) * (33 * config::link_lengths[0] / 100);
-        t_coordinates.y += (rand() - 0.5) * (33 * config::link_lengths[0] / 100);
-        t_coordinates.z += (rand() - 0.5) * ( 0 * config::link_lengths[0] / 100);
+        t_coordinates.x = static_cast <float> (std::rand())
+                          / (static_cast <float> (RAND_MAX/config::link_lengths[0]));
+        t_coordinates.y = static_cast <float> (rand())
+                          / (static_cast <float> (RAND_MAX/config::link_lengths[0]));
+        t_coordinates.z = 0;
 
         /* Profiling with boost libraries to get cpu time and wall time */
         boost::timer::auto_cpu_timer *t = new boost::timer::auto_cpu_timer();
@@ -101,10 +102,8 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 
         /* Keep here until the robot reaches it's destination */
         do {
-            RoboArm->GetPosition(coordinates);
-        } while((t_coordinates.x != m_coordinates.x) &&
-                (t_coordinates.y != m_coordinates.y) &&
-                (t_coordinates.z != m_coordinates.z));
+            RoboArm->GetPosition(m_coordinates);
+        } while(t_coordinates != m_coordinates);
        
         delete t; 
     }
