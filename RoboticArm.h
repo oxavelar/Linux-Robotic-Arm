@@ -12,11 +12,9 @@ class Point
     public:
         double x, y, z;
         bool operator==(const Point &p) {
-            bool eq = false;
-            eq |= (std::abs(p.x - x) < epsilon);
-            eq |= (std::abs(p.y - y) < epsilon);
-            eq |= (std::abs(p.z - z) < epsilon);
-          return eq;
+            return ((std::abs(p.x - x) < epsilon) &&
+                    (std::abs(p.y - y) < epsilon) &&
+                    (std::abs(p.z - z) < epsilon));
         };
         bool operator!=(const Point &p) { return !operator==(p); };
 };
