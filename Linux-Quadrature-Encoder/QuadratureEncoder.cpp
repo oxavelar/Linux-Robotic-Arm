@@ -24,6 +24,13 @@ QuadratureEncoder::QuadratureEncoder(const int &pin_a, const int &pin_b, const i
     else if (_encoder_rate == 4)    interrupt_mode = GPIO::Edge::BOTH;
     else    throw std::runtime_error("Invalid encoder rate selected, only 2x or 4x supported");
 
+#if DEBUG
+    /* Zero out our debug counters in case of optimizations */
+     _channel_a_isr_count = 0;
+     _channel_b_isr_count = 0;
+     _gpio_processing_error_count = 0;
+#endif
+
     /* Register our local GPIO callbacks to use for SW interrupts */
     _channel_a_callback = std::bind(&QuadratureEncoder::ISR_ChannelA, this);
     _channel_b_callback = std::bind(&QuadratureEncoder::ISR_ChannelB, this);
