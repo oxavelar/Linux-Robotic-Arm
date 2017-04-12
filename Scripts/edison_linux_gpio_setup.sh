@@ -69,12 +69,16 @@ echo 225 > /sys/class/gpio/unexport
 echo "I: Enabling GPIO48 on IO7"
 echo mode0 > /sys/kernel/debug/gpio_debug/gpio48/current_pinmux
 echo nopull > /sys/kernel/debug/gpio_debug/gpio48/current_pullmode
+echo 20k > /sys/kernel/debug/gpio_debug/gpio48/current_pullstrength
+echo pulldown > /sys/kernel/debug/gpio_debug/gpio48/current_pullmode
 echo override-enable > /sys/kernel/debug/gpio_debug/gpio48/current_override_indir
 echo no-override > /sys/kernel/debug/gpio_debug/gpio48/current_override_outdir
 
 echo "I: Enabling GPIO49 on IO8"
 echo mode0 > /sys/kernel/debug/gpio_debug/gpio49/current_pinmux
 echo nopull > /sys/kernel/debug/gpio_debug/gpio49/current_pullmode
+echo 20k > /sys/kernel/debug/gpio_debug/gpio49/current_pullstrength
+echo pulldown > /sys/kernel/debug/gpio_debug/gpio49/current_pullmode
 echo override-enable > /sys/kernel/debug/gpio_debug/gpio49/current_override_indir
 echo no-override > /sys/kernel/debug/gpio_debug/gpio49/current_override_outdir
 
@@ -88,6 +92,8 @@ echo high > /sys/class/gpio/gpio263/direction
 echo low > /sys/class/gpio/gpio240/direction
 echo mode0 > /sys/kernel/debug/gpio_debug/gpio41/current_pinmux
 echo nopull > /sys/kernel/debug/gpio_debug/gpio41/current_pullmode
+echo 20k > /sys/kernel/debug/gpio_debug/gpio41/current_pullstrength
+echo pulldown > /sys/kernel/debug/gpio_debug/gpio41/current_pullmode
 echo override-enable > /sys/kernel/debug/gpio_debug/gpio41/current_override_indir
 echo no-override > /sys/kernel/debug/gpio_debug/gpio41/current_override_outdir
 echo low > /sys/class/gpio/gpio258/direction
@@ -106,6 +112,8 @@ echo high > /sys/class/gpio/gpio262/direction
 echo low > /sys/class/gpio/gpio241/direction
 echo mode0 > /sys/kernel/debug/gpio_debug/gpio43/current_pinmux
 echo nopull > /sys/kernel/debug/gpio_debug/gpio43/current_pullmode
+echo 20k > /sys/kernel/debug/gpio_debug/gpio43/current_pullstrength
+echo pulldown > /sys/kernel/debug/gpio_debug/gpio43/current_pullmode
 echo override-enable > /sys/kernel/debug/gpio_debug/gpio43/current_override_indir
 echo no-override > /sys/kernel/debug/gpio_debug/gpio43/current_override_outdir
 echo low > /sys/class/gpio/gpio259/direction
