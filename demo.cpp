@@ -170,7 +170,8 @@ int main(void)
 	SPrintCoordinates(coordinates, buffer);
         logger << "I: Computed - " << buffer << std::endl;
 #else
-        system("read");
+        /* Press [ENTER] to continue... */
+        cin.ignore();
 #endif
 
         /* Updated coordinates and print it out */
