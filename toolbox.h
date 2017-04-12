@@ -59,6 +59,7 @@ namespace toolbox
             src(o), srcbuf(o.rdbuf()), std::ostream(&tbuf)
             {
                 o.rdbuf(rdbuf());
+                o.flush();
             }
 
             ~ncurses_stream() {

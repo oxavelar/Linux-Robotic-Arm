@@ -119,7 +119,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 200;
+        const auto k = 20;
         const auto actual_angle = Position->GetAngle();
         const auto error_angle = actual_angle - _reference_angle;
         
@@ -229,10 +229,7 @@ void RoboticArm::CalibrateMovement(void)
         
         /* Now we can have a range from minimum speed to full */
         joint->Movement->ApplyRangeLimits(min_speed, 100);
-
-        /* oxavelar: remove me after 2nd rotor is here */
-        break;
-       
+        
     }
 }
 

@@ -80,7 +80,7 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
     /* Target vs Measured coordinate variables */
     Point t_coordinates, m_coordinates;
 
-    logger << "I: Entering diagnostics mode, used for testing and checking latency" << std::endl << std::endl;
+    logger << "I: Entering diagnostics mode for measuring latency" << std::endl;
 
     /* Initializing the rng seed */
     std::srand(std::time(0));
@@ -88,10 +88,8 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
     for(auto s = 0; s < max_samples; s++) {
 
         /* Calculation for two random x,y parameters, this is hardcoded at the moment */
-        t_coordinates.x = static_cast <float> (std::rand())
-                          / (static_cast <float> (RAND_MAX/config::link_lengths[0]));
-        t_coordinates.y = static_cast <float> (rand())
-                          / (static_cast <float> (RAND_MAX/config::link_lengths[0]));
+        t_coordinates.x = 0;
+        t_coordinates.y = config::link_lengths[0] + config::link_lengths[1];
         t_coordinates.z = 0;
 
         /* Profiling with boost libraries to get cpu time and wall time */
@@ -104,7 +102,8 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
         do {
             RoboArm->GetPosition(m_coordinates);
         } while(t_coordinates != m_coordinates);
-       
+        
+        /* Measurements get printed after this */
         delete t; 
     }
 
