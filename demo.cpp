@@ -171,7 +171,7 @@ int main(void)
         logger << "I: Computed - " << buffer << std::endl;
 #else
         /* Press [ENTER] to continue... */
-        cin.ignore();
+        std::cin.ignore();
 #endif
 
         /* Updated coordinates and print it out */
