@@ -3,6 +3,10 @@
  * interrupts in order to have a working infrastructure
  * for quadrature encoders.
  *
+ * Note: In order to have a cleaner signal tt is better
+ * to go and configurue the GPIO pins to have either 10k
+ * or 20k pulldowns for less noise at the input.
+ *
  * References:
  * https://github.com/tweej/HighLatencyGPIO
  *
