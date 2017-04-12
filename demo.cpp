@@ -154,7 +154,7 @@ int main(void)
 
         auto load = toolbox::get_cpu_load();
         logger << "I: CPU Utilization - " << std::fixed << std::setw(11) << std::setprecision(6)
-                                          << std::setfill('0') << load << std::endl;
+                                          << load << std::endl;
 
         /* First obtain the actual coordinates of the robot, to move it at will */
         RoboArm->GetPosition(coordinates);
