@@ -79,9 +79,12 @@ void WaitKeyPress(Point &coordinates)
 void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 {
     /* Target vs Measured coordinate variables */
-    Point t_coordinates, m_coordinates;
+    Point t_coordinates, m_coordinates, h_coordinates;
 
     logger << "I: Entering diagnostics mode for measuring latency" << std::endl;
+
+    /* Saving our home position */
+    RoboArm->GetPosition(h_coordinates);
 
     /* Initializing the rng seed */
     std::srand(std::time(0));
@@ -89,8 +92,10 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
     for(auto s = 0; s < max_samples; s++) {
 
         /* Calculation for two random x,y parameters, this is hardcoded at the moment */
-        t_coordinates.x = 0;
-        t_coordinates.y = config::link_lengths[0] + config::link_lengths[1];
+        t_coordinates.x = static_cast <float> (rand()) 
+                          / (static_cast <float> (RAND_MAX/config::link_lengths[0]));
+        t_coordinates.y = static_cast <float> (rand()) 
+                          / (static_cast <float> (RAND_MAX/config::link_lengths[1]));
         t_coordinates.z = 0;
 
         /* Profiling with boost libraries to get cpu time and wall time */
@@ -107,6 +112,9 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
         /* Measurements get printed after this */
         delete t; 
     }
+
+    /* Restoring the robot to the home position */
+    RoboArm->SetPosition(h_coordinates);
 
     logger << "I: Finished running diagnostics mode" << std::endl << std::endl;
 }
