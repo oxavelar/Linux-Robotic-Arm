@@ -151,23 +151,26 @@ int main(void)
 
         /* Not used right now, but can be used for analytics */
         /* NOTE: This is buggy right now */
-/*
+
         auto load = toolbox::get_cpu_load();
-        logger << "I: CPU Utilization - " << load << std::endl;
-*/
+        logger << "I: CPU Utilization - " << std::fixed << std::setw(11) << std::setprecision(6)
+                                          << std::setfill('0') << load << std::endl;
+
         /* First obtain the actual coordinates of the robot, to move it at will */
         RoboArm->GetPosition(coordinates);
 
 #ifdef NCURSES_SUPPORT
         /* Arrows will increase position by 1% increments in a x,y plane, uses curses library */
         WaitKeyPress(coordinates);
-#endif
 
         /* Command the robot to a new position once that coordinates was updated */
         RoboArm->SetPosition(coordinates);
         
 	SPrintCoordinates(coordinates, buffer);
         logger << "I: Computed - " << buffer << std::endl;
+#else
+        system("read");
+#endif
 
         /* Updated coordinates and print it out */
         RoboArm->GetPosition(coordinates);
