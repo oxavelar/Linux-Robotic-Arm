@@ -4,7 +4,7 @@
 #include "Linux-Quadrature-Encoder/QuadratureEncoder.h"
 #include "Linux-Visual-Encoder/VisualEncoder.h"
 
-#define epsilon 10E-9
+#define epsilon (double)10E-9
 
 
 class Point
@@ -16,7 +16,7 @@ class Point
                     (std::abs(p.y - y) < epsilon) &&
                     (std::abs(p.z - z) < epsilon));
         };
-        bool operator!=(const Point &p) { return !operator==(p); };
+        bool operator!=(const Point &p) { return !(*this == p); };
 };
 
 
