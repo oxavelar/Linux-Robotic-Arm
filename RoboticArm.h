@@ -5,16 +5,17 @@
 #include "Linux-Visual-Encoder/VisualEncoder.h"
 
 #define epsilon (double)10E-9
-
+#define tolerance_percent 1
+#define round_tolerance(x) (std::round(x * (x * tolerance_percent / 100)) / (x * tolerance_percent / 100))
 
 class Point
 {
     public:
         double x, y, z;
         bool operator==(const Point &p) {
-            return ((std::abs(p.x - x) < epsilon) &&
-                    (std::abs(p.y - y) < epsilon) &&
-                    (std::abs(p.z - z) < epsilon));
+            return ((std::abs(round_tolerance(p.x) - round_tolerance(x)) < epsilon) &&
+                    (std::abs(round_tolerance(p.y) - round_tolerance(y)) < epsilon) &&
+                    (std::abs(round_tolerance(p.z) - round_tolerance(z)) < epsilon));
         };
         bool operator!=(const Point &p) { return !(*this == p); };
 };
