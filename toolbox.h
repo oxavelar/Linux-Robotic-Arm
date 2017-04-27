@@ -5,6 +5,7 @@
 #include <string>
 #include <streambuf>
 #include <ncurses.h>
+#include <unistd.h>
 #include <fcntl.h>
 
 #define appname "Robotic-Arm"

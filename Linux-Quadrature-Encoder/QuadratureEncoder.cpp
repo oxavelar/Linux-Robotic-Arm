@@ -132,7 +132,7 @@ inline void QuadratureEncoder::GPIO_DataProcess(void)
     if (delta == 'x') {
 #ifdef DEBUG
         _gpio_processing_error_count++;
-        std::cout << "W: Execution might be too slow, reading wrong values from the encoder" << std::endl;
+        //std::cout << "W: Execution might be too slow, reading wrong values from the encoder" << std::endl;
 #endif
         delta = 0;
     }

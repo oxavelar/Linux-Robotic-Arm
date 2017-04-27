@@ -75,6 +75,12 @@ void WaitKeyPress(Point &coordinates)
 }
 #endif
 
+void SPrintCoordinates(const Point &coordinates, char *buffer)
+{
+    sprintf(buffer, " x= %+3.4f | y= %+3.4f | z= %+3.4f", 
+            coordinates.x, coordinates.y, coordinates.z);
+}
+
 #ifdef DIAGNOSTICS
 void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 {
@@ -91,13 +97,22 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 
     for(auto s = 0; s < max_samples; s++) {
 
-        /* Calculation for two random x,y parameters, this is hardcoded at the moment */
-        t_coordinates.x = static_cast <float> (rand()) 
-                          / (static_cast <float> (RAND_MAX/config::link_lengths[0]));
-        t_coordinates.y = static_cast <float> (rand()) 
-                          / (static_cast <float> (RAND_MAX/config::link_lengths[1]));
-        t_coordinates.z = 0;
+#ifdef DIAGNOSTICS_VERBOSE
+        char buffer[80];
+#endif
 
+        /* Fill our N joints angles with random data */
+        std::vector<double> theta_random;
+
+        for(auto id = 0; id < config::joints_nr; id++) {
+            /* WIll be limitting the max angle from 0 to 30 for better performance analysis */
+            int random_angle = std::rand() % 30;
+            theta_random.push_back(random_angle);
+        }
+
+        /* Use Our Robot's FK to obtain a valid "random" position */
+        RoboArm->ForwardKinematics(t_coordinates, theta_random);
+ 
         /* Profiling with boost libraries to get cpu time and wall time */
         boost::timer::auto_cpu_timer *t = new boost::timer::auto_cpu_timer();
 
@@ -107,6 +122,13 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
         /* Keep here until the robot reaches it's destination */
         do {
             RoboArm->GetPosition(m_coordinates);
+#ifdef DIAGNOSTICS_VERBOSE
+            SPrintCoordinates(t_coordinates, buffer);
+            logger << "I: Computed - " << buffer << std::endl;
+
+            SPrintCoordinates(m_coordinates, buffer);
+            logger << "I: Measured - " << buffer << std::endl;
+#endif
         } while(t_coordinates != m_coordinates);
         
         /* Measurements get printed after this */
@@ -119,12 +141,6 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
     logger << "I: Finished running diagnostics mode" << std::endl << std::endl;
 }
 #endif
-
-void SPrintCoordinates(const Point &coordinates, char *buffer)
-{
-    sprintf(buffer, " x= %+3.4f | y= %+3.4f | z= %+3.4f", 
-            coordinates.x, coordinates.y, coordinates.z);
-}
 
 int main(void)
 {
@@ -160,11 +176,11 @@ int main(void)
 
         /* Not used right now, but can be used for analytics */
         /* NOTE: This is buggy right now */
-
+/*
         auto load = toolbox::get_cpu_load();
         logger << "I: CPU Utilization - " << std::fixed << std::setw(11) << std::setprecision(6)
                                           << load << std::endl;
-
+*/
         /* First obtain the actual coordinates of the robot, to move it at will */
         RoboArm->GetPosition(coordinates);
 
@@ -175,7 +191,7 @@ int main(void)
         /* Command the robot to a new position once that coordinates was updated */
         RoboArm->SetPosition(coordinates);
         
-	SPrintCoordinates(coordinates, buffer);
+    SPrintCoordinates(coordinates, buffer);
         logger << "I: Computed - " << buffer << std::endl;
 #else
         /* Press [ENTER] to continue... */
@@ -185,7 +201,7 @@ int main(void)
         /* Updated coordinates and print it out */
         RoboArm->GetPosition(coordinates);
 
-	SPrintCoordinates(coordinates, buffer);
+        SPrintCoordinates(coordinates, buffer);
         logger << "I: Measured - " << buffer << std::endl;
         
     }

@@ -25,8 +25,8 @@
 #include <sstream>
 #include <cmath>
 #include <atomic>
-#include <stdlib.h>
-#include <unistd.h>
+#include <chrono>
+#include <thread>
 #include "toolbox.h"
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
@@ -198,7 +198,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            usleep(1E4);
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
@@ -218,7 +218,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            usleep(1E6);
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
@@ -254,7 +254,7 @@ void RoboticArm::CalibratePosition(void)
             
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            usleep(0.5E6);
+            std::this_thread::sleep_for(std::chrono::microseconds(500));
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             

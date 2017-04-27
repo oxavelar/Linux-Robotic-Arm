@@ -4,8 +4,8 @@
 #include "Linux-Quadrature-Encoder/QuadratureEncoder.h"
 #include "Linux-Visual-Encoder/VisualEncoder.h"
 
-#define epsilon (double)10E-9
-#define precision (double)0.5E-3
+#define epsilon (double)10E-09
+#define precision (double)1E-03
 #define roundtr(x) (std::round( x / precision ) * precision)
 
 class Point
@@ -58,6 +58,9 @@ class RoboticArm
         void GetPosition(Point &pos);
         void SetPosition(const Point &pos);
 
+        void ForwardKinematics(Point &pos, const std::vector<double> &theta);
+        void InverseKinematics(const Point &pos, std::vector<double> &theta);
+
     private:
         const int _joints_nr;
         /* A container of joints form a chain, 
@@ -70,8 +73,5 @@ class RoboticArm
 
         void CalibrateMovement(void);
         void CalibratePosition(void);
-
-        void ForwardKinematics(Point &pos, const std::vector<double> &theta);
-        void InverseKinematics(const Point &pos, std::vector<double> &theta);
 };
 
