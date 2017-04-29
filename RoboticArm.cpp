@@ -255,7 +255,7 @@ void RoboticArm::CalibratePosition(void)
             
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            std::this_thread::sleep_for(std::chrono::microseconds(500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
