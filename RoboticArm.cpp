@@ -370,7 +370,7 @@ void RoboticArm::InverseKinematics(const Point &pos, std::vector<double> &theta)
             theta[0] = atan2(pos.y, pos.x);
         case 2:
             #define D ((pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]))
-            theta[1] = atan2( 1 - (D*D), D)
+            theta[1] = atan2( 1 - (D*D), D);
             theta[0] = atan2(pos.y, pos.x) - atan2( (L[1] * sin(theta[1])), (L[0] + L[1] * cos(theta[1])) );
             break;
         default:
