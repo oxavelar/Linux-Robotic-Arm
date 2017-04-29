@@ -16,6 +16,7 @@
  * References:
  * http://cdn.intechopen.com/pdfs/379.pdf
  * http://www.cis.upenn.edu/~badler/gmod/0528a.pdf
+ * http://www.hessmer.org/uploads/RobotArm/Inverse%2520Kinematics%2520for%2520Robot%2520Arm.pdf
  *
  * Authors: Omar X. Avelar & Juan C. Razo
  *
@@ -369,8 +370,8 @@ void RoboticArm::InverseKinematics(const Point &pos, std::vector<double> &theta)
             theta[0] = atan2(pos.y, pos.x);
         case 2:
             #define D ((pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]))
-            theta[1] = atan( sqrt(1 - D*D) / D );
-            theta[0] = atan(pos.y / pos.x) - atan( (L[1] * sin(theta[1])) / (L[0] + L[1] * cos(theta[1])) );
+            theta[1] = atan2( 1 - (D*D), D)
+            theta[0] = atan2(pos.y, pos.x) - atan2( (L[1] * sin(theta[1])), (L[0] + L[1] * cos(theta[1])) );
             break;
         default:
             /* oxavelar: To extend this to 3 dimensions for N joints */
