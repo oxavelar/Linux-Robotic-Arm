@@ -5,17 +5,21 @@
 #include "Linux-Visual-Encoder/VisualEncoder.h"
 
 #define epsilon (double)10E-09
-#define precision (double)1E-03
-#define roundtr(x) (std::round( x / precision ) * precision)
+
+/* Decimal spaces to trim for comparision tolerance*/
+#define tolerance (double)2E-03
+#define trim_precision (double)1E-06
+#define trim(x) ((long long)std::round( x / trim_precision ) * (double)trim_precision)
+
 
 class Point
 {
     public:
         double x, y, z;
         bool operator==(const Point &p) {
-            return ((std::abs(roundtr(p.x) - roundtr(x)) < epsilon) &&
-                    (std::abs(roundtr(p.y) - roundtr(y)) < epsilon) &&
-                    (std::abs(roundtr(p.z) - roundtr(z)) < epsilon));
+            return ((std::abs(trim(p.x) - trim(x)) < tolerance) &&
+                    (std::abs(trim(p.y) - trim(y)) < tolerance) &&
+                    (std::abs(trim(p.z) - trim(z)) < tolerance));
         };
         bool operator!=(const Point &p) { return !(*this == p); };
 };

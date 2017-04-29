@@ -105,8 +105,9 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
         std::vector<double> theta_random;
 
         for(auto id = 0; id < config::joints_nr; id++) {
-            /* WIll be limitting the max angle from 0 to 30 for better performance analysis */
-            int random_angle = std::rand() % 30;
+            /* WIll be limitting the max angle for better performance analysis */
+            const unsigned char max_angle = 20;
+            const unsigned char random_angle = std::rand() % max_angle;
             theta_random.push_back(random_angle);
         }
 
@@ -128,6 +129,7 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 
             SPrintCoordinates(m_coordinates, buffer);
             logger << "I: Measured - " << buffer << std::endl;
+            usleep(1E06);
 #endif
         } while(t_coordinates != m_coordinates);
         
@@ -164,7 +166,7 @@ int main(void)
 
 #ifdef DIAGNOSTICS
     /* Perform N samples of measurements and print statistics */
-    RunDiagnostics(RoboArm, 100);
+    RunDiagnostics(RoboArm, 10);
 #endif
 
     logger << "I: Press the arrow keys to control the robotic arm!" << std::endl << std::endl;

@@ -177,7 +177,7 @@ void QuadratureEncoder::TrackChannelPulseWidth(void)
 
 void QuadratureEncoder::PrintDebugStats(void)
 {
-    double gpio_error_rate = _gpio_processing_error_count / (double)
+    double gpio_error_rate = 100 * _gpio_processing_error_count / (double)
                              (_channel_a_isr_count + _channel_b_isr_count);
     std::cout << "D: Internal counter value   " << _counter << std::endl;
     std::cout << "D: ChannelA interrupts      " << _channel_a_isr_count << std::endl;
