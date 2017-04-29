@@ -15,6 +15,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
+#include <iomanip>
 #include "QuadratureEncoder.h"
 
 
@@ -176,10 +177,14 @@ void QuadratureEncoder::TrackChannelPulseWidth(void)
 
 void QuadratureEncoder::PrintDebugStats(void)
 {
+    double gpio_error_rate = _gpio_processing_error_count / 
+                             _channel_a_isr_count + _channel_b_isr_count;
     std::cout << "D: Internal counter value   " << _counter << std::endl;
     std::cout << "D: ChannelA interrupts      " << _channel_a_isr_count << std::endl;
     std::cout << "D: ChannelB interrupts      " << _channel_b_isr_count << std::endl;
     std::cout << "D: GPIO processing errors   " << _gpio_processing_error_count << std::endl;
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << "D: GPIO error rate          " << gpio_error_rate << "%" << std::endl;
     std::cout << std::endl;
 }
 #endif
