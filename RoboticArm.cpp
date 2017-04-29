@@ -285,7 +285,6 @@ void RoboticArm::Init(void)
     }
 
     logger << "I: Robot was successfully initialized" << std::endl;
-    logger << std::flush;
 }
 
 
