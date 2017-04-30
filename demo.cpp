@@ -5,6 +5,7 @@
 #include <sched.h>
 #include <boost/timer/timer.hpp>
 #include <iomanip>
+#include <random>
 #include "toolbox.h"
 #include "RoboticArm.h"
 #include "RoboticArm_Config.h"
