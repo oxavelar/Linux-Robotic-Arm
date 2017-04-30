@@ -100,7 +100,7 @@ void RoboticJoint::SetAngle(const double &theta)
 {
     /* Update the internal variable, the control loop
      * will take charge of getting us here eventually */
-    _reference_angle = theta;
+    _reference_angle = (theta + M_PI) * 180 / M_PI;
 }
 
 
@@ -295,7 +295,7 @@ void RoboticArm::GetPosition(Point &pos)
     
     /* Fill our N joints angles in our temporary matrix in radians */
     for(auto id = 0; id < _joints_nr; id++) {
-        theta.push_back( joints[id]->GetAngle() / 180 * M_PI );
+        theta.push_back( (joints[id]->GetAngle() / 180 * M_PI) - M_PI );
     }
 
     /* Makes use of forward kinematics in order to get position */
@@ -313,7 +313,7 @@ void RoboticArm::SetPosition(const Point &pos)
     
     /* Update each of the joints their new reference angle */
     for(auto id = 0; id < _joints_nr; id++) {
-        joints[id]->SetAngle( theta[id] * 180 / M_PI );
+        joints[id]->SetAngle(theta[id]);
     }
 }
 
@@ -371,9 +371,6 @@ void RoboticArm::InverseKinematics(const Point &pos, std::vector<double> &theta)
             #define D ((pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]))
             theta[1] = atan2( 1 - D*D, D);
             theta[0] = atan2(pos.y, pos.x) - atan2( (L[1] * sin(theta[1])), (L[0] + L[1] * cos(theta[1])) );
-            /* atan2 ranges from -pi to pi, while robot coordinates were chosen to be 0 to 2pi */
-            theta[0]+= M_PI;
-            theta[1]+= M_PI;
             break;
         default:
             /* oxavelar: To extend this to 3 dimensions for N joints */

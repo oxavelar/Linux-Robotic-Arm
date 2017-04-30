@@ -92,23 +92,22 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
     /* Saving our home position */
     RoboArm->GetPosition(h_coordinates);
 
-    /* Initializing the rng seed */
-    std::srand(std::time(0));
-
     for(auto s = 0; s < max_samples; s++) {
 
 #ifdef DIAGNOSTICS_VERBOSE
         char buffer[80];
 #endif
-
         /* Fill our N joints angles with random data */
         std::vector<double> theta_random;
 
+        /* Random value between [-pi - pi] */
+        std::mt19937 rng(std::random_device{}());
+        std::uniform_real_distribution<double> unif(-M_PI, M_PI);
+
         for(auto id = 0; id < config::joints_nr; id++) {
-            /* Will be limitting the max angle for better performance analysis */
-            const unsigned char max_angle = 10;
-            const unsigned char random_angle = std::rand() % max_angle;
-            theta_random.push_back(random_angle);
+            const double random_angle = unif(rng);
+            /* Limitting to 45° for faster metrics */
+            theta_random.push_back(random_angle / 8.0);
         }
 
         /* Use Our Robot's FK to obtain a valid "random" position */
@@ -123,20 +122,19 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
         /* Keep here until the robot reaches it's destination */
         do {
             RoboArm->GetPosition(m_coordinates);
+            //usleep(100E03);
+            usleep(1E06);
 #ifdef DIAGNOSTICS_VERBOSE
             SPrintCoordinates(t_coordinates, buffer);
             logger << "I: Computed - " << buffer << std::endl;
 
             SPrintCoordinates(m_coordinates, buffer);
             logger << "I: Measured - " << buffer << std::endl;
-
-            usleep(0.9E06);
 #endif
         } while(t_coordinates != m_coordinates);
         
         /* Measurements get printed after this */
         delete t;
-        usleep(5E06);
     }
 
     /* Restoring the robot to the home position */
@@ -168,7 +166,7 @@ int main(void)
 
 #ifdef DIAGNOSTICS
     /* Perform N samples of measurements and print statistics */
-    RunDiagnostics(RoboArm, 10);
+    RunDiagnostics(RoboArm, 1000);
     _cleanup(-17);
 #endif
 

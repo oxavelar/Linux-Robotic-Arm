@@ -44,7 +44,7 @@ namespace config
     static constexpr int quad_encoder_rate = 4;
 
     /* The physical length of each of the links in meters */
-    static constexpr double link_lengths[] = { 0.012, 0.012 };
+    static constexpr double link_lengths[] = { 0.012, 0.010 };
 
     /* Pair of pins used for these elements */
     static constexpr int quad_encoder_pins[][2]  = {{ 49,  48}, { 41,  43}};
