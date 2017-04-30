@@ -54,6 +54,8 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
 
 Motor::~Motor(void)
 {
+    Stop();
+
     /* Deleting the PWM object will disable the output */
     delete _pwm_a;
     delete _pwm_b;

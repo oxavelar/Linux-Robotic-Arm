@@ -10,6 +10,14 @@
 #
 # http://www.emutexlabs.com/project/215-intel-edison-gpio-pin-multiplexing-guide
 
+echo "I: Intel Edison Low Jitter Tweaks"
+echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+echo performance > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state1/disable
+echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state2/disable
+echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state3/disable
+echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state4/disable
+
 echo "I: Intel Edison IO Pre-Configuration"
 
 # Setting tri-state to make IO changes
