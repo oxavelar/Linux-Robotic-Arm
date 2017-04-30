@@ -171,7 +171,7 @@ RoboticArm::~RoboticArm(void)
 void RoboticArm::CalibrateMovement(void)
 {
     double difference;
-    const double delta = 0.1;
+    const double delta = 0.05;
 
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
@@ -205,8 +205,8 @@ void RoboticArm::CalibrateMovement(void)
             
         } while(difference < epsilon);
         
-        
-        /* Fine tuning, go back by 10% of deltas to where we stop moving in steady state */
+        joint->Movement->SetDirection(Motor::Direction::CW);
+        /* Fine tuning, go back by delta squared to where we stop moving in steady state */
         do {
 
             /* Make sure we have not reached 0% + delta */
@@ -215,7 +215,7 @@ void RoboticArm::CalibrateMovement(void)
                 exit(-100);
             }
 
-            min_speed -= (0.1 * delta);
+            min_speed -= (delta * delta);
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
