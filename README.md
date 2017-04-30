@@ -16,9 +16,20 @@ A robot joint is formed by a positioning (imaging/encoder) and movement (actuato
 Testing has shown and we would recomend tweak the following parameters in the Linux scheduler through the sysctl.conf interface in order to get better response times.
 
 ```
-kernel.sched_latency_ns = 10000
-kernel.sched_min_granularity_ns = 20000
-kernel.sched_wakeup_granularity_ns = 750000
+kernel.sched_migration_cost_ns = 100000
+#kernel.sched_latency_ns = 10000
+#kernel.sched_min_granularity_ns = 20000
+#kernel.sched_wakeup_granularity_ns = 750000
+```
+
+As well as disabling C-States and P-States on the board by using
+```
+echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+echo performance > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state1/disable
+echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state2/disable
+echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state3/disable
+echo 1 > /sys/devices/system/cpu/cpu0/ckernel.sched_migration_cost_nspuidle/state4/disable
 ```
 
 I have tested the above parameters in an Intel Edison and an Intel Galileo board.
