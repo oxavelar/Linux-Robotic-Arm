@@ -30,8 +30,10 @@ echo performance > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
 echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state1/disable
 echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state2/disable
 echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state3/disable
-echo 1 > /sys/devices/system/cpu/cpu0/ckernel.sched_migration_cost_nspuidle/state4/disable
+echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state4/disable
 ```
+
+And also install irqbalance for a more responsive experience using this.
 
 I have tested the above parameters in an Intel Edison and an Intel Galileo board.
 
