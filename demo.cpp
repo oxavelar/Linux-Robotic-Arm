@@ -122,8 +122,7 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
         /* Keep here until the robot reaches it's destination */
         do {
             RoboArm->GetPosition(m_coordinates);
-            //usleep(100E03);
-            usleep(1E06);
+            usleep(100E03);
 #ifdef DIAGNOSTICS_VERBOSE
             SPrintCoordinates(t_coordinates, buffer);
             logger << "I: Computed - " << buffer << std::endl;
