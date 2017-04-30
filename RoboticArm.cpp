@@ -371,6 +371,9 @@ void RoboticArm::InverseKinematics(const Point &pos, std::vector<double> &theta)
             #define D ((pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]))
             theta[1] = atan2( 1 - D*D, D);
             theta[0] = atan2(pos.y, pos.x) - atan2( (L[1] * sin(theta[1])), (L[0] + L[1] * cos(theta[1])) );
+            /* atan2 ranges from -pi to pi, while robot coordinates were chosen to be 0 to 2pi */
+            theta[0]+= M_PI;
+            theta[1]+= M_PI;
             break;
         default:
             /* oxavelar: To extend this to 3 dimensions for N joints */
