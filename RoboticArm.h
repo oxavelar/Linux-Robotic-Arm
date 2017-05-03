@@ -7,8 +7,8 @@
 #define epsilon (double)10E-09
 
 /* Decimal spaces to trim for comparision tolerance*/
-#define tolerance (double)2E-03
-#define trim_precision (double)1E-06
+#define tolerance (double)1E-04
+#define trim_precision (double)1E-09
 #define trim(x) ((long long)std::round( x / trim_precision ) * (double)trim_precision)
 
 

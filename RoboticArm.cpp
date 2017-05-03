@@ -33,7 +33,6 @@
 #include "RoboticArm_Config.h"
 
 
-
 RoboticJoint::RoboticJoint(const int &id) :
     _id(id),
     _reference_angle(0),
@@ -99,8 +98,9 @@ double RoboticJoint::GetAngle(void)
 void RoboticJoint::SetAngle(const double &theta)
 {
     /* Update the internal variable, the control loop
-     * will take charge of getting us here eventually */
-    _reference_angle = (theta + M_PI) * 180 / M_PI;
+     * will take charge of getting us here eventually 
+     * theta is in radians so converting from 0 to 360 */
+    _reference_angle = (theta >= 0 ? theta : (2 * M_PI + theta)) * 180.0 / M_PI;
 }
 
 
@@ -120,7 +120,8 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 8;
+        const auto k = 0.80;
+        /* Internal refernces are in degrees no conversion at all */
         const auto actual_angle = Position->GetAngle();
         const auto error_angle = actual_angle - _reference_angle;
         
@@ -199,7 +200,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
@@ -219,18 +220,19 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
-        } while(difference >= epsilon);
+        } while(difference < epsilon);
         
         logger << "I: Joint ID " << id << " min speed found for movement is ~" << min_speed << "%" << std::endl;
         logger << "I: Joint ID " << id << " set speed remap for 0% to 100% values" << std::endl;
         
         /* Now we can have a range from minimum speed to full */
         joint->Movement->ApplyRangeLimits(min_speed, 100);
-        
+        /* Keep it at zero for safety reasons */
+        joint->Movement->SetSpeed(0);
     }
 }
 
@@ -250,17 +252,19 @@ void RoboticArm::CalibratePosition(void)
          */
         joint->Movement->SetDirection(Motor::Direction::CW);
         joint->Movement->SetSpeed(100);
-        joint->Movement->Start();
         do {
             
             auto old = joint->Position->GetAngle();
             joint->Movement->Start();
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            /* Must account for turn off and turn on delays, use bigger delay */
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
-        } while(difference >= epsilon);
-        
+        } while(difference < epsilon);
+
+        /* Keep it at zero for safety reasons */
+        joint->Movement->SetSpeed(0);
         /* Reset the position coordinates, this is our new home position */
         joint->SetZero();
         
@@ -295,7 +299,7 @@ void RoboticArm::GetPosition(Point &pos)
     
     /* Fill our N joints angles in our temporary matrix in radians */
     for(auto id = 0; id < _joints_nr; id++) {
-        theta.push_back( (joints[id]->GetAngle() / 180 * M_PI) - M_PI );
+        theta.push_back( (joints[id]->GetAngle() / 180.0 * M_PI) - M_PI );
     }
 
     /* Makes use of forward kinematics in order to get position */
@@ -329,13 +333,13 @@ void RoboticArm::ForwardKinematics(Point &pos, const std::vector<double> &theta)
     switch(theta.size())
     {
         case 1:
-            tpos.x = L[0] * cos(theta[0]);
-            tpos.y = L[0] * sin(theta[0]);
+            tpos.x = L[0] * std::cos(theta[0] + M_PI);
+            tpos.y = L[0] * std::sin(theta[0] + M_PI);
             tpos.z = 0;
             break;
         case 2:
-            tpos.x = L[0] * cos(theta[0]) + L[1] * cos(theta[0] + theta[1]);
-            tpos.y = L[0] * sin(theta[0]) + L[1] * sin(theta[0] + theta[1]);
+            tpos.x = L[0] * std::cos(theta[0] + M_PI) + L[1] * std::cos(theta[0] + theta[1]);
+            tpos.y = L[0] * std::sin(theta[0] + M_PI) + L[1] * std::sin(theta[0] + theta[1]);
             tpos.z = 0;
             break;
         default:
@@ -366,11 +370,11 @@ void RoboticArm::InverseKinematics(const Point &pos, std::vector<double> &theta)
     {
 
         case 1:
-            theta[0] = atan2(pos.y, pos.x);
+            theta[0] = std::atan2(pos.y, pos.x);
         case 2:
             #define D ((pos.x*pos.x + pos.y*pos.y - L[0]*L[0] - L[1]*L[1]) / (2 * L[0] * L[1]))
-            theta[1] = atan2( 1 - D*D, D);
-            theta[0] = atan2(pos.y, pos.x) - atan2( (L[1] * sin(theta[1])), (L[0] + L[1] * cos(theta[1])) );
+            theta[1] = std::atan2( 1 - (D*D), D);
+            theta[0] = std::atan2(pos.y, pos.x) - std::atan2( (L[1] * std::sin(theta[1])), (L[0] + L[1] * std::cos(theta[1])) );
             break;
         default:
             /* oxavelar: To extend this to 3 dimensions for N joints */
