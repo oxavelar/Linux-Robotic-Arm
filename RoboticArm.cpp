@@ -79,6 +79,7 @@ RoboticJoint::~RoboticJoint(void)
 void RoboticJoint::Init(void)
 {
     /* Set the motors running, so the control loop can work on it */
+    Movement->SetSpeed(0);
     Movement->Start();
     logger << "I: Joint ID " << _id << " is in our home position" << std::endl;
     /* Register our control thread */
@@ -101,6 +102,7 @@ void RoboticJoint::SetAngle(const double &theta)
      * will take charge of getting us here eventually 
      * theta is in radians so converting from 0 to 360 */
     _reference_angle = (theta >= 0 ? theta : (2 * M_PI + theta)) * 180.0 / M_PI;
+    _reference_angle = std::fmod(_reference_angle, 360.0);
 }
 
 
@@ -120,9 +122,9 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 0.80;
+        const auto k = 20.00;
         /* Internal refernces are in degrees no conversion at all */
-        const auto actual_angle = Position->GetAngle();
+        const auto actual_angle = std::fmod(Position->GetAngle(), 360.0);
         const auto error_angle = actual_angle - _reference_angle;
         
         /* Sign dictates the direction of movement */
@@ -231,8 +233,6 @@ void RoboticArm::CalibrateMovement(void)
         
         /* Now we can have a range from minimum speed to full */
         joint->Movement->ApplyRangeLimits(min_speed, 100);
-        /* Keep it at zero for safety reasons */
-        joint->Movement->SetSpeed(0);
     }
 }
 
@@ -255,16 +255,14 @@ void RoboticArm::CalibratePosition(void)
         do {
             
             auto old = joint->Position->GetAngle();
-            joint->Movement->Start();
+            //joint->Movement->Start();
             /* Must account for turn off and turn on delays, use bigger delay */
-            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
         } while(difference < epsilon);
 
-        /* Keep it at zero for safety reasons */
-        joint->Movement->SetSpeed(0);
         /* Reset the position coordinates, this is our new home position */
         joint->SetZero();
         
@@ -333,13 +331,13 @@ void RoboticArm::ForwardKinematics(Point &pos, const std::vector<double> &theta)
     switch(theta.size())
     {
         case 1:
-            tpos.x = L[0] * std::cos(theta[0] + M_PI);
-            tpos.y = L[0] * std::sin(theta[0] + M_PI);
+            tpos.x = L[0] * std::cos(theta[0]);
+            tpos.y = L[0] * std::sin(theta[0]);
             tpos.z = 0;
             break;
         case 2:
-            tpos.x = L[0] * std::cos(theta[0] + M_PI) + L[1] * std::cos(theta[0] + theta[1]);
-            tpos.y = L[0] * std::sin(theta[0] + M_PI) + L[1] * std::sin(theta[0] + theta[1]);
+            tpos.x = L[0] * std::cos(theta[0]) + L[1] * std::cos(theta[0] + theta[1]);
+            tpos.y = L[0] * std::sin(theta[0]) + L[1] * std::sin(theta[0] + theta[1]);
             tpos.z = 0;
             break;
         default:

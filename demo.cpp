@@ -103,12 +103,11 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 
         /* Random value between [-pi - pi] */
         std::mt19937 rng(std::random_device{}());
-        std::uniform_real_distribution<double> unif(M_PI, M_PI);
+        std::uniform_real_distribution<double> unif(-M_PI, M_PI);
 
         for(auto id = 0; id < config::joints_nr; id++) {
-            //const double random_theta = unif(rng);
+            const double random_theta = unif(rng);
             /* Limitting to 10° for faster metrics */
-            const double random_theta = M_PI / 18.0;
             theta_random.push_back(0 * random_theta / 18.0);
         }
 
@@ -124,7 +123,7 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
         /* Keep here until the robot reaches it's destination */
         do {
             RoboArm->GetPosition(m_coordinates);
-            usleep(5000E03);
+            usleep(100E03);
 #ifdef DIAGNOSTICS_VERBOSE
             SPrintCoordinates(t_coordinates, buffer);
             logger << "I: Computed - " << buffer << std::endl;

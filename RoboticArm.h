@@ -8,7 +8,7 @@
 
 /* Decimal spaces to trim for comparision tolerance*/
 #define tolerance (double)1E-04
-#define trim_precision (double)1E-09
+#define trim_precision (double)1E-07
 #define trim(x) ((long long)std::round( x / trim_precision ) * (double)trim_precision)
 
 
