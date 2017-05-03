@@ -122,7 +122,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 20.00;
+        const auto k = 40.00;
         /* Internal refernces are in degrees no conversion at all */
         const auto actual_angle = std::fmod(Position->GetAngle(), 360.0);
         const auto error_angle = actual_angle - _reference_angle;
@@ -297,7 +297,7 @@ void RoboticArm::GetPosition(Point &pos)
     
     /* Fill our N joints angles in our temporary matrix in radians */
     for(auto id = 0; id < _joints_nr; id++) {
-        theta.push_back( (joints[id]->GetAngle() / 180.0 * M_PI) - M_PI );
+        theta.push_back( joints[id]->GetAngle() / 180.0 * M_PI );
     }
 
     /* Makes use of forward kinematics in order to get position */
