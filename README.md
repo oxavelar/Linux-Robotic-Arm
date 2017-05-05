@@ -18,7 +18,7 @@ Testing has shown and we would recomend tweak the following parameters in the Li
 ```
 ernel.sched_tunable_scaling = 0
 kernel.sched_latency_ns = 120000
-kernel.sched_min_granularity_ns = 100000
+kernel.sched_min_granularity_ns = 200000
 kernel.sched_wakeup_granularity_ns = 1000
 kernel.sched_migration_cost_ns = 100000
 ```
@@ -33,7 +33,7 @@ echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state3/disable
 echo 1 > /sys/devices/system/cpu/cpu0/cpuidle/state4/disable
 ```
 
-And also install irqbalance for a more responsive experience using this.
+And also install irqbalance for a more responsive experience on multi-core systems.
 
 I have tested the above parameters in an Intel Edison and an Intel Galileo board.
 

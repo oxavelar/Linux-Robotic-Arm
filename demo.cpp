@@ -78,7 +78,7 @@ void WaitKeyPress(Point &coordinates)
 
 void SPrintCoordinates(const Point &coordinates, char *buffer)
 {
-    sprintf(buffer, " x= %+3.4f | y= %+3.4f | z= %+3.4f", 
+    sprintf(buffer, " x= %+3.9f | y= %+3.9f | z= %+3.9f", 
             coordinates.x, coordinates.y, coordinates.z);
 }
 
@@ -103,12 +103,12 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 
         /* Random value between [-pi - pi] */
         std::mt19937 rng(std::random_device{}());
-        std::uniform_real_distribution<double> unif(0, 2 * M_PI);
+        std::uniform_real_distribution<float> unif(0, 2 * M_PI);
 
         for(auto id = 0; id < config::joints_nr; id++) {
             const double random_theta = unif(rng);
-            /* Limitting to 10° for faster metrics */
-            theta_random.push_back(random_theta / 36.0);
+            /* Limitting to 20° for faster metrics and less inertia*/
+            theta_random.push_back(random_theta / 18.0);
         }
 
         /* Use Our Robot's FK to obtain a valid "random" position */
@@ -120,10 +120,10 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
         /* Command the robot to a new position once that coordinates was updated */
         RoboArm->SetPosition(t_coordinates);
 
-        /* Keep here until the robot reaches it's destination */
+        /* Keep here until the robot reaches its destination */
         do {
             RoboArm->GetPosition(m_coordinates);
-            usleep(100E03);
+            usleep(1000E03);
 #ifdef DIAGNOSTICS_VERBOSE
             SPrintCoordinates(t_coordinates, buffer);
             logger << "I: Computed - " << buffer << std::endl;

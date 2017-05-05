@@ -4,11 +4,11 @@
 #include "Linux-Quadrature-Encoder/QuadratureEncoder.h"
 #include "Linux-Visual-Encoder/VisualEncoder.h"
 
-#define epsilon (double)10E-09
+#define epsilon (double)1E-09
 
 /* Decimal spaces to trim for comparision tolerance*/
-#define tolerance (double)1E-04
-#define trim_precision (double)1E-07
+#define tolerance (double)3E-04
+#define trim_precision (double)4E-09
 #define trim(x) ((long long)std::round( x / trim_precision ) * (double)trim_precision)
 
 
@@ -61,6 +61,7 @@ class RoboticArm
         void Init(void);
         void GetPosition(Point &pos);
         void SetPosition(const Point &pos);
+        void SetPositionSync(const Point &pos);
 
         void ForwardKinematics(Point &pos, const std::vector<double> &theta);
         void InverseKinematics(const Point &pos, std::vector<double> &theta);

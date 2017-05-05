@@ -122,7 +122,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 40.00;
+        const auto k = 80.00;
         /* Internal refernces are in degrees no conversion at all */
         const auto actual_angle = std::fmod(Position->GetAngle(), 360.0);
         const auto error_angle = actual_angle - _reference_angle;
@@ -255,13 +255,13 @@ void RoboticArm::CalibratePosition(void)
         do {
             
             auto old = joint->Position->GetAngle();
-            //joint->Movement->Start();
+            joint->Movement->Start();
             /* Must account for turn off and turn on delays, use bigger delay */
-            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            std::this_thread::sleep_for(std::chrono::nanoseconds(1));
             joint->Movement->Stop();
             difference = std::abs(joint->Position->GetAngle() - old);
             
-        } while(difference < epsilon);
+        } while(difference >= epsilon);
 
         /* Reset the position coordinates, this is our new home position */
         joint->SetZero();
@@ -317,6 +317,20 @@ void RoboticArm::SetPosition(const Point &pos)
     for(auto id = 0; id < _joints_nr; id++) {
         joints[id]->SetAngle(theta[id]);
     }
+}
+
+
+void RoboticArm::SetPositionSync(const Point &pos)
+{
+    /* Synchronous version of SetPosition */
+    Point measured, target = pos;
+
+    SetPosition(target);
+
+    /* Stay here until the robot reaches its destination */
+    do {
+        GetPosition(measured);
+    } while(target != measured);
 }
 
 
