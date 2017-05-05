@@ -6,10 +6,8 @@
 
 #define epsilon (double)1E-09
 
-/* Decimal spaces to trim for comparision tolerance*/
+/* 3 millimeter tolerance */
 #define tolerance (double)3E-04
-#define trim_precision (double)4E-09
-#define trim(x) ((long long)std::round( x / trim_precision ) * (double)trim_precision)
 
 
 class Point
@@ -17,9 +15,9 @@ class Point
     public:
         double x, y, z;
         bool operator==(const Point &p) {
-            return ((std::abs(trim(p.x) - trim(x)) < tolerance) &&
-                    (std::abs(trim(p.y) - trim(y)) < tolerance) &&
-                    (std::abs(trim(p.z) - trim(z)) < tolerance));
+            return ((std::abs(p.x - x) < tolerance) &&
+                    (std::abs(p.y - y) < tolerance) &&
+                    (std::abs(p.z - z) < tolerance));
         };
         bool operator!=(const Point &p) { return !(*this == p); };
 };

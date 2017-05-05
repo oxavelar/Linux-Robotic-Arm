@@ -122,7 +122,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 80.00;
+        const auto k = 8.00;
         /* Internal refernces are in degrees no conversion at all */
         const auto actual_angle = std::fmod(Position->GetAngle(), 360.0);
         const auto error_angle = actual_angle - _reference_angle;

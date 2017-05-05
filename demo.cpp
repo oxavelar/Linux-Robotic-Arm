@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <sched.h>
+#include <sys/mman.h>
 #include <boost/timer/timer.hpp>
 #include <iomanip>
 #include <random>
@@ -29,6 +30,8 @@ void SetProcessPriority(const int &number)
 void _cleanup(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
+
+    munlockall();
 
 #ifdef NCURSES_SUPPORT
     /* Finishes up gracefully the curses screen */
@@ -78,7 +81,7 @@ void WaitKeyPress(Point &coordinates)
 
 void SPrintCoordinates(const Point &coordinates, char *buffer)
 {
-    sprintf(buffer, " x= %+3.9f | y= %+3.9f | z= %+3.9f", 
+    sprintf(buffer, " x= %+2.5f | y= %+2.5f | z= %+2.5f", 
             coordinates.x, coordinates.y, coordinates.z);
 }
 
@@ -86,7 +89,7 @@ void SPrintCoordinates(const Point &coordinates, char *buffer)
 void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 {
     /* Target vs Measured coordinate variables */
-    Point t_coordinates, m_coordinates, h_coordinates;
+    Point t_coordinates, h_coordinates;
 
     logger << "I: Entering diagnostics mode for measuring latency" << std::endl;
 
@@ -95,9 +98,6 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 
     for(auto s = 0; s < max_samples; s++) {
 
-#ifdef DIAGNOSTICS_VERBOSE
-        char buffer[80];
-#endif
         /* Fill our N joints angles with random data */
         std::vector<double> theta_random;
 
@@ -107,8 +107,8 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 
         for(auto id = 0; id < config::joints_nr; id++) {
             const double random_theta = unif(rng);
-            /* Limitting to 20° for faster metrics and less inertia*/
-            theta_random.push_back(random_theta / 18.0);
+            /* Limitting to 30° for faster metrics and less inertia*/
+            theta_random.push_back(random_theta / 12.0);
         }
 
         /* Use Our Robot's FK to obtain a valid "random" position */
@@ -117,28 +117,19 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
         /* Profiling with boost libraries to get cpu time and wall time */
         boost::timer::auto_cpu_timer *t = new boost::timer::auto_cpu_timer();
 
-        /* Command the robot to a new position once that coordinates was updated */
-        RoboArm->SetPosition(t_coordinates);
+        /* Known fixed 100ms delay for CPU utilization accounting
+         * You will need to substract this from statistics */
+        usleep(100E03);
 
-        /* Keep here until the robot reaches its destination */
-        do {
-            RoboArm->GetPosition(m_coordinates);
-            usleep(1000E03);
-#ifdef DIAGNOSTICS_VERBOSE
-            SPrintCoordinates(t_coordinates, buffer);
-            logger << "I: Computed - " << buffer << std::endl;
+        /* Command the robot to a new position and block until there */
+        RoboArm->SetPositionSync(t_coordinates);
 
-            SPrintCoordinates(m_coordinates, buffer);
-            logger << "I: Measured - " << buffer << std::endl;
-#endif
-        } while(t_coordinates != m_coordinates);
-        
         /* Measurements get printed after this */
         delete t;
     }
 
     /* Restoring the robot to the home position */
-    RoboArm->SetPosition(h_coordinates);
+    RoboArm->SetPositionSync(h_coordinates);
 
     logger << "I: Finished running diagnostics mode" << std::endl << std::endl;
 }
@@ -146,6 +137,8 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
 
 int main(void)
 {
+    mlockall(MCL_CURRENT | MCL_FUTURE);
+
 #ifdef NCURSES_SUPPORT
     InitializeScreen();
     /* Redirect all of std::cout to a curses complaint window */
