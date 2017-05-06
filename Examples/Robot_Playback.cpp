@@ -16,7 +16,7 @@
 #include "../RoboticArm_Config.h"
 
 
-RoboticArm *RoboArm;
+std::unique_ptr<RoboticArm> RoboArm;
 std::vector<Point> trajectory;
 
 /* Global command line knobs */
@@ -39,9 +39,6 @@ void _cleanup(int signum)
     logger << "I: Caught signal " << signum << std::endl;
 
     munlockall();
-
-    /* Delete all of the robotic-arm objects */
-    delete RoboArm;
     
     exit(signum);
 }
@@ -159,7 +156,7 @@ int main(int argc, char *argv[])
     mlockall(MCL_CURRENT | MCL_FUTURE);
 
     /* Please check RoboticArtm_Config.h for number of joints*/
-    RoboArm = new RoboticArm();
+    RoboArm = std::unique_ptr<RoboticArm>(new RoboticArm());
     
     /* Register a signal handler to exit gracefully */
     signal(SIGINT, _cleanup);

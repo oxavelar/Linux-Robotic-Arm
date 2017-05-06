@@ -16,10 +16,10 @@
 #include "../RoboticArm_Config.h"
 
 
-RoboticArm *RoboArm;
+std::unique_ptr<RoboticArm> RoboArm;
 Point coordinates;
 double timestamp;
-std::ofstream *outfile;
+std::unique_ptr<std::ofstream> outfile;
 
 /* Global command line knobs */
 std::string cl_option_filename;
@@ -43,9 +43,6 @@ void _cleanup(int signum)
     outfile->close();
 
     munlockall();
-
-    /* Delete all of the robotic-arm objects */
-    delete RoboArm;
     
     exit(signum);
 }
@@ -113,11 +110,12 @@ int main(int argc, char *argv[])
     mlockall(MCL_CURRENT | MCL_FUTURE);
 
     /* Please check RoboticArtm_Config.h for number of joints*/
-    RoboArm = new RoboticArm();
+    RoboArm = std::unique_ptr<RoboticArm>(new RoboticArm());
     
     /* File that we will be writing to */
-    outfile = new std::ofstream(cl_option_filename, std::ios::binary | 
-                                                    std::ios::trunc);
+    outfile = std::unique_ptr<std::ofstream>(new std::ofstream(cl_option_filename,
+                                                               std::ios::binary |
+                                                               std::ios::trunc));
 
     if(outfile == NULL) {
         logger << "E: Failed to write the trajectory file" << std::endl;

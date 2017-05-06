@@ -12,7 +12,7 @@
 #include "../RoboticArm_Config.h"
 
 
-RoboticArm *RoboArm;
+std::unique_ptr<RoboticArm> RoboArm;
 Point coordinates;
 
 #ifdef RT_PRIORITY
@@ -35,9 +35,6 @@ void _cleanup(int signum)
     /* Finishes up gracefully the curses screen */
     endwin();
     system("reset");
-    
-    /* Delete all of the robotic-arm objects */
-    delete RoboArm;
     
     exit(signum);
 }
@@ -93,7 +90,7 @@ int main(void)
 #endif
 
     /* Please check RoboticArtm_Config.h for number of joints*/
-    RoboArm = new RoboticArm();
+    RoboArm = std::unique_ptr<RoboticArm>(new RoboticArm());
     
     /* Register a signal handler to exit gracefully */
     signal(SIGINT, _cleanup);

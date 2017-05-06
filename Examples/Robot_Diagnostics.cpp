@@ -12,7 +12,7 @@
 #include "../RoboticArm_Config.h"
 
 
-RoboticArm *RoboArm;
+std::unique_ptr<RoboticArm> RoboArm;
 Point coordinates;
 
 #ifdef RT_PRIORITY
@@ -31,17 +31,30 @@ void _cleanup(int signum)
     logger << "I: Caught signal " << signum << std::endl;
 
     munlockall();
-
-    /* Delete all of the robotic-arm objects */
-    delete RoboArm;
     
     exit(signum);
 }
 
-void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
+int main(void)
 {
+    /* Doing 1000 samples for the demo */
+    auto const max_samples = 1000;
     /* Target vs Measured coordinate variables */
     Point t_coordinates, h_coordinates;
+
+    mlockall(MCL_CURRENT | MCL_FUTURE);
+    
+#ifdef RT_PRIORITY
+    SetProcessPriority(RT_PRIORITY);
+#endif
+
+    /* Please check RoboticArtm_Config.h for number of joints*/
+    RoboArm = std::unique_ptr<RoboticArm>(new RoboticArm());
+    
+    /* Register a signal handler to exit gracefully */
+    signal(SIGINT, _cleanup);
+
+    RoboArm->Init();
 
     logger << "I: Entering diagnostics mode for measuring latency" << std::endl;
 
@@ -84,26 +97,6 @@ void RunDiagnostics(RoboticArm *RoboArm, const long max_samples)
     RoboArm->SetPositionSync(h_coordinates);
 
     logger << "I: Finished running diagnostics mode" << std::endl << std::endl;
-}
-
-int main(void)
-{
-    mlockall(MCL_CURRENT | MCL_FUTURE);
-    
-#ifdef RT_PRIORITY
-    SetProcessPriority(RT_PRIORITY);
-#endif
-
-    /* Please check RoboticArtm_Config.h for number of joints*/
-    RoboArm = new RoboticArm();
-    
-    /* Register a signal handler to exit gracefully */
-    signal(SIGINT, _cleanup);
-
-    RoboArm->Init();
-
-    /* Perform N samples of measurements and print statistics */
-    RunDiagnostics(RoboArm, 1000);
 
     _cleanup(EXIT_SUCCESS);
 
