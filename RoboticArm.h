@@ -35,8 +35,8 @@ class RoboticJoint
         void SetZero(void);
 
         /* Quadrature encoders + DC motors */
-        QuadratureEncoder* Position;
-        Motor* Movement;
+        std::shared_ptr<QuadratureEncoder> Position;
+        std::shared_ptr<Motor> Movement;
 
     private:
         const int _id;
@@ -72,7 +72,7 @@ class RoboticArm
          * :
          * joints[n] = nodeN
          */
-        std::vector<RoboticJoint*> joints;
+        std::vector<std::shared_ptr<RoboticJoint>> joints;
 
         void CalibrateMovement(void);
         void CalibratePosition(void);

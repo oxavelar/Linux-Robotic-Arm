@@ -41,21 +41,24 @@ RoboticJoint::RoboticJoint(const int &id) :
 
 #ifndef VISUAL_ENCODER
 
-    Position = new QuadratureEncoder(config::quad_encoder_pins[_id][0],
-                                     config::quad_encoder_pins[_id][1],
-                                     config::quad_encoder_rate);
+    Position = std::shared_ptr<QuadratureEncoder>(
+                    new QuadratureEncoder(config::quad_encoder_pins[_id][0],
+                                          config::quad_encoder_pins[_id][1],
+                                          config::quad_encoder_rate));
     /* Set the physical parameters for correct degree measurements
      * this is basically the number of segments per revolution   */
     Position->SetParameters(config::quad_encoder_segments[_id]);
 
 #else
 
-    Position = new VisualEncoder(config::visual_enc_port[_id]);
+    Position = std::shared_ptr<VisualEncoder>(
+                        new VisualEncoder(config::visual_enc_port[_id]));
 
 #endif
     /* H-Bridge 2 PWM pins motor abstraction */
-    Movement = new Motor(config::dc_motor_pins[_id][0],
-                         config::dc_motor_pins[_id][1]);
+    Movement = std::shared_ptr<Motor>(
+                        new Motor(config::dc_motor_pins[_id][0],
+                                  config::dc_motor_pins[_id][1]));
     
 }
 
@@ -68,9 +71,6 @@ RoboticJoint::~RoboticJoint(void)
         _control_thread_stop_event = true;
         AutomaticControlThread.join();
     }
-
-    delete Position;
-    delete Movement;
 }
 
 
@@ -154,7 +154,7 @@ RoboticArm::RoboticArm(void) : _joints_nr(config::joints_nr)
 {
     /* Initialize each joint objects with unique ID's */
     for(auto id = 0; id < _joints_nr; id++) {
-        joints.push_back(new RoboticJoint(id));
+        joints.push_back(std::shared_ptr<RoboticJoint>(new RoboticJoint(id)));
     }
     logger << "I: Created a " << _joints_nr << " joints arm object" << std::endl;
 }
@@ -162,10 +162,7 @@ RoboticArm::RoboticArm(void) : _joints_nr(config::joints_nr)
 
 RoboticArm::~RoboticArm(void)
 {
-    /* Call each of the joints destructors and stop any movement object */
-    for(auto id = 0; id < _joints_nr; id++) {
-        delete joints[id];
-    }
+    return;
 }
 
 
@@ -177,7 +174,7 @@ void RoboticArm::CalibrateMovement(void)
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        RoboticJoint * const joint = joints[id];
+        std::shared_ptr<RoboticJoint> const joint = joints[id];
 
         /* Calibrate each motor independently to find the minimum speed
          * value that produces real movement, due to rounding aritmethic
@@ -242,7 +239,7 @@ void RoboticArm::CalibratePosition(void)
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        RoboticJoint * const joint = joints[id];
+        std::shared_ptr<RoboticJoint> const joint = joints[id];
        
         /* Get the rotors to a known position on a tight controlled loop 
          * due to rounding aritmethic errors, we use an epsilon comparision
@@ -277,7 +274,7 @@ void RoboticArm::Init(void)
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        RoboticJoint * const joint = joints[id];
+        std::shared_ptr<RoboticJoint> const joint = joints[id];
         
         /* Let the the joint correction control thread run and motors start-up */
         joint->Init();
@@ -293,7 +290,7 @@ void RoboticArm::EnableTrainingMode(void)
     /* Kill off the automatic control for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        RoboticJoint * const joint = joints[id];
+        std::shared_ptr<RoboticJoint> const joint = joints[id];
         
         /* Kill off the movement */
         joint->Movement->Disabled();
