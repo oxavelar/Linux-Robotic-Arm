@@ -175,8 +175,10 @@ int main(int argc, char *argv[])
             logger << "I: Target - " << buffer << std::endl;
             RoboArm->SetPositionSync(point);
             usleep(500E03);
-        }
+    }
     
+    _cleanup(EXIT_SUCCESS);
+
     return EXIT_SUCCESS;
 }
 
