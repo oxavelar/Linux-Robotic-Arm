@@ -168,8 +168,6 @@ int main(int argc, char *argv[])
 
     /* Start feeding the trajectory data into our robot for play back */
     for(auto &point : trajectory) {
-            SPrintCoordinates(point, buffer);
-            logger << "I: Target - " << buffer << std::endl;
             RoboArm->SetPositionSync(point);
             usleep(2E03);
     }
