@@ -140,9 +140,6 @@ int main(int argc, char *argv[])
         RoboArm->GetPosition(coordinates);
         timestamp += 0.002;
 
-        SPrintCoordinates(coordinates, buffer);
-        logger << buffer << std::endl;
-
         /* Format is x y z timestamp */
         sprintf(buffer, "%2.8f %2.8f %2.8f %2.9f",
                 coordinates.x, coordinates.y, coordinates.z, timestamp);
