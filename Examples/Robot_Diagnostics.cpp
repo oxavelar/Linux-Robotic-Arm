@@ -18,7 +18,6 @@ Point coordinates;
 #ifdef RT_PRIORITY
 void SetProcessPriority(const int &number)
 {
-    /* Higher priority for interrupt procesisng */
     /* https://rt.wiki.kernel.org/index.php/HOWTO:_Build_an_RT-application */
     struct sched_param sp = { .sched_priority = number };
     if( sched_setscheduler(0, RT_POLICY, &sp) != 0 ) {
