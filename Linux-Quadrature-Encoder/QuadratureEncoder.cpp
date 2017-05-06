@@ -41,8 +41,8 @@ QuadratureEncoder::QuadratureEncoder(const int &pin_a, const int &pin_b, const i
     _channel_b_callback = std::bind(&QuadratureEncoder::ISR_ChannelB, this);
     
     /* Initialize channels GPIO objects and assign local callbacks */
-    _gpio_a = new GPIO(pin_a, interrupt_mode, _channel_a_callback);
-    _gpio_b = new GPIO(pin_b, interrupt_mode, _channel_b_callback);
+    _gpio_a = std::unique_ptr<GPIO>(new GPIO(pin_a, interrupt_mode, _channel_a_callback));
+    _gpio_b = std::unique_ptr<GPIO>(new GPIO(pin_b, interrupt_mode, _channel_b_callback));
     
     /* Useful information to be printed regarding set-up */
     std::cout << "I: Userspace quadrature encoder created @ (pinA="
@@ -55,8 +55,6 @@ QuadratureEncoder::QuadratureEncoder(const int &pin_a, const int &pin_b, const i
 
 QuadratureEncoder::~QuadratureEncoder(void)
 {
-    delete _gpio_a;
-    delete _gpio_b;
 #if DEBUG
     PrintDebugStats();
 #endif

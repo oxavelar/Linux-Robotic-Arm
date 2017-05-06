@@ -37,7 +37,9 @@ class Motor
 
     private:
         /* External world interactions to the H-Bridge */
-        PWM *_pwm_a, *_pwm_b, *_pwm_active;
+        std::shared_ptr<PWM> _pwm_a;
+        std::shared_ptr<PWM> _pwm_b;
+        std::shared_ptr<PWM> _pwm_active;
         /* Used to keep track of stopped motor */
         double _speed_backup;
         /* We can set hard limits to the percentage of PWM channels */

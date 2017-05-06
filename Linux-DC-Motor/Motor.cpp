@@ -17,8 +17,8 @@
 Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
 {
     /* DC motor control is performed with PWM sysfs abstraction */
-    _pwm_a = new PWM(pin_pwm_a);
-    _pwm_b = new PWM(pin_pwm_b);
+    _pwm_a = std::shared_ptr<PWM>(new PWM(pin_pwm_a));
+    _pwm_b = std::shared_ptr<PWM>(new PWM(pin_pwm_b));
     
     /* Operational values being calculated for default base freq */
     const double t = (1 / (double)BASE_PWM_FREQUENCY_HZ);
@@ -55,10 +55,6 @@ Motor::~Motor(void)
 {
     Disabled();
     Stop();
-
-    /* Deleting the PWM object will disable the output */
-    delete _pwm_a;
-    delete _pwm_b;
 }
 
 
