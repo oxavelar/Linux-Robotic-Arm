@@ -17,7 +17,7 @@
 
 
 RoboticArm *RoboArm;
-Point coordinates;
+std::vector<Point> trajectory;
 
 /* Global command line knobs */
 std::string cl_option_filename;
@@ -38,7 +38,7 @@ void _cleanup(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
 
-    //munlockall();
+    munlockall();
 
     /* Delete all of the robotic-arm objects */
     delete RoboArm;
@@ -104,11 +104,9 @@ void ProcessCLI(int argc, char *argv[])
         }
 }
 
-void ParseTrajectoryFile(const std::string &file)
+void ParseTrajectoryFile(const std::string &file, std::vector<Point> &points)
 {
     logger << "I: Loading trajectory file: \"" << file << "\"" << std::endl;
-
-    std::vector<Point> points;
 
     std::string line;
     std::ifstream infile(file);
@@ -155,12 +153,10 @@ int main(int argc, char *argv[])
     /* Process the trajectory filename and arguments */
     ProcessCLI(argc, argv);
 
-    //mlockall(MCL_CURRENT | MCL_FUTURE);
+    mlockall(MCL_CURRENT | MCL_FUTURE);
 
     /* Preload the input file, and start loading it in memory */
-    ParseTrajectoryFile(cl_option_filename);
-
-    exit(-99);
+    ParseTrajectoryFile(cl_option_filename, trajectory);
 
     /* Please check RoboticArtm_Config.h for number of joints*/
     RoboArm = new RoboticArm();
@@ -170,22 +166,17 @@ int main(int argc, char *argv[])
 
     RoboArm->Init();
 
-    for(;;) {
+    /* Used for single line message */
+    char buffer[80];
 
-        /* Used for single line message */
-        char buffer[80];
-
-        /* First obtain the actual coordinates of the robot, to move it at will */
-        RoboArm->GetPosition(coordinates);
-
-        SPrintCoordinates(coordinates, buffer);
-        logger << "I: Moving to - " << buffer << std::endl;
-
-        /* Command the robot to a new position */
-        RoboArm->SetPositionSync(coordinates);
-       
-    }
-
+    /* Start feeding the trajectory data into our robot for play back */
+    for(auto &point : trajectory) {
+            SPrintCoordinates(point, buffer);
+            logger << "I: Target - " << buffer << std::endl;
+            RoboArm->SetPositionSync(point);
+            usleep(500E03);
+        }
+    
     return EXIT_SUCCESS;
 }
 
