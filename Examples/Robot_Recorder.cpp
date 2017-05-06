@@ -38,7 +38,8 @@ void SetProcessPriority(const int &number)
 void _cleanup(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
-
+    
+    outfile->flush();
     outfile->close();
 
     munlockall();
@@ -135,6 +136,8 @@ int main(int argc, char *argv[])
     logger << "I: You can now begin to move the robot" << std::endl;
     logger << "I: Press <Ctrl-C> to stop recording" << std::endl;
 
+    unsigned long long debug;
+
     for(;;) {
 
         /* Storing a sample for every 20ms */
@@ -150,6 +153,7 @@ int main(int argc, char *argv[])
 
         /* Write into the file */
         *outfile << buffer << std::endl;
+        *outfile << debug++ << std::endl;
 
     }
     
