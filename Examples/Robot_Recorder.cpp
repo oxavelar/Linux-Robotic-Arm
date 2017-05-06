@@ -150,6 +150,7 @@ int main(int argc, char *argv[])
 
         /* Write into the file */
         *outfile << buffer << std::endl;
+
     }
     
     _cleanup(EXIT_SUCCESS);
