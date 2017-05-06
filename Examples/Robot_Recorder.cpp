@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     mlockall(MCL_CURRENT | MCL_FUTURE);
 
     /* Please check RoboticArtm_Config.h for number of joints*/
-    //RoboArm = new RoboticArm();
+    RoboArm = new RoboticArm();
     
     /* File that we will be writing to */
     outfile = new std::ofstream(cl_option_filename, std::ofstream::binary);
