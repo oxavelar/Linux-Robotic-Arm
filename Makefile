@@ -15,6 +15,7 @@ OBJECTS += HighLatencyGPIO/GPIO.o \
 DEMOS = Examples/Robot_Diagnostics.o \
         Examples/Robot_Keyboard.o \
         Examples/Robot_Playback.o \
+        Examples/Robot_Recorder.o \
 
 DEPS += HighLatencyGPIO \
         HighLatencyPWM \
@@ -34,6 +35,7 @@ build: $(DEPS) $(OBJECTS) $(DEMOS)
 	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Diagnostics.o  -o linux-robotic-arm-diagnostics.app
 	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Keyboard.o     -o linux-robotic-arm-keyboard.app
 	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Playback.o     -o linux-robotic-arm-playback.app
+	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Recorder.o     -o linux-robotic-arm-recorder.app
 
 
 $(DEPS):
