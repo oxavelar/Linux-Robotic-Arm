@@ -296,7 +296,7 @@ void RoboticArm::EnableTrainingMode(void)
         RoboticJoint * const joint = joints[id];
         
         /* Kill off the movement */
-        joint->Movement->Stop();
+        joint->Movement->Disabled();
 
     }
 

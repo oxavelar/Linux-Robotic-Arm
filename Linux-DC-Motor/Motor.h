@@ -23,6 +23,8 @@ class Motor
 
         void Stop(void);
         void Start(void);
+        void Enabled(void);
+        void Disabled(void);
         double GetSpeed(void);
         void SetSpeed(const double &percent);
         void ApplyRangeLimits(const double &percent_l = 0, 

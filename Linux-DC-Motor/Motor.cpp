@@ -31,8 +31,7 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
     _pwm_b->setDuty(_pwm_dutycycle_ns);
 
     /* Starts up the PWM pins */    
-    _pwm_a->setState(PWM::State::ENABLED);
-    _pwm_b->setState(PWM::State::ENABLED);
+    Enabled();
 
     /* Defaults to channel A as active */
     _pwm_active = _pwm_a;
@@ -54,6 +53,7 @@ Motor::Motor(const int &pin_pwm_a, const int &pin_pwm_b)
 
 Motor::~Motor(void)
 {
+    Disabled();
     Stop();
 
     /* Deleting the PWM object will disable the output */
@@ -77,6 +77,19 @@ void Motor::Stop(void)
     _pwm_b->setDuty(0);
 }
 
+
+void Motor::Enabled(void)
+{
+    _pwm_a->setState(PWM::State::ENABLED);
+    _pwm_b->setState(PWM::State::ENABLED);
+}
+
+
+void Motor::Disabled(void)
+{
+    _pwm_a->setState(PWM::State::DISABLED);
+    _pwm_b->setState(PWM::State::DISABLED);
+}
 
 double Motor::GetSpeed(void)
 {
