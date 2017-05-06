@@ -1,19 +1,10 @@
-PROGRAM := linux-robotic-arm.app
-
 CC = g++
 CXXFLAGS += -O3 -std=c++11 -Wall -Wextra -Werror -Wno-reorder -fomit-frame-pointer -pipe -ftree-vectorize -mfpmath=sse -march=native -mtune=native -flto
 LDLIBS += -lpthread -lboost_system -lboost_filesystem -lboost_timer -lncurses
 LDFLAGS += -O1 -std=c++11 -Wall -flto --hash-style=gnu --as-needed
 
-SOURCES = demo.cpp RoboticArm.cpp
-OBJECTS = demo.o RoboticArm.o
-
-SOURCES += HighLatencyGPIO/GPIO.cc \
-           HighLatencyPWM/PWM.cc \
-           Linux-DC-Motor/Motor.cpp \
-           Linux-Quadrature-Encoder/QuadratureEncoder.cpp \
-           Linux-Visual-Encoder/VisualEncoder.cpp \
-
+SOURCES = RoboticArm.cpp
+OBJECTS = RoboticArm.o
  
 OBJECTS += HighLatencyGPIO/GPIO.o \
            HighLatencyPWM/PWM.o \
@@ -21,30 +12,36 @@ OBJECTS += HighLatencyGPIO/GPIO.o \
            Linux-Quadrature-Encoder/QuadratureEncoder.o \
            Linux-Visual-Encoder/VisualEncoder.o \
 
+DEMOS = Examples/Robot_Diagnostics.o \
+        Examples/Robot_Keyboard.o \
+        Examples/Robot_Read_File.o \
 
-DEPS += HighLatencyGPIO
-DEPS += HighLatencyPWM
+DEPS += HighLatencyGPIO \
+        HighLatencyPWM \
 
 CXXFLAGS += -DRT_PRIORITY=5 -DRT_POLICY=SCHED_RR
 CXXFLAGS += -DBASE_PWM_FREQUENCY_HZ=250 -DBASE_PWM_DUTYCYCLE=0
 CXXFLAGS += -DNO_VISUAL_ENCODER
 CXXFLAGS += -DDEBUG -DDEBUG_LEVEL=5
-CXXFLAGS += -DDIAGNOSTICS 
-#CXXFLAGS += -DNCURSES_SUPPORT
 
 
 all:
 	$(MAKE) -j1 $(DEPS) > /dev/null
 	$(MAKE) build
 
-build: $(DEPS) $(SOURCES) $(OBJECTS)
-	$(CC) $(LDLIBS) $(OBJECTS) -o $(PROGRAM)
+build: $(DEPS) $(OBJECTS) $(DEMOS)
+	# To build all of our demos as separate binaries
+	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Diagnostics.o  -o linux-robotic-arm-diagnostics.app
+	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Keyboard.o     -o linux-robotic-arm-keyboard.app
+	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Read_File.o    -o linux-robotic-arm-readfile.app
+
 
 $(DEPS):
 	git clone -q https://github.com/oxavelar/HighLatencyGPIO
 	git clone -q https://github.com/oxavelar/HighLatencyPWM
 
 clean:
-	-rm -rf $(PROGRAM) $(OBJECTS)
+	-rm -rf $(OBJECTS) $(DEMOS)
+	-rm -rf linux-robotic-arm-*.app
 
 

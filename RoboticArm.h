@@ -6,8 +6,8 @@
 
 #define epsilon (double)1E-09
 
-/* 3 millimeter tolerance */
-#define tolerance (double)3E-04
+/* 4 millimeter tolerance */
+#define tolerance (double)6E-04
 
 
 class Point
