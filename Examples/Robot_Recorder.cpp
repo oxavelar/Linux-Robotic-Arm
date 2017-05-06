@@ -15,10 +15,6 @@
 #include "../RoboticArm.h"
 #include "../RoboticArm_Config.h"
 
-
-std::unique_ptr<RoboticArm> RoboArm;
-Point coordinates;
-double timestamp;
 std::unique_ptr<std::ofstream> outfile;
 
 /* Global command line knobs */
@@ -101,6 +97,10 @@ void ProcessCLI(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+    std::unique_ptr<RoboticArm> RoboArm;
+    Point coordinates;
+    double timestamp;
+
     /* Used for single line messages */
     char buffer[80];
 
@@ -134,16 +134,14 @@ int main(int argc, char *argv[])
     logger << "I: You can now begin to move the robot" << std::endl;
     logger << "I: Press <Ctrl-C> to stop recording" << std::endl;
 
-    unsigned long long debug;
-
     for(;;) {
 
-        /* Storing a sample for every 20ms */
-        usleep(20E03);
-
-        /* Obtain the position and time stamp before we write it down */
+        /* Update the position and time stamp before we write it down */
         RoboArm->GetPosition(coordinates);
-        timestamp = 0.0;
+        timestamp += 0.002;
+
+        SPrintCoordinates(coordinates, buffer);
+        logger << buffer << std::endl;
 
         /* Format is x y z timestamp */
         sprintf(buffer, "%2.8f %2.8f %2.8f %2.9f",
@@ -151,7 +149,9 @@ int main(int argc, char *argv[])
 
         /* Write into the file */
         *outfile << buffer << std::endl;
-        *outfile << debug++ << std::endl;
+
+        /* Storing a sample for every 2ms */
+        usleep(2E03);
 
     }
     

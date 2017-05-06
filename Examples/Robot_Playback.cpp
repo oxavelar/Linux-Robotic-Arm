@@ -16,9 +16,6 @@
 #include "../RoboticArm_Config.h"
 
 
-std::unique_ptr<RoboticArm> RoboArm;
-std::vector<Point> trajectory;
-
 /* Global command line knobs */
 std::string cl_option_filename;
 uint64_t cl_option_loop;
@@ -147,6 +144,9 @@ void ParseTrajectoryFile(const std::string &file, std::vector<Point> &points)
 
 int main(int argc, char *argv[])
 {
+    std::unique_ptr<RoboticArm> RoboArm;
+    std::vector<Point> trajectory;
+
     /* Used for single line messages */
     char buffer[80];
 

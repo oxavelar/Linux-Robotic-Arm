@@ -12,9 +12,6 @@
 #include "../RoboticArm_Config.h"
 
 
-std::unique_ptr<RoboticArm> RoboArm;
-Point coordinates;
-
 #ifdef RT_PRIORITY
 void SetProcessPriority(const int &number)
 {
@@ -37,10 +34,11 @@ void _cleanup(int signum)
 
 int main(void)
 {
+    std::unique_ptr<RoboticArm> RoboArm;
+    Point t_coordinates, h_coordinates;
+
     /* Doing 1000 samples for the demo */
     auto const max_samples = 1000;
-    /* Target vs Measured coordinate variables */
-    Point t_coordinates, h_coordinates;
 
     mlockall(MCL_CURRENT | MCL_FUTURE);
     

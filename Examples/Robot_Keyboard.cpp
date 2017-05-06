@@ -12,9 +12,6 @@
 #include "../RoboticArm_Config.h"
 
 
-std::unique_ptr<RoboticArm> RoboArm;
-Point coordinates;
-
 #ifdef RT_PRIORITY
 void SetProcessPriority(const int &number)
 {
@@ -79,6 +76,9 @@ void SPrintCoordinates(const Point &coordinates, char *buffer)
 
 int main(void)
 {
+    std::unique_ptr<RoboticArm> RoboArm;
+    Point coordinates;
+
     mlockall(MCL_CURRENT | MCL_FUTURE);
 
     InitializeScreen();
@@ -103,12 +103,6 @@ int main(void)
 
         /* Used for single line message */
         char buffer[80];
-
-        /* Not used right now, but can be used for analytics */
-
-        auto load = toolbox::get_cpu_load();
-        logger << "I: CPU Utilization - " << std::fixed << std::setw(11) << std::setprecision(6)
-                                          << load << std::endl;
 
         /* First obtain the actual coordinates of the robot, to move it at will */
         RoboArm->GetPosition(coordinates);
