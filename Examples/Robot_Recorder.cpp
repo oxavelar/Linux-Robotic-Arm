@@ -17,6 +17,8 @@
 
 
 RoboticArm *RoboArm;
+Point coordinates;
+double timestamp;
 std::ofstream *outfile;
 
 /* Global command line knobs */
@@ -101,6 +103,9 @@ void ProcessCLI(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+    /* Used for single line messages */
+    char buffer[80];
+
     /* Process the trajectory filename and arguments */
     ProcessCLI(argc, argv);
 
@@ -120,17 +125,28 @@ int main(int argc, char *argv[])
     /* Register a signal handler to exit gracefully */
     signal(SIGINT, _cleanup);
 
-    //RoboArm->Init();
+    RoboArm->Init();
 
     /* Disable automatic control to move it with our hands to train it */
+    RoboArm->EnableTrainingMode();
 
     logger << "I: Recording trajectory file: \"" << cl_option_filename << "\"" << std::endl;
     logger << "I: You can now begin to move the robot" << std::endl;
     logger << "I: Press <Ctrl-C> to stop recording" << std::endl;
 
     for(;;) {
+
+        /* Storing a sample for every 500ms */
         usleep(500E03);
-        outfile->write("ping pong\n", 20);
+
+        /* Obtain the position and time stamp before we write it down */
+        RoboArm->GetPosition(coordinates);
+        timestamp = 0.0;
+
+        /* Format is x y z timestamp */
+        sprintf(buffer, "%+2.8f %+2.8f %+2.8f %+2.8f\n", 
+                coordinates.x, coordinates.y, coordinates.z, timestamp);
+        outfile->write(buffer, sizeof(buffer));
     }
     
     _cleanup(EXIT_SUCCESS);

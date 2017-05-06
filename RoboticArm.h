@@ -34,7 +34,6 @@ class RoboticJoint
         void SetAngle(const double &theta);
         void SetZero(void);
 
-
         /* Quadrature encoders + DC motors */
         QuadratureEncoder* Position;
         Motor* Movement;
@@ -64,6 +63,7 @@ class RoboticArm
         void ForwardKinematics(Point &pos, const std::vector<double> &theta);
         void InverseKinematics(const Point &pos, std::vector<double> &theta);
 
+        void EnableTrainingMode(void);
     private:
         const int _joints_nr;
         /* A container of joints form a chain, 

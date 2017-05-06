@@ -59,18 +59,16 @@ RoboticJoint::RoboticJoint(const int &id) :
     
 }
 
-
 RoboticJoint::~RoboticJoint(void)
 {
+    Movement->Stop();
+
     /* Stop the automatic control loop thread */
     if (AutomaticControlThread.joinable()) {
         _control_thread_stop_event = true;
         AutomaticControlThread.join();
     }
-    
-    /* Kill off any movement */
-    Movement->Stop();
-    
+
     delete Position;
     delete Movement;
 }
@@ -287,6 +285,22 @@ void RoboticArm::Init(void)
     }
 
     logger << "I: Robot was successfully initialized" << std::endl;
+}
+
+
+void RoboticArm::EnableTrainingMode(void)
+{  
+    /* Kill off the automatic control for each of the joints */
+    for(auto id = 0; id < _joints_nr; id++) {
+
+        RoboticJoint * const joint = joints[id];
+        
+        /* Kill off the movement */
+        joint->Movement->Stop();
+
+    }
+
+    logger << "I: Robot was put in training mode for manual override" << std::endl;
 }
 
 
