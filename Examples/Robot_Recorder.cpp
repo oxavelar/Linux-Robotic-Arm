@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 {
     std::unique_ptr<RoboticArm> RoboArm;
     Point coordinates;
-    double timestamp;
+    double timestamp = 0.0;
 
     /* Used for single line messages */
     char buffer[80];

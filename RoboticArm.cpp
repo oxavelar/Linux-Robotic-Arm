@@ -87,10 +87,9 @@ void RoboticJoint::Init(void)
 
 double RoboticJoint::GetAngle(void)
 {
-    /* Reads the internal variable, this is used by 
-     * the control loop thread, so just reading it is
-     * enough information of where the joint is */
-    return _reference_angle;
+    /* Reads the sensor variable, this is used by the arm level */
+    const auto actual_angle = std::fmod(Position->GetAngle(), 360.0);
+    return actual_angle;
 }
 
 
@@ -195,11 +194,11 @@ void RoboticArm::CalibrateMovement(void)
             }
             
             joint->Movement->SetSpeed(min_speed);
-            auto old = joint->Position->GetAngle();
+            auto old = joint->GetAngle();
             joint->Movement->Start();
             std::this_thread::sleep_for(std::chrono::milliseconds(2));
             joint->Movement->Stop();
-            difference = std::abs(joint->Position->GetAngle() - old);
+            difference = std::abs(joint->GetAngle() - old);
             
         } while(difference < epsilon);
         
@@ -215,7 +214,7 @@ void RoboticArm::CalibrateMovement(void)
 
             min_speed -= (delta * delta);
             joint->Movement->SetSpeed(min_speed);
-            auto old = joint->Position->GetAngle();
+            auto old = joint->GetAngle();
             joint->Movement->Start();
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
             joint->Movement->Stop();
@@ -249,12 +248,12 @@ void RoboticArm::CalibratePosition(void)
         joint->Movement->SetSpeed(100);
         do {
             
-            auto old = joint->Position->GetAngle();
+            auto old = joint->GetAngle();
             joint->Movement->Start();
             /* Must account for turn off and turn on delays, use bigger delay */
             std::this_thread::sleep_for(std::chrono::nanoseconds(1));
             joint->Movement->Stop();
-            difference = std::abs(joint->Position->GetAngle() - old);
+            difference = std::abs(joint->GetAngle() - old);
             
         } while(difference >= epsilon);
 
