@@ -115,7 +115,8 @@ int main(int argc, char *argv[])
     RoboArm = new RoboticArm();
     
     /* File that we will be writing to */
-    outfile = new std::ofstream(cl_option_filename, std::ofstream::binary);
+    outfile = new std::ofstream(cl_option_filename, std::ios::binary | 
+                                                    std::ios::trunc);
 
     if(outfile == NULL) {
         logger << "E: Failed to write the trajectory file" << std::endl;
@@ -144,9 +145,9 @@ int main(int argc, char *argv[])
         timestamp = 0.0;
 
         /* Format is x y z timestamp */
-        sprintf(buffer, "%+2.8f %+2.8f %+2.8f %+2.8f\n", 
+        sprintf(buffer, "%+2.8f %+2.8f %+2.8f %+2.8f",
                 coordinates.x, coordinates.y, coordinates.z, timestamp);
-        outfile->write(buffer, sizeof(buffer));
+        *outfile << buffer << std::endl;
     }
     
     _cleanup(EXIT_SUCCESS);
