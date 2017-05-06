@@ -137,16 +137,18 @@ int main(int argc, char *argv[])
 
     for(;;) {
 
-        /* Storing a sample for every 500ms */
-        usleep(500E03);
+        /* Storing a sample for every 20ms */
+        usleep(20E03);
 
         /* Obtain the position and time stamp before we write it down */
         RoboArm->GetPosition(coordinates);
         timestamp = 0.0;
 
         /* Format is x y z timestamp */
-        sprintf(buffer, "%+2.8f %+2.8f %+2.8f %+2.8f",
+        sprintf(buffer, "%2.8f %2.8f %2.8f %2.9f",
                 coordinates.x, coordinates.y, coordinates.z, timestamp);
+
+        /* Write into the file */
         *outfile << buffer << std::endl;
     }
     
