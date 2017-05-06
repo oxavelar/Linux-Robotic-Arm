@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
             SPrintCoordinates(point, buffer);
             logger << "I: Target - " << buffer << std::endl;
             RoboArm->SetPositionSync(point);
-            usleep(500E03);
+            usleep(2E03);
     }
     
     _cleanup(EXIT_SUCCESS);
