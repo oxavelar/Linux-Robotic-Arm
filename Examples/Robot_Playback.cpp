@@ -150,13 +150,13 @@ void ParseTrajectoryFile(const std::string &file, std::vector<Point> &points)
 
 int main(int argc, char *argv[])
 {
+    /* Used for single line messages */
+    char buffer[80];
+
     /* Process the trajectory filename and arguments */
     ProcessCLI(argc, argv);
 
     mlockall(MCL_CURRENT | MCL_FUTURE);
-
-    /* Preload the input file, and start loading it in memory */
-    ParseTrajectoryFile(cl_option_filename, trajectory);
 
     /* Please check RoboticArtm_Config.h for number of joints*/
     RoboArm = new RoboticArm();
@@ -166,8 +166,8 @@ int main(int argc, char *argv[])
 
     RoboArm->Init();
 
-    /* Used for single line message */
-    char buffer[80];
+    /* Preload the input file, and start loading it in memory */
+    ParseTrajectoryFile(cl_option_filename, trajectory);
 
     /* Start feeding the trajectory data into our robot for play back */
     for(auto &point : trajectory) {
