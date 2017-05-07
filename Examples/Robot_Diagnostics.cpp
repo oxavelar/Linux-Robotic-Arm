@@ -11,7 +11,7 @@
 #include "../RoboticArm.h"
 #include "../RoboticArm_Config.h"
 
-#define NUMBER_OF_SAMPLES 20
+#define NUMBER_OF_SAMPLES 100
 std::unique_ptr<RoboticArm> RoboArm;
 
 #ifdef RT_PRIORITY
@@ -65,12 +65,12 @@ int main(void)
 
         /* Random value between [-pi - pi] */
         std::mt19937 rng(std::random_device{}());
-        std::uniform_real_distribution<double> unif(0, 2 * M_PI);
+        std::uniform_real_distribution<float> unif(0, 2 * M_PI);
 
         for(auto id = 0; id < config::joints_nr; id++) {
             const double random_theta = unif(rng);
-            /* Limitting to 2° for faster metrics and less inertia*/
-            theta_random.push_back(random_theta / 180.0);
+            /* Limitting to 5° for faster metrics and less inertia*/
+            theta_random.push_back(random_theta / 72.0);
         }
 
         /* Use Our Robot's FK to obtain a valid "random" position */
