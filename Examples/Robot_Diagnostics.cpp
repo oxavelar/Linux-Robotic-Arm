@@ -27,9 +27,7 @@ void _cleanup(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
 
-    munlockall();
-    
-    exit(signum);
+    std::exit(signum);
 }
 
 int main(void)
@@ -95,8 +93,6 @@ int main(void)
     RoboArm->SetPositionSync(h_coordinates);
 
     logger << "I: Finished running diagnostics mode" << std::endl << std::endl;
-
-    _cleanup(EXIT_SUCCESS);
 
     return(EXIT_SUCCESS);
 }

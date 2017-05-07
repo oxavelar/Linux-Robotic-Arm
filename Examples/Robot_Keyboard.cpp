@@ -27,13 +27,11 @@ void _cleanup(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
 
-    munlockall();
-
     /* Finishes up gracefully the curses screen */
     endwin();
     system("reset");
     
-    exit(signum);
+    std::exit(signum);
 }
 
 void InitializeScreen(void)

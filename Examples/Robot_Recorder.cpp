@@ -35,13 +35,8 @@ void SetProcessPriority(const int &number)
 void _cleanup(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
-    
-    outfile->flush();
-    outfile->close();
 
-    munlockall();
-    
-    exit(signum);
+    std::exit(signum);
 }
 
 void SPrintCoordinates(const Point &coordinates, char *buffer)
@@ -151,8 +146,6 @@ int main(int argc, char *argv[])
         usleep((1 / (double)RECORD_RATE_HZ) * 1E06);
 
     }
-    
-    _cleanup(EXIT_SUCCESS);
 
     return EXIT_SUCCESS;
 }
