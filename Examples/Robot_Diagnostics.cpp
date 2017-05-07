@@ -11,6 +11,7 @@
 #include "../RoboticArm.h"
 #include "../RoboticArm_Config.h"
 
+#define NUMBER_OF_SAMPLES 20
 
 #ifdef RT_PRIORITY
 void SetProcessPriority(const int &number)
@@ -35,9 +36,6 @@ int main(void)
     std::unique_ptr<RoboticArm> RoboArm;
     Point t_coordinates, h_coordinates;
 
-    /* Doing 1000 samples for the demo */
-    auto const max_samples = 1000;
-
     mlockall(MCL_CURRENT | MCL_FUTURE);
     
 #ifdef RT_PRIORITY
@@ -57,7 +55,7 @@ int main(void)
     /* Saving our home position */
     RoboArm->GetPosition(h_coordinates);
 
-    for(auto s = 0; s < max_samples; s++) {
+    for(auto s = 0; s < NUMBER_OF_SAMPLES; s++) {
 
         /* Fill our N joints angles with random data */
         std::vector<double> theta_random;
