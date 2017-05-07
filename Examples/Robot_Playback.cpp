@@ -16,6 +16,8 @@
 #include "../RoboticArm_Config.h"
 
 
+std::unique_ptr<RoboticArm> RoboArm;
+
 /* Global command line knobs */
 std::string cl_option_filename;
 uint64_t cl_option_loop;
@@ -31,9 +33,12 @@ void SetProcessPriority(const int &number)
 }
 #endif
 
-void _cleanup(int signum)
+void Shutdown(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
+
+    /* Calling the destructor explicitly */
+    RoboArm.reset();
 
     std::exit(signum);
 }
@@ -146,7 +151,6 @@ void ParseTrajectoryFile(const std::string &file, std::vector<std::pair<Point, d
 
 int main(int argc, char *argv[])
 {
-    std::unique_ptr<RoboticArm> RoboArm;
     std::vector<std::pair<Point, double>> trajectory;
 
     /* Process the trajectory filename and arguments */
@@ -158,7 +162,7 @@ int main(int argc, char *argv[])
     RoboArm = std::unique_ptr<RoboticArm>(new RoboticArm());
     
     /* Register a signal handler to exit gracefully */
-    signal(SIGINT, _cleanup);
+    signal(SIGINT, Shutdown);
 
     RoboArm->Init();
 

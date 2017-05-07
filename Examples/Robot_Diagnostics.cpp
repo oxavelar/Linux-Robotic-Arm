@@ -12,6 +12,7 @@
 #include "../RoboticArm_Config.h"
 
 #define NUMBER_OF_SAMPLES 20
+std::unique_ptr<RoboticArm> RoboArm;
 
 #ifdef RT_PRIORITY
 void SetProcessPriority(const int &number)
@@ -24,16 +25,18 @@ void SetProcessPriority(const int &number)
 }
 #endif
 
-void _cleanup(int signum)
+void Shutdown(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
+
+    /* Calling the destructor explicitly */
+    RoboArm.reset();
 
     std::exit(signum);
 }
 
 int main(void)
 {
-    std::unique_ptr<RoboticArm> RoboArm;
     Point t_coordinates, h_coordinates;
 
     mlockall(MCL_CURRENT | MCL_FUTURE);
@@ -46,7 +49,7 @@ int main(void)
     RoboArm = std::unique_ptr<RoboticArm>(new RoboticArm());
     
     /* Register a signal handler to exit gracefully */
-    signal(SIGINT, _cleanup);
+    signal(SIGINT, Shutdown);
 
     RoboArm->Init();
 
@@ -62,12 +65,12 @@ int main(void)
 
         /* Random value between [-pi - pi] */
         std::mt19937 rng(std::random_device{}());
-        std::uniform_real_distribution<float> unif(0, 2 * M_PI);
+        std::uniform_real_distribution<double> unif(0, 2 * M_PI);
 
         for(auto id = 0; id < config::joints_nr; id++) {
             const double random_theta = unif(rng);
-            /* Limitting to 4° for faster metrics and less inertia*/
-            theta_random.push_back(random_theta / 90.0);
+            /* Limitting to 2° for faster metrics and less inertia*/
+            theta_random.push_back(random_theta / 180.0);
         }
 
         /* Use Our Robot's FK to obtain a valid "random" position */

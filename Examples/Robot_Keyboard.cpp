@@ -12,6 +12,8 @@
 #include "../RoboticArm_Config.h"
 
 
+std::unique_ptr<RoboticArm> RoboArm;
+
 #ifdef RT_PRIORITY
 void SetProcessPriority(const int &number)
 {
@@ -23,13 +25,16 @@ void SetProcessPriority(const int &number)
 }
 #endif
 
-void _cleanup(int signum)
+void Shutdown(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
 
     /* Finishes up gracefully the curses screen */
     endwin();
     system("reset");
+
+    /* Calling the destructor explicitly */
+    RoboArm.reset();
     
     std::exit(signum);
 }
@@ -91,7 +96,7 @@ int main(void)
     RoboArm = std::unique_ptr<RoboticArm>(new RoboticArm());
     
     /* Register a signal handler to exit gracefully */
-    signal(SIGINT, _cleanup);
+    signal(SIGINT, Shutdown);
 
     RoboArm->Init();
 

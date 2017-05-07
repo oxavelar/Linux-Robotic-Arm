@@ -16,6 +16,7 @@
 #include "../RoboticArm_Config.h"
 
 #define RECORD_RATE_HZ 20
+std::unique_ptr<RoboticArm> RoboArm;
 std::unique_ptr<std::ofstream> outfile;
 
 /* Global command line knobs */
@@ -32,9 +33,13 @@ void SetProcessPriority(const int &number)
 }
 #endif
 
-void _cleanup(int signum)
+void Shutdown(int signum)
 {
     logger << "I: Caught signal " << signum << std::endl;
+
+    /* Calling the destructor explicitly */
+    RoboArm.reset();
+    outfile.reset();
 
     std::exit(signum);
 }
@@ -93,7 +98,6 @@ void ProcessCLI(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-    std::unique_ptr<RoboticArm> RoboArm;
     Point coordinates;
     double timestamp = 0.0;
 
@@ -119,7 +123,7 @@ int main(int argc, char *argv[])
     }
 
     /* Register a signal handler to exit gracefully */
-    signal(SIGINT, _cleanup);
+    signal(SIGINT, Shutdown);
 
     RoboArm->Init();
 
