@@ -69,8 +69,8 @@ void QuadratureEncoder::SetParameters(const int &segments)
 
 double QuadratureEncoder::GetAngle(void)
 {
-    double degrees;
-    degrees = 360.0 * _counter / (double)_segments_per_revolution;
+    double degrees = 360.0 * _counter;
+    degrees /= (double)_segments_per_revolution;
     return degrees;
 }
 

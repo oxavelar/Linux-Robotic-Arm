@@ -88,7 +88,7 @@ void RoboticJoint::Init(void)
 double RoboticJoint::GetAngle(void)
 {
     /*
-     * Adds a big 360 degree chunk in case we have CW direction.
+     * Adds a big 360 degree chunk in case we have some offset.
      * Keep in mind that we are reading from the raw sensor.
      */
     double angle = Position->GetAngle();
@@ -101,7 +101,8 @@ void RoboticJoint::SetAngle(const double &theta)
     /* Update the internal variable, the control loop
      * will take charge of getting us here eventually 
      * theta is in radians so converting from 0 to 360 */
-    _reference_angle = (theta >= 0 ? theta : (2 * M_PI + theta)) * 180.0 / M_PI;
+    double angle = (theta >= 0 ? theta : (2 * M_PI + theta)) * 180.0 / M_PI;
+    _reference_angle = std::fmod(angle, 360.0);
 }
 
 
@@ -110,7 +111,7 @@ void RoboticJoint::SetZero(void)
     /* This will reset the sensors and the internal state
      * as our zero reference point */
     Position->SetZero();
-    _reference_angle = 0;
+    _reference_angle = GetAngle();
 }
 
 
@@ -121,13 +122,21 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 8.00;
+        const auto k = 40.00;
         /* Internal refernces are in degrees no conversion at all */
-        const auto error_angle = GetAngle() - _reference_angle;
-        
-        /* Sign dictates the direction of movement */
-        if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
-        else                     Movement->SetDirection(Motor::Direction::CCW);
+        const auto actual_angle = GetAngle();
+        const auto error_angle = actual_angle - _reference_angle;
+
+        /* The sign and range indicate the quadrant */
+        if        (error_angle >= +180.0) {
+            Movement->SetDirection(Motor::Direction::CCW);
+        } else if (error_angle >= +0.000) {
+            Movement->SetDirection(Motor::Direction::CW);
+        } else if (error_angle >= -180.0) {
+            Movement->SetDirection(Motor::Direction::CCW);
+        } else {
+            Movement->SetDirection(Motor::Direction::CW);
+        }
         
         /* Store the motor control value to the movement function */
         Movement->SetSpeed( k * std::abs(error_angle) );

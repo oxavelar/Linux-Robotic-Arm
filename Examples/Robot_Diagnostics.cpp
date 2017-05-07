@@ -11,7 +11,7 @@
 #include "../RoboticArm.h"
 #include "../RoboticArm_Config.h"
 
-#define NUMBER_OF_SAMPLES 100
+#define NUMBER_OF_SAMPLES 1000
 std::unique_ptr<RoboticArm> RoboArm;
 
 #ifdef RT_PRIORITY

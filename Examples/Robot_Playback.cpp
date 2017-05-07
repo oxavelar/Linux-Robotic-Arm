@@ -11,6 +11,7 @@
 #include <fstream>
 #include <cstring>
 #include <string>
+#include <chrono>
 #include "../toolbox.h"
 #include "../RoboticArm.h"
 #include "../RoboticArm_Config.h"
@@ -151,6 +152,9 @@ void ParseTrajectoryFile(const std::string &file, std::vector<std::pair<Point, d
 
 int main(int argc, char *argv[])
 {
+    /* Used for single line message */
+    char buffer[80];
+
     std::vector<std::pair<Point, double>> trajectory;
 
     /* Process the trajectory filename and arguments */
@@ -169,12 +173,24 @@ int main(int argc, char *argv[])
     /* Preload the input file, and start loading it in memory */
     ParseTrajectoryFile(cl_option_filename, trajectory);
 
+    /* Base off our current time as our beginning */
+    double delta_time = 0;
+
     /* Start feeding the trajectory data into our robot for play back */
     for(auto &point_and_time : trajectory) {
+
             Point p = point_and_time.first;
-            double t = point_and_time.second;
+            double t = point_and_time.second - delta_time;
+            delta_time = point_and_time.second;
+
+            SPrintCoordinates(p, buffer);
+            logger << "I: Moving - " << buffer << std::endl;
+            logger << "I: Waiting - " << t << " seconds" << std::endl;
+
             RoboArm->SetPositionSync(p);
             usleep(t * 1E06);
+
+
     }
 
     return EXIT_SUCCESS;
