@@ -88,8 +88,7 @@ void RoboticJoint::Init(void)
 double RoboticJoint::GetAngle(void)
 {
     /* Reads the sensor variable, this is used by the arm level */
-    const auto actual_angle = std::fmod(Position->GetAngle(), 360.0);
-    return actual_angle;
+    return std::fmod(Position->GetAngle(), 360.0);
 }
 
 
@@ -121,7 +120,7 @@ void RoboticJoint::AngularControl(void)
         /* Consists of the interaction between position & movement */
         const auto k = 8.00;
         /* Internal refernces are in degrees no conversion at all */
-        const auto actual_angle = std::fmod(Position->GetAngle(), 360.0);
+        const auto actual_angle = std::fmod(GetAngle(), 360.0);
         const auto error_angle = actual_angle - _reference_angle;
         
         /* Sign dictates the direction of movement */
@@ -173,7 +172,7 @@ void RoboticArm::CalibrateMovement(void)
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        std::shared_ptr<RoboticJoint> const joint = joints[id];
+        auto const joint = joints[id];
 
         /* Calibrate each motor independently to find the minimum speed
          * value that produces real movement, due to rounding aritmethic
@@ -218,7 +217,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->Start();
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
             joint->Movement->Stop();
-            difference = std::abs(joint->Position->GetAngle() - old);
+            difference = std::abs(joint->GetAngle() - old);
             
         } while(difference < epsilon);
         
@@ -238,7 +237,7 @@ void RoboticArm::CalibratePosition(void)
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        std::shared_ptr<RoboticJoint> const joint = joints[id];
+        auto const joint = joints[id];
        
         /* Get the rotors to a known position on a tight controlled loop 
          * due to rounding aritmethic errors, we use an epsilon comparision
@@ -273,9 +272,9 @@ void RoboticArm::Init(void)
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        std::shared_ptr<RoboticJoint> const joint = joints[id];
+        auto const joint = joints[id];
         
-        /* Let the the joint correction control thread run and motors start-up */
+        /* Correction control thread run and motors start-up */
         joint->Init();
 
     }
@@ -289,7 +288,7 @@ void RoboticArm::EnableTrainingMode(void)
     /* Kill off the automatic control for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
 
-        std::shared_ptr<RoboticJoint> const joint = joints[id];
+        auto const joint = joints[id];
         
         /* Kill off the movement */
         joint->Movement->Disabled();
