@@ -92,7 +92,7 @@ double RoboticJoint::GetAngle(void)
      * Keep in mind that we are reading from the raw sensor.
      */
     double angle = Position->GetAngle();
-    return std::fmod(angle + 720000.0), 360.0);
+    return std::fmod(angle + 720000.0, 360.0);
 }
 
 
