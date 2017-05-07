@@ -21,7 +21,7 @@ std::unique_ptr<RoboticArm> RoboArm;
 
 /* Global command line knobs */
 std::string cl_option_filename;
-uint64_t cl_option_loop;
+uint64_t cl_option_loop = 1;
 
 #ifdef RT_PRIORITY
 void SetProcessPriority(const int &number)
@@ -42,12 +42,6 @@ void Shutdown(int signum)
     RoboArm.reset();
 
     std::exit(signum);
-}
-
-void SPrintCoordinates(const Point &coordinates, char *buffer)
-{
-    sprintf(buffer, " x= %+2.5f | y= %+2.5f | z= %+2.5f", 
-            coordinates.x, coordinates.y, coordinates.z);
 }
 
 void PrintUsage()
@@ -74,10 +68,10 @@ void ProcessCLI(int argc, char *argv[])
     int c, option_index = 0;
 
     struct option long_options[] = {
-        { "file"    , required_argument ,0, 'f'},
-        { "loop "   , optional_argument ,0, 'l'},
-        { "help"    , no_argument       ,0, 'h'},
-        { 0         , 0                 ,0,  0 }
+        { "file"    , required_argument , NULL, 'f'},
+        { "loop "   , optional_argument , NULL, 'l'},
+        { "help"    , no_argument       , NULL, 'h'},
+        { 0         , 0                 , NULL,  0 }
     };
 
     if (argc < 2)
@@ -152,9 +146,6 @@ void ParseTrajectoryFile(const std::string &file, std::vector<std::pair<Point, d
 
 int main(int argc, char *argv[])
 {
-    /* Used for single line message */
-    char buffer[80];
-
     std::vector<std::pair<Point, double>> trajectory;
 
     /* Process the trajectory filename and arguments */
@@ -173,23 +164,22 @@ int main(int argc, char *argv[])
     /* Preload the input file, and start loading it in memory */
     ParseTrajectoryFile(cl_option_filename, trajectory);
 
-    /* Base off our current time as our beginning */
-    double delta_time = 0;
+    while(cl_option_loop--) {
 
-    /* Start feeding the trajectory data into our robot for play back */
-    for(auto &point_and_time : trajectory) {
+        /* Base off our current time as our beginning */
+        double delta_time = 0;
 
-            Point p = point_and_time.first;
-            double t = point_and_time.second - delta_time;
-            delta_time = point_and_time.second;
+        /* Start feeding the trajectory data into our robot for play back */
+        for(auto &point_and_time : trajectory) {
 
-            SPrintCoordinates(p, buffer);
-            logger << "I: Moving - " << buffer << std::endl;
-            logger << "I: Waiting - " << t << " seconds" << std::endl;
+                Point p = point_and_time.first;
+                double t = point_and_time.second - delta_time;
+                delta_time = point_and_time.second;
 
-            RoboArm->SetPositionSync(p);
-            usleep(t * 1E06);
+                RoboArm->SetPositionSync(p);
+                usleep(t * 1E06);
 
+        }
 
     }
 

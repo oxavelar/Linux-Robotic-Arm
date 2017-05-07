@@ -44,12 +44,6 @@ void Shutdown(int signum)
     std::exit(signum);
 }
 
-void SPrintCoordinates(const Point &coordinates, char *buffer)
-{
-    sprintf(buffer, " x= %+2.5f | y= %+2.5f | z= %+2.5f", 
-            coordinates.x, coordinates.y, coordinates.z);
-}
-
 void PrintUsage()
 {
     const std::string usage                                   \
@@ -73,9 +67,9 @@ void ProcessCLI(int argc, char *argv[])
     int c, option_index = 0;
 
     struct option long_options[] = {
-        { "file"    , required_argument ,0, 'f'},
-        { "help"    , no_argument       ,0, 'h'},
-        { 0         , 0                 ,0,  0 }
+        { "file"    , required_argument , NULL, 'f'},
+        { "help"    , no_argument       , NULL, 'h'},
+        { 0         , 0                 , NULL,  0 }
     };
 
     if (argc < 2)
