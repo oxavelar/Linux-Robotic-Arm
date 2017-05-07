@@ -87,8 +87,12 @@ void RoboticJoint::Init(void)
 
 double RoboticJoint::GetAngle(void)
 {
-    /* Reads the sensor variable, this is used by the arm level */
-    return std::fmod(Position->GetAngle(), 360.0);
+    /*
+     * Adds a big 360 degree chunk in case we have CW direction.
+     * Keep in mind that we are reading from the raw sensor.
+     */
+    double angle = Position->GetAngle();
+    return std::fmod(angle + 720000.0), 360.0);
 }
 
 
@@ -98,7 +102,6 @@ void RoboticJoint::SetAngle(const double &theta)
      * will take charge of getting us here eventually 
      * theta is in radians so converting from 0 to 360 */
     _reference_angle = (theta >= 0 ? theta : (2 * M_PI + theta)) * 180.0 / M_PI;
-    _reference_angle = std::fmod(_reference_angle, 360.0);
 }
 
 
@@ -120,8 +123,7 @@ void RoboticJoint::AngularControl(void)
         /* Consists of the interaction between position & movement */
         const auto k = 8.00;
         /* Internal refernces are in degrees no conversion at all */
-        const auto actual_angle = std::fmod(GetAngle(), 360.0);
-        const auto error_angle = actual_angle - _reference_angle;
+        const auto error_angle = GetAngle() - _reference_angle;
         
         /* Sign dictates the direction of movement */
         if (error_angle >= 0)    Movement->SetDirection(Motor::Direction::CW);
