@@ -98,7 +98,7 @@ void ProcessCLI(int argc, char *argv[])
         }
 }
 
-void ParseTrajectoryFile(const std::string &file, std::vector<Point> &points)
+void ParseTrajectoryFile(const std::string &file, std::vector<std::pair<Point, double>> &trajectory)
 {
     logger << "I: Loading trajectory file: \"" << file << "\"" << std::endl;
 
@@ -126,7 +126,11 @@ void ParseTrajectoryFile(const std::string &file, std::vector<Point> &points)
                 p.x = std::stod(split_line[0]);
                 p.y = std::stod(split_line[1]);
                 p.z = std::stod(split_line[2]);
-                points.push_back(p);
+
+                /* Last field contains timestamp in seconds */
+                double t = std::stod(split_line[3]);
+
+                trajectory.push_back(std::make_pair(p, t));
 
             }
 
@@ -139,16 +143,13 @@ void ParseTrajectoryFile(const std::string &file, std::vector<Point> &points)
         return;
     }
 
-    logger << "I: Loaded " << points.size() << " points from the trajectory file" << std::endl;
+    logger << "I: Loaded " << trajectory.size() << " points from the trajectory file" << std::endl;
 }
 
 int main(int argc, char *argv[])
 {
     std::unique_ptr<RoboticArm> RoboArm;
-    std::vector<Point> trajectory;
-
-    /* Used for single line messages */
-    char buffer[80];
+    std::vector<std::pair<Point, double>> trajectory;
 
     /* Process the trajectory filename and arguments */
     ProcessCLI(argc, argv);
@@ -167,9 +168,11 @@ int main(int argc, char *argv[])
     ParseTrajectoryFile(cl_option_filename, trajectory);
 
     /* Start feeding the trajectory data into our robot for play back */
-    for(auto &point : trajectory) {
-            RoboArm->SetPositionSync(point);
-            usleep(2E03);
+    for(auto &point_and_time : trajectory) {
+            Point p = point_and_time.first;
+            double t = point_and_time.second;
+            RoboArm->SetPositionSync(p);
+            usleep(t * 1E06);
     }
     
     _cleanup(EXIT_SUCCESS);

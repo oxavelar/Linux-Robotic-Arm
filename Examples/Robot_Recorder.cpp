@@ -15,6 +15,7 @@
 #include "../RoboticArm.h"
 #include "../RoboticArm_Config.h"
 
+#define RECORD_RATE_HZ 20
 std::unique_ptr<std::ofstream> outfile;
 
 /* Global command line knobs */
@@ -138,7 +139,7 @@ int main(int argc, char *argv[])
 
         /* Update the position and time stamp before we write it down */
         RoboArm->GetPosition(coordinates);
-        timestamp += 0.002;
+        timestamp += (1 / (double)RECORD_RATE_HZ);
 
         /* Format is x y z timestamp */
         sprintf(buffer, "%2.8f %2.8f %2.8f %2.9f",
@@ -147,8 +148,7 @@ int main(int argc, char *argv[])
         /* Write into the file */
         *outfile << buffer << std::endl;
 
-        /* Storing a sample for every 2ms */
-        usleep(2E03);
+        usleep((1 / (double)RECORD_RATE_HZ) * 1E06);
 
     }
     
