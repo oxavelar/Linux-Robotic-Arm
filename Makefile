@@ -1,7 +1,7 @@
 CC = g++
 CXXFLAGS += -O3 -std=c++11 -Wall -Wextra -Werror -Wno-reorder -fomit-frame-pointer -pipe -ftree-vectorize -mfpmath=sse -march=native -mtune=native -flto
 LDLIBS += -lpthread -lboost_system -lboost_filesystem -lboost_timer -lncurses
-LDFLAGS += -O1 -std=c++11 -Wall -flto --hash-style=gnu --as-needed
+LDFLAGS += -O3 -std=c++11 -Wall -flto --hash-style=gnu --as-needed
 
 SOURCES = RoboticArm.cpp
 OBJECTS = RoboticArm.o
@@ -20,7 +20,7 @@ DEMOS = Examples/Robot_Diagnostics.o \
 DEPS += HighLatencyGPIO \
         HighLatencyPWM \
 
-CXXFLAGS += -DRT_PRIORITY=5 -DRT_POLICY=SCHED_RR
+CXXFLAGS += -DRT_PRIORITY=7 -DRT_POLICY=SCHED_RR
 CXXFLAGS += -DBASE_PWM_FREQUENCY_HZ=250 -DBASE_PWM_DUTYCYCLE=0
 CXXFLAGS += -DNO_VISUAL_ENCODER
 CXXFLAGS += -DDEBUG -DDEBUG_LEVEL=5
@@ -32,10 +32,10 @@ all:
 
 build: $(DEPS) $(OBJECTS) $(DEMOS)
 	# To build all of our demos as separate binaries
-	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Diagnostics.o  -o linux-robotic-arm-diagnostics.app
-	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Keyboard.o     -o linux-robotic-arm-keyboard.app
-	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Playback.o     -o linux-robotic-arm-playback.app
-	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Recorder.o     -o linux-robotic-arm-recorder.app
+	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Diagnostics.o  -o robot-arm-diagnostics.app
+	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Keyboard.o     -o robot-arm-keyboard.app
+	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Playback.o     -o robot-arm-playback.app
+	$(CC) $(LDLIBS) $(OBJECTS) Examples/Robot_Recorder.o     -o robot-arm-recorder.app
 
 
 $(DEPS):
@@ -44,6 +44,6 @@ $(DEPS):
 
 clean:
 	-rm -rf $(OBJECTS) $(DEMOS)
-	-rm -rf linux-robotic-arm-*.app
+	-rm -rf *.app
 
 

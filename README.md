@@ -16,7 +16,7 @@ A robot joint is formed by a positioning (imaging/encoder) and movement (actuato
 Testing has shown and we would recomend tweak the following parameters in the Linux scheduler through the sysctl.conf interface in order to get better response times.
 
 ```
-ernel.sched_tunable_scaling = 0
+kernel.sched_tunable_scaling = 0
 kernel.sched_latency_ns = 120000
 kernel.sched_min_granularity_ns = 200000
 kernel.sched_wakeup_granularity_ns = 1000

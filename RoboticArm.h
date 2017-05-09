@@ -6,7 +6,7 @@
 
 #define epsilon (double)1E-09
 
-/* 4 millimeter tolerance */
+/* 6 millimeter tolerance */
 #define tolerance (double)6E-04
 
 

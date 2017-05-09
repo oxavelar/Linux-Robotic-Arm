@@ -69,8 +69,8 @@ int main(void)
 
         for(auto id = 0; id < config::joints_nr; id++) {
             const double random_theta = unif(rng);
-            /* Limitting to 5° for faster metrics and less inertia*/
-            theta_random.push_back(random_theta / 72.0);
+            /* Limitting to 2° for faster metrics and less inertia*/
+            theta_random.push_back(0 * random_theta / 180.0);
         }
 
         /* Use Our Robot's FK to obtain a valid "random" position */

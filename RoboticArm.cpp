@@ -92,7 +92,7 @@ double RoboticJoint::GetAngle(void)
      * Keep in mind that we are reading from the raw sensor.
      */
     double angle = Position->GetAngle();
-    return std::fmod(angle + 720000.0, 360.0);
+    return std::remainder(angle + 2160.0, 360.0);
 }
 
 
@@ -102,7 +102,7 @@ void RoboticJoint::SetAngle(const double &theta)
      * will take charge of getting us here eventually 
      * theta is in radians so converting from 0 to 360 */
     double angle = (theta >= 0 ? theta : (2 * M_PI + theta)) * 180.0 / M_PI;
-    _reference_angle = std::fmod(angle, 360.0);
+    _reference_angle = std::remainder(angle, 360.0);
 }
 
 
@@ -122,24 +122,22 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 40.00;
+        const auto k = 8.00;
         /* Internal refernces are in degrees no conversion at all */
         const auto actual_angle = GetAngle();
         const auto error_angle = actual_angle - _reference_angle;
 
-        /* The sign and range indicate the quadrant */
-        if        (error_angle >= +180.0) {
+        /* If the error is negative use it it inversely */
+        const auto sign = (error_angle > 0) ? +1.0 : -1.0;
+
+        /* The relationship indicate rotation direction */
+        if (sign * _reference_angle > actual_angle)
             Movement->SetDirection(Motor::Direction::CCW);
-        } else if (error_angle >= +0.000) {
+        else
             Movement->SetDirection(Motor::Direction::CW);
-        } else if (error_angle >= -180.0) {
-            Movement->SetDirection(Motor::Direction::CCW);
-        } else {
-            Movement->SetDirection(Motor::Direction::CW);
-        }
         
-        /* Store the motor control value to the movement function */
-        Movement->SetSpeed( k * std::abs(error_angle) );
+        /* P-Only control: Store the motor control value */
+        Movement->SetSpeed( k * std::abs(error_angle) + 16.0);
         
 #if (DEBUG_LEVEL >= 10)
         logger << "D: Joint ID " << _id << " actual=" << actual_angle << std::endl;
