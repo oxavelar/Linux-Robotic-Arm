@@ -32,6 +32,8 @@ echo in > /sys/class/gpio/gpio219/direction
 echo mode1 > /sys/kernel/debug/gpio_debug/gpio12/current_pinmux
 echo no-override > /sys/kernel/debug/gpio_debug/gpio12/current_override_indir
 echo override-enable > /sys/kernel/debug/gpio_debug/gpio12/current_override_outdir
+echo override-low > /sys/kernel/debug/gpio_debug/gpio12/current_standby_outval
+echo override-enable > /sys/kernel/debug/gpio_debug/gpio12/current_standby_outdir
 echo 251 > /sys/class/gpio/unexport
 echo 219 > /sys/class/gpio/unexport
 
@@ -43,14 +45,10 @@ echo in > /sys/class/gpio/gpio221/direction
 echo mode1 > /sys/kernel/debug/gpio_debug/gpio13/current_pinmux
 echo no-override > /sys/kernel/debug/gpio_debug/gpio13/current_override_indir
 echo override-enable > /sys/kernel/debug/gpio_debug/gpio13/current_override_outdir
+echo override-low > /sys/kernel/debug/gpio_debug/gpio13/current_standby_outval
+echo override-enable > /sys/kernel/debug/gpio_debug/gpio13/current_standby_outdir
 echo 253 > /sys/class/gpio/unexport
 echo 221 > /sys/class/gpio/unexport
-
-echo "I: PWM1 Noise workaround"
-echo 1 > /sys/class/pwm/pwmchip0/export
-echo 1 > /sys/class/pwm/pwmchip0/pwm1/enable
-echo 0 > /sys/class/pwm/pwmchip0/pwm1/enable
-echo 1 > /sys/class/pwm/pwmchip0/unexport
 
 echo "I: Enabling PWM2 on IO6"
 echo 254 > /sys/class/gpio/export
@@ -60,6 +58,8 @@ echo in > /sys/class/gpio/gpio222/direction
 echo mode1 > /sys/kernel/debug/gpio_debug/gpio182/current_pinmux
 echo no-override > /sys/kernel/debug/gpio_debug/gpio182/current_override_indir
 echo override-enable > /sys/kernel/debug/gpio_debug/gpio182/current_override_outdir
+echo override-low > /sys/kernel/debug/gpio_debug/gpio182/current_standby_outval
+echo override-enable > /sys/kernel/debug/gpio_debug/gpio182/current_standby_outdir
 echo 254 > /sys/class/gpio/unexport
 echo 222 > /sys/class/gpio/unexport
 
@@ -71,24 +71,27 @@ echo in > /sys/class/gpio/gpio225/direction
 echo mode1 > /sys/kernel/debug/gpio_debug/gpio183/current_pinmux
 echo no-override > /sys/kernel/debug/gpio_debug/gpio183/current_override_indir
 echo override-enable > /sys/kernel/debug/gpio_debug/gpio183/current_override_outdir
+echo override-low > /sys/kernel/debug/gpio_debug/gpio183/current_standby_outval
+echo override-enable > /sys/kernel/debug/gpio_debug/gpio183/current_standby_outdir
 echo 257 > /sys/class/gpio/unexport
 echo 225 > /sys/class/gpio/unexport
 
+
 echo "I: Enabling GPIO48 on IO7"
 echo mode0 > /sys/kernel/debug/gpio_debug/gpio48/current_pinmux
-echo 910ohms > /sys/kernel/debug/gpio_debug/gpio48/current_pullstrength
+echo 20k > /sys/kernel/debug/gpio_debug/gpio48/current_pullstrength
 echo pulldown > /sys/kernel/debug/gpio_debug/gpio48/current_pullmode
-echo enable > /sys/kernel/debug/gpio_debug/gpio48/current_opendrain
-echo override-enable > /sys/kernel/debug/gpio_debug/gpio48/current_override_indir
+echo disable > /sys/kernel/debug/gpio_debug/gpio48/current_opendrain
 echo no-override > /sys/kernel/debug/gpio_debug/gpio48/current_override_outdir
+echo override-enable > /sys/kernel/debug/gpio_debug/gpio48/current_override_indir
 
 echo "I: Enabling GPIO49 on IO8"
 echo mode0 > /sys/kernel/debug/gpio_debug/gpio49/current_pinmux
-echo 910ohms > /sys/kernel/debug/gpio_debug/gpio49/current_pullstrength
+echo 20k > /sys/kernel/debug/gpio_debug/gpio49/current_pullstrength
 echo pulldown > /sys/kernel/debug/gpio_debug/gpio49/current_pullmode
-echo enable > /sys/kernel/debug/gpio_debug/gpio49/current_opendrain
-echo override-enable > /sys/kernel/debug/gpio_debug/gpio49/current_override_indir
+echo disable > /sys/kernel/debug/gpio_debug/gpio49/current_opendrain
 echo no-override > /sys/kernel/debug/gpio_debug/gpio49/current_override_outdir
+echo override-enable > /sys/kernel/debug/gpio_debug/gpio49/current_override_indir
 
 echo "I: Enabling GPIO41 on IO10"
 echo 263 > /sys/class/gpio/export
@@ -98,11 +101,11 @@ echo 226 > /sys/class/gpio/export
 echo high > /sys/class/gpio/gpio263/direction
 echo low > /sys/class/gpio/gpio240/direction
 echo mode0 > /sys/kernel/debug/gpio_debug/gpio41/current_pinmux
-echo 910ohms > /sys/kernel/debug/gpio_debug/gpio41/current_pullstrength
+echo 20k > /sys/kernel/debug/gpio_debug/gpio41/current_pullstrength
 echo pulldown > /sys/kernel/debug/gpio_debug/gpio41/current_pullmode
-echo enable > /sys/kernel/debug/gpio_debug/gpio41/current_opendrain
-echo override-enable > /sys/kernel/debug/gpio_debug/gpio41/current_override_indir
+echo disable > /sys/kernel/debug/gpio_debug/gpio41/current_opendrain
 echo no-override > /sys/kernel/debug/gpio_debug/gpio41/current_override_outdir
+echo override-enable > /sys/kernel/debug/gpio_debug/gpio41/current_override_indir
 echo low > /sys/class/gpio/gpio258/direction
 echo in > /sys/class/gpio/gpio226/direction
 echo 263 > /sys/class/gpio/unexport
@@ -118,11 +121,11 @@ echo 227 > /sys/class/gpio/export
 echo high > /sys/class/gpio/gpio262/direction
 echo low > /sys/class/gpio/gpio241/direction
 echo mode0 > /sys/kernel/debug/gpio_debug/gpio43/current_pinmux
-echo 910ohms > /sys/kernel/debug/gpio_debug/gpio43/current_pullstrength
+echo 20k > /sys/kernel/debug/gpio_debug/gpio43/current_pullstrength
 echo pulldown > /sys/kernel/debug/gpio_debug/gpio43/current_pullmode
-echo enable > /sys/kernel/debug/gpio_debug/gpio43/current_opendrain
-echo override-enable > /sys/kernel/debug/gpio_debug/gpio43/current_override_indir
+echo disable > /sys/kernel/debug/gpio_debug/gpio43/current_opendrain
 echo no-override > /sys/kernel/debug/gpio_debug/gpio43/current_override_outdir
+echo override-enable > /sys/kernel/debug/gpio_debug/gpio43/current_override_indir
 echo low > /sys/class/gpio/gpio259/direction
 echo in > /sys/class/gpio/gpio227/direction
 echo 262 > /sys/class/gpio/unexport
