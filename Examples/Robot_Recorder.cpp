@@ -15,7 +15,7 @@
 #include "../RoboticArm.h"
 #include "../RoboticArm_Config.h"
 
-#define RECORD_RATE_HZ 20
+#define RECORD_RATE_HZ 100
 std::unique_ptr<RoboticArm> RoboArm;
 std::unique_ptr<std::ofstream> outfile;
 

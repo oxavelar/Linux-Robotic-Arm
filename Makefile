@@ -1,7 +1,7 @@
 CC = g++
 CXXFLAGS += -O3 -std=c++11 -Wall -Wextra -Werror -Wno-reorder -fomit-frame-pointer -pipe -ftree-vectorize -mfpmath=sse -march=native -mtune=native -flto
 LDLIBS += -lpthread -lboost_system -lboost_filesystem -lboost_timer -lncurses
-LDFLAGS += -O3 -std=c++11 -Wall -flto --hash-style=gnu --as-needed
+LDFLAGS += -O1 -std=c++11 -Wall -flto --hash-style=gnu --as-needed
 
 SOURCES = RoboticArm.cpp
 OBJECTS = RoboticArm.o

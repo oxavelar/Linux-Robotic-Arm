@@ -76,23 +76,22 @@ RoboticJoint::~RoboticJoint(void)
 
 void RoboticJoint::Init(void)
 {
-    /* Set the motors running, so the control loop can work on it */
-    Movement->SetSpeed(0);
-    Movement->Start();
     logger << "I: Joint ID " << _id << " is in our home position" << std::endl;
     /* Register our control thread */
     AutomaticControlThread = std::thread(&RoboticJoint::AngularControl, this);
+
+    /* Set the motors running, so the control loop can do real work on it */
+    Movement->Start();
 }
 
 
 double RoboticJoint::GetAngle(void)
 {
-    /*
-     * Adds a big 360 degree chunk in case we have some offset.
-     * Keep in mind that we are reading from the raw sensor.
-     */
+    /* Keep in mind that we are reading from the raw sensor */
     double angle = Position->GetAngle();
-    return std::remainder(angle + 3600.0, 360.0);
+    /* Wrap it on 360 degrees */
+    angle = std::fmod(angle, 360.0) + 360.0;
+    return std::fmod(angle, 360.0);
 }
 
 
@@ -101,15 +100,16 @@ void RoboticJoint::SetAngle(const double &theta)
     /* Update the internal variable, the control loop
      * will take charge of getting us here eventually 
      * theta is in radians so converting from 0 to 360 */
-    double angle = (theta >= 0 ? theta : (2 * M_PI + theta)) * 180.0 / M_PI;
-    _reference_angle = std::remainder(angle, 360.0);
+    double angle = theta * 180.0 / M_PI;
+    /* Wrap it on 360 degrees */
+    angle = std::fmod(angle, 360.0) + 360.0;
+    _reference_angle = std::fmod(angle, 360.0);
 }
 
 
 void RoboticJoint::SetZero(void)
 {
-    /* This will reset the sensors and the internal state
-     * as our zero reference point */
+    /* This will reset the sensors internal references */
     Position->SetZero();
     _reference_angle = GetAngle();
 }
@@ -125,25 +125,26 @@ void RoboticJoint::AngularControl(void)
         const auto k = 0.80;
         /* Internal refernces are in degrees no conversion at all */
         const auto actual_angle = GetAngle();
-        const auto error_angle = actual_angle - _reference_angle;
 
-        /* If the error is negative use it it inversely */
-        const auto sign = (error_angle > 0) ? +1.0 : -1.0;
+        /* Extracts the shortest angle differences */
+        const auto e0 = std::remainder(actual_angle - _reference_angle, 180.0);
+        const auto e1 = std::remainder(_reference_angle - actual_angle, 180.0);
+        /* Picks the smallest rotation */
+        const auto error_angle = (e0 < e1) ? e0 : e1;
 
-        /* The relationship indicate rotation direction */
-        if (sign * _reference_angle > actual_angle)
+        /* The angle that was choosen indicates direction */
+        if (error_angle == e0)
             Movement->SetDirection(Motor::Direction::CCW);
         else
             Movement->SetDirection(Motor::Direction::CW);
-        
+
         /* P-Only control: Store the motor control value */
-        Movement->SetSpeed( k * std::abs(error_angle) + 20.0);
+        Movement->SetSpeed( k * std::abs(error_angle) + 4.0);
         
 #if (DEBUG_LEVEL >= 10)
         logger << "D: Joint ID " << _id << " actual=" << actual_angle << std::endl;
         logger << "D: Joint ID " << _id << " reference=" << _reference_angle << std::endl;
         logger << "D: Joint ID " << _id << " error=" << error_angle << std::endl;
-        logger << "D: Joint ID " << _id << " computed speed=" << k * std::abs(error_angle) << "%" << std::endl;
         logger << "D: Joint ID " << _id << " measured speed=" << Movement->GetSpeed() << "%" << std::endl;
         logger << std::endl;
 #endif
@@ -176,7 +177,7 @@ RoboticArm::~RoboticArm(void)
 void RoboticArm::CalibrateMovement(void)
 {
     double difference;
-    const double delta = 0.05;
+    const double delta = 0.02;
 
     /* Perform the initialization for each of the joints */
     for(auto id = 0; id < _joints_nr; id++) {
@@ -204,7 +205,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->GetAngle();
             joint->Movement->Start();
-            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
             joint->Movement->Stop();
             difference = std::abs(joint->GetAngle() - old);
             
@@ -224,7 +225,7 @@ void RoboticArm::CalibrateMovement(void)
             joint->Movement->SetSpeed(min_speed);
             auto old = joint->GetAngle();
             joint->Movement->Start();
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
             joint->Movement->Stop();
             difference = std::abs(joint->GetAngle() - old);
             
@@ -313,7 +314,7 @@ void RoboticArm::GetPosition(Point &pos)
     /* Temporary working matrix to fill sensor data */
     std::vector<double> theta;
     
-    /* Fill our N joints angles in our temporary matrix in radians */
+    /* Fill our N joints angles in radians */
     for(auto id = 0; id < _joints_nr; id++) {
         theta.push_back( joints[id]->GetAngle() / 180.0 * M_PI );
     }

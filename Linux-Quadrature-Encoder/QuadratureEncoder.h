@@ -50,7 +50,7 @@ class QuadratureEncoder
         const signed char _qem[16] = {0,-1,1,'x',1,0,'x',-1,-1,'x',0,1,'x',1,-1,0};
 
         /* Internal state variables */
-        std::atomic<int> _counter;
+        std::atomic<long> _counter;
         std::chrono::nanoseconds _pulse_period_ns;
         std::atomic<Direction> _direction;
         
