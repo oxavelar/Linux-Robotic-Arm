@@ -92,7 +92,7 @@ double RoboticJoint::GetAngle(void)
      * Keep in mind that we are reading from the raw sensor.
      */
     double angle = Position->GetAngle();
-    return std::remainder(angle + 2160.0, 360.0);
+    return std::remainder(angle + 3600.0, 360.0);
 }
 
 
@@ -122,7 +122,7 @@ void RoboticJoint::AngularControl(void)
     while(!_control_thread_stop_event) {
         
         /* Consists of the interaction between position & movement */
-        const auto k = 8.00;
+        const auto k = 0.80;
         /* Internal refernces are in degrees no conversion at all */
         const auto actual_angle = GetAngle();
         const auto error_angle = actual_angle - _reference_angle;
@@ -137,7 +137,7 @@ void RoboticJoint::AngularControl(void)
             Movement->SetDirection(Motor::Direction::CW);
         
         /* P-Only control: Store the motor control value */
-        Movement->SetSpeed( k * std::abs(error_angle) + 16.0);
+        Movement->SetSpeed( k * std::abs(error_angle) + 20.0);
         
 #if (DEBUG_LEVEL >= 10)
         logger << "D: Joint ID " << _id << " actual=" << actual_angle << std::endl;

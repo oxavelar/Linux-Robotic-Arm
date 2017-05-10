@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
                 double t = point_and_time.second - delta_time;
                 delta_time = point_and_time.second;
 
-                RoboArm->SetPositionSync(p);
+                RoboArm->SetPosition(p);
                 usleep(t * 1E06);
 
         }
